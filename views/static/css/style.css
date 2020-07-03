@@ -8287,7 +8287,7 @@ button.bg-dark:focus {
 
 .mb-5,
 .my-5 {
-    margin-bottom: 3rem;
+    margin-bottom: 3rem !important;
 }
 
 .ml-5,
@@ -10651,9 +10651,8 @@ h5,
 
 @media (max-width: 767.98px) {
     .img-2 {
-        visibility: hidden;
-        /* height: 300px;
-        margin-bottom: 40px; */
+        height: 300px;
+        margin-bottom: 40px;
     }
 }
 
