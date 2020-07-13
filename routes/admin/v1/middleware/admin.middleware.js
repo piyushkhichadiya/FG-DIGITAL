@@ -23,8 +23,8 @@ module.exports = {
                                 return false;
                             }
 
-                            var dbAdminAccount = await firebase.database().ref('/admin').once('value').then(snapshot => { return snapshot.val() });
-                            req.session.dbAdminAccount = dbAdminAccount;
+                            var dbAdminSnapshot = await firebase.database().ref('/admin').once('value').then(snapshot => { return snapshot.val() });
+                            req.session.dbAdminSnapshot = dbAdminSnapshot;
                             req.session.decode_adminAuthToken = token;
                             return true;
                         } else {

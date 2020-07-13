@@ -25,6 +25,9 @@ adminAPI.use('/user', require('./v1/components/user'));
 // 2. ADMIN PROFILE
 adminAPI.use('/profile', require('./v1/components/profile'));
 
+// 3. PLAN
+adminAPI.use('/plan', require('./v1/components/plan'));
+
 adminAPI.use('*', (req, res) => {
     return response(res, 400, 'unknownApi', 'The API that the request is calling is not recognized.', undefined, 'A-API');
 });
