@@ -8,6 +8,13 @@ const profileAPI = require('express').Router(),
 //----------------------------- CONFIGURATION ------------------------------
 
 //---------------------------- GLOBAL VARIABLE -----------------------------
+var dbAdminSnapshot, adminAuthToken, dbUser;
+profileAPI.use((req, res, next) => {
+    dbAdminSnapshot = req.session.dbAdminSnapshot
+    adminAuthToken = req.session.decode_adminAuthToken
+    dbUser = dbAdminSnapshot.users[adminAuthToken.user_key];
+    next();
+});
 
 //--------------------------------- ROUTES ---------------------------------
 
@@ -16,9 +23,6 @@ const profileAPI = require('express').Router(),
 
 // 2.1 GET PROFILE 
 profileAPI.get('/', (req, res) => {
-    var dbAdminAccount = req.session.dbAdminAccount,
-        adminAuthToken = req.session.decode_adminAuthToken,
-        dbUser = dbAdminAccount.users[adminAuthToken.user_key];
 
     var postData = {
         email: dbUser.email,
@@ -32,9 +36,6 @@ profileAPI.get('/', (req, res) => {
 
 // 2.2 UPDATE PROFILE
 profileAPI.post('/update', (req, res) => {
-    var dbAdminAccount = req.session.dbAdminAccount,
-        adminAuthToken = req.session.decode_adminAuthToken,
-        dbUser = dbAdminAccount.users[adminAuthToken.user_key];
 
     dbUser.lastModifiedOn = String(new Date());
 
@@ -87,9 +88,6 @@ profileAPI.post('/update', (req, res) => {
 
 // 2.3 CHANGE PASSWORD
 profileAPI.post('/password', async(req, res) => {
-    var dbAdminAccount = req.session.dbAdminAccount,
-        adminAuthToken = req.session.decode_adminAuthToken,
-        dbUser = dbAdminAccount.users[adminAuthToken.user_key];
 
     if (!req.body.password) {
         return response(res, 400, 'required', 'Password is required', undefined, 'A-2.3.1');

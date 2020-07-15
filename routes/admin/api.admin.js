@@ -25,7 +25,10 @@ adminAPI.use('/user', require('./v1/components/user'));
 // 2. ADMIN PROFILE
 adminAPI.use('/profile', require('./v1/components/profile'));
 
-// 3. CLIENT PROFILE
+// 3. PLAN
+adminAPI.use('/plan', require('./v1/components/plan'));
+
+// 4. CLIENT PROFILE
 adminAPI.use('/client', require('./v1/components/client'));
 
 adminAPI.use('*', (req, res) => {
