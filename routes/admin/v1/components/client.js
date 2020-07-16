@@ -19,7 +19,7 @@ client.use((req, res, next) => {
 //------------------------------- 4. CLIENT -------------------------------
 
 //4.1 CREATE CLIENT ID
-client.post('/create', async(req, res) => {
+client.post('/create', (req, res) => {
     if (!req.body.name || !req.body.email || !req.body.password) {
         return response(res, 400, 'Body required', 'name,email or password missing', undefined, 'A-4.1.1')
     }
@@ -28,7 +28,7 @@ client.post('/create', async(req, res) => {
         password = String(req.body.password)
 
     if (!regex.email(email)) {
-        return response(res, 400, 'Invalid', 'Email value is invalid', undefined, 'A-4.1.3')
+        return response(res, 400, 'invalid', 'Email value is invalid', undefined, 'A-4.1.2')
     }
     var pushData = {
         name: name,
@@ -42,10 +42,10 @@ client.post('/create', async(req, res) => {
             clientKey = Object.keys(clientDB)
         for (var i = 0; i < clientKey.length; i++) {
             if (clientDB[clientKey[i]].email == email) {
-                return response(res, 403, 'Forbidden', 'Client With This Email Is Already Exist', undefined, 'A-4.1.4')
+                return response(res, 403, 'forbidden', 'Client With This Email Is Already Exist', undefined, 'A-4.1.3')
             } else if (i == clientKey.length - 1) {
                 firebase.database().ref('/admin/clients/').push(pushData)
-                return response(res, 200, 'success', 'User created successfully', undefined, 'A-4.1.5')
+                return response(res, 200, 'success', 'User created successfully', undefined, 'A-4.1.4')
             }
         }
 
@@ -57,17 +57,17 @@ client.post('/create', async(req, res) => {
 })
 
 //4.2 Profile Update
-client.post('/update', async(req, res) => {
+client.post('/update', (req, res) => {
     var pushData = {}
     if (dbAdminSnapshot.clients) {
         var clientDB = dbAdminSnapshot.clients,
             clientKey = Object.keys(clientDB)
         if (!req.body.clientID) {
-            return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.2.1')
+            return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.2.1')
         }
         var clientID = String(req.body.clientID).trim()
         if (!clientKey.includes(clientID)) {
-            return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.2.2')
+            return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.2.2')
         }
         if (req.body.name) {
             var name = String(req.body.name).trim()
@@ -77,13 +77,12 @@ client.post('/update', async(req, res) => {
             var email = String(req.body.email).trim().toLowerCase()
             for (var i = 0; i < clientKey.length; i++) {
                 if (clientDB[clientKey[i]].email == email && !clientDB[clientKey[i]].deleted) {
-                    return response(res, 403, 'Forbidden', 'Client With This Email Is Already Exist', undefined, 'A-4.2.3')
+                    return response(res, 403, 'forbidden', 'Client With This Email Is Already Exist', undefined, 'A-4.2.3')
                 } else if (i == clientKey.length - 1) {
                     pushData.email = email
                 }
             }
         }
-        console.log(pushData, !clientDB[clientID].deleted);
         if (pushData && !clientDB[clientID].deleted) {
             pushData.lastModifiedOn = String(new Date())
             pushData.lastModifiedBy = "ADMIN"
@@ -91,53 +90,53 @@ client.post('/update', async(req, res) => {
                 return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.2.4')
             })
         } else {
-            return response(res, 404, 'Forbidden', undefined, undefined, 'A-4.2.5')
+            return response(res, 404, 'forbidden', undefined, undefined, 'A-4.2.5')
 
         }
     } else {
-        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.2.6')
+        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.2.6')
 
     }
 
 });
 
 // 4.3 DELETE CLIENT
-client.post('/delete', async(req, res) => {
+client.post('/delete', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.3.1')
+        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.3.1')
     }
     var clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB),
         clientID = String(req.body.clientID).trim()
     if (!req.body.clientID || !clientKey.includes(clientID)) {
-        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.3.2')
+        return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.3.2')
     }
 
     if (!clientDB[clientID].deleted) {
-        firebase.database().ref(`/admin/clients/${clientID}/`).update({ "deleted": true, "lastModifiedOn": String(new Date()), "lastModifiedBy": String(new Date()) }).then(() => {
+        firebase.database().ref(`/admin/clients/${clientID}/`).update({ "deleted": true, "lastModifiedOn": String(new Date()), "lastModifiedBy": "ADMIN" }).then(() => {
             return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.3.3')
         })
     } else {
-        return response(res, 403, 'Forbidden', 'Client Account is already deleted', undefined, 'A-4.3.4')
+        return response(res, 403, 'forbidden', 'Client Account is already deleted', undefined, 'A-4.3.4')
     }
 
 });
 
 // 4.4 ADD PLAN
-client.post('/addplan', async(req, res) => {
+client.post('/plan/add', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.4.1')
+        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.4.1')
     }
     var pushData = {},
         clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB),
-        plan_id = String(new Date().getTime()) + randomIntDigit(0, 999)
+        plan_id = Math.floor(new Date().valueOf() * Math.random())
     if (!req.body.plan || !req.body.planstartdate || !req.body.duration || !req.body.clientID) {
-        return response(res, 400, 'Invalid', 'Input Data properly', undefined, 'A-4.4.2')
+        return response(res, 400, 'invalid', 'Input Data properly', undefined, 'A-4.4.2')
     }
     var clientID = String(req.body.clientID).trim()
     if (!clientKey.includes(clientID)) {
-        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.4.3')
+        return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.4.3')
     }
     var plan = String(req.body.plan),
         startDate = String(req.body.planstartdate),
@@ -145,14 +144,14 @@ client.post('/addplan', async(req, res) => {
     if (req.body.price) {
         var price = String(req.body.price)
         if (isNaN(price)) {
-            return response(res, 400, 'Invalid', 'Price Value Invalid', undefined, 'A-4.4.4')
+            return response(res, 400, 'invalid', 'Price Value invalid', undefined, 'A-4.4.4')
         }
         pushData = {
             price: price
         }
     }
     if (isNaN(duration)) {
-        return response(res, 400, 'Invalid', 'Duration Value Invalid', undefined, 'A-4.4.5')
+        return response(res, 400, 'invalid', 'Duration Value invalid', undefined, 'A-4.4.5')
     }
     pushData = {
         startdate: startDate,
@@ -160,7 +159,7 @@ client.post('/addplan', async(req, res) => {
         duration: duration,
         createdBy: "ADMIN",
         createdOn: String(new Date()),
-        plan_id: plan_id
+        project_id: plan_id
     }
     firebase.database().ref(`/admin/clients/${clientID}/plans/`).push(pushData).then(() => {
         return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.4.6')
@@ -168,22 +167,22 @@ client.post('/addplan', async(req, res) => {
 });
 
 // 4.5 UPDATE PLAN
-client.post('/updateplan', async(req, res) => {
+client.post('/plan/update', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.5.1')
+        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.5.1')
     }
     var clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB),
         clientID = String(req.body.clientID),
         pushData = {}
     if (!req.body.clientID || !clientKey.includes(clientID)) {
-        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.5.2')
+        return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.5.2')
     }
     var planDB = clientDB[clientID].plans,
         planKey = Object.keys(planDB),
         planID = String(req.body.planID)
     if (!req.body.planID || !planKey.includes(planID)) {
-        return response(res, 400, 'Invalid', 'Invalid Plan Key', undefined, 'A-4.5.2')
+        return response(res, 400, 'invalid', 'invalid Plan Key', undefined, 'A-4.5.2')
     }
     if (req.body.plan) {
         var plan = String(req.body.plan)
@@ -196,14 +195,14 @@ client.post('/updateplan', async(req, res) => {
     if (req.body.duration) {
         var duration = String(req.body.duration)
         if (isNaN(duration)) {
-            return response(res, 400, 'Invalid', 'Duration Value Invalid', undefined, 'A-4.5.4')
+            return response(res, 400, 'invalid', 'Duration Value invalid', undefined, 'A-4.5.4')
         }
         pushData.duration = duration
     }
     if (req.body.price) {
         var price = String(req.body.price)
         if (isNaN(price)) {
-            return response(res, 400, 'Invalid', 'Price Value Invalid', undefined, 'A-4.5.7')
+            return response(res, 400, 'invalid', 'Price Value invalid', undefined, 'A-4.5.7')
         }
         pushData.price = price
     }
@@ -212,19 +211,19 @@ client.post('/updateplan', async(req, res) => {
         pushData.lastModifiedOn = String(new Date())
         pushData.lastModifiedBy = "ADMIN"
         firebase.database().ref(`/admin/clients/${clientID}/plans/${planID}/`).update(pushData).then(() => {
-            return response(res, 200, 'Success', 'Plan Successfully Updated', undefined, 'A-4.5.8')
+            return response(res, 200, 'success', 'Plan Successfully Updated', undefined, 'A-4.5.8')
         })
     } else {
-        return response(res, 403, 'Forbidden', 'Plan Is Deleted Or Not Available', undefined, 'A-4.5.9')
+        return response(res, 403, 'forbidden', 'Plan Is Deleted Or Not Available', undefined, 'A-4.5.9')
     }
 
 
 });
 
 // 4.6 DELETE PLAN
-client.post('/removeplan', async(req, res) => {
+client.post('/plan/remove', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.6.1')
+        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.6.1')
     }
     var clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB),
@@ -235,16 +234,16 @@ client.post('/removeplan', async(req, res) => {
             lastModifiedBy: "ADMIN"
         }
     if (!req.body.clientID || !clientKey.includes(clientID)) {
-        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.6.2')
+        return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.6.2')
     }
     var planDB = clientDB[clientID].plans,
         planKey = Object.keys(planDB),
         planID = String(req.body.planID)
     if (!req.body.planID || !planKey.includes(planID)) {
-        return response(res, 400, 'Invalid', 'Invalid Plan Key', undefined, 'A-4.6.3')
+        return response(res, 400, 'invalid', 'invalid Plan Key', undefined, 'A-4.6.3')
     }
     firebase.database().ref(`/admin/clients/${clientID}/plans/${planID}/`).update(pushData).then(() => {
-        return response(res, 200, 'Success', 'Plan Successfully Removed', undefined, 'A-4.6.4')
+        return response(res, 200, 'success', 'Plan Successfully Removed', undefined, 'A-4.6.4')
     })
 
 })
