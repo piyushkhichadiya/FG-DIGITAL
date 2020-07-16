@@ -1,6 +1,6 @@
 const client = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response } = require('../functions/functions'),
+    { response, randomIntDigit } = require('../functions/functions'),
     fs = require('fs'),
     regex = require('../functions/regex')
 
@@ -8,7 +8,12 @@ const client = require('express').Router(),
 //----------------------------- CONFIGURATION ------------------------------
 
 //---------------------------- GLOBAL VARIABLE -----------------------------
-
+var dbAdminSnapshot, adminAuthToken;
+client.use((req, res, next) => {
+    dbAdminSnapshot = req.session.dbAdminSnapshot
+    adminAuthToken = req.session.decode_adminAuthToken
+    next();
+});
 //--------------------------------- ROUTES ---------------------------------
 
 //------------------------------- 4. CLIENT -------------------------------
@@ -18,143 +23,230 @@ client.post('/create', async(req, res) => {
     if (!req.body.name || !req.body.email || !req.body.password) {
         return response(res, 400, 'Body required', 'name,email or password missing', undefined, 'A-4.1.1')
     }
-    var name = String(req.body.name),
-        email = String(req.body.email),
+    var name = String(req.body.name).trim(),
+        email = String(req.body.email).trim().toLowerCase(),
         password = String(req.body.password)
-    if (!regex.text(name)) {
-        return response(res, 400, 'Invalid', 'Name invalid', undefined, 'A-4.1.2')
-    }
+
     if (!regex.email(email)) {
         return response(res, 400, 'Invalid', 'Email value is invalid', undefined, 'A-4.1.3')
     }
     var pushData = {
-        name: name.trim(),
-        email: email.trim(),
-        password: password.trim(),
+        name: name,
+        email: email,
+        password: password,
         createdOn: String(new Date()),
-        createdBy: "Admin"
+        createdBy: "ADMIN"
     }
-    await firebase.database().ref('/admin/clients/').once('value', (snapshot) => {
-        if (snapshot) {
-            var clientDB = snapshot.val(),
-                clientKey = Object.keys(clientDB)
-            for (var i = 0; i < clientKey.length; i++) {
-                if (clientDB[clientKey[i]].email == email) {
-                    return response(res, 403, 'Forbidden', 'Client With This Email Is Already Exist', , undefined, 'A-4.1.4')
-                } else if (i == clientKey.length - 1) {
-                    firebase.database().ref('/admin/clients/').push(pushData)
-                    return response(res, 200, 'success', 'User created successfully', undefined, 'A-4.1.5')
-                }
+    if (dbAdminSnapshot.clients) {
+        var clientDB = dbAdminSnapshot.clients,
+            clientKey = Object.keys(clientDB)
+        for (var i = 0; i < clientKey.length; i++) {
+            if (clientDB[clientKey[i]].email == email) {
+                return response(res, 403, 'Forbidden', 'Client With This Email Is Already Exist', undefined, 'A-4.1.4')
+            } else if (i == clientKey.length - 1) {
+                firebase.database().ref('/admin/clients/').push(pushData)
+                return response(res, 200, 'success', 'User created successfully', undefined, 'A-4.1.5')
             }
         }
-    })
 
+    }
+    firebase.database().ref('/admin/clients/').push(pushData).then(() => {
+        return response(res, 200, 'success', 'User created successfully', undefined, 'A-4.1.5')
+
+    })
 })
 
 //4.2 Profile Update
 client.post('/update', async(req, res) => {
-    var pushData = {},
-        snapshot = await firebase.database().ref('/admin/clients/').once('value').then((snapshot) => {
-            if (snapshot.exists()) {
-                return snapshot.val()
-            }
-        }),
-        clientDB = snapshot,
-        clientKey = Object.keys(clientDB)
-    if (!req.body.clientID) {
-        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.1.6')
-    }
-    var clientID = String(req.body.clientID).trim()
-    if (snapshot) {
-        var clientID = req.body.clientID
+    var pushData = {}
+    if (dbAdminSnapshot.clients) {
+        var clientDB = dbAdminSnapshot.clients,
+            clientKey = Object.keys(clientDB)
+        if (!req.body.clientID) {
+            return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.2.1')
+        }
+        var clientID = String(req.body.clientID).trim()
         if (!clientKey.includes(clientID)) {
-            return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.1.7')
+            return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.2.2')
         }
-    }
-
-    if (req.body.name) {
-        var name = String(req.body.name)
-        if (!regex.text(name)) {
-            return response(res, 400, 'Invalid', 'Name invalid', undefined, 'A-4.1.8')
+        if (req.body.name) {
+            var name = String(req.body.name).trim()
+            pushData.name = name
         }
-        pushData.name = name
-    }
-    if (req.body.email) {
-        var email = String(req.body.email)
-        if (!regex.email(email)) {
-            return response(res, 400, 'Invalid', 'Email Invalid', undefined, 'A-4.1.9')
-        }
-
-        if (snapshot) {
-
+        if (req.body.email) {
+            var email = String(req.body.email).trim().toLowerCase()
             for (var i = 0; i < clientKey.length; i++) {
                 if (clientDB[clientKey[i]].email == email && !clientDB[clientKey[i]].deleted) {
-                    return response(res, 403, 'Forbidden', 'Client With This Email Is Already Exist', undefined, 'A-4.1.10')
+                    return response(res, 403, 'Forbidden', 'Client With This Email Is Already Exist', undefined, 'A-4.2.3')
                 } else if (i == clientKey.length - 1) {
                     pushData.email = email
                 }
             }
         }
+        console.log(pushData, !clientDB[clientID].deleted);
+        if (pushData && !clientDB[clientID].deleted) {
+            pushData.lastModifiedOn = String(new Date())
+            pushData.lastModifiedBy = "ADMIN"
+            firebase.database().ref(`/admin/clients/${clientID}/`).update(pushData).then(() => {
+                return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.2.4')
+            })
+        } else {
+            return response(res, 404, 'Forbidden', undefined, undefined, 'A-4.2.5')
+
+        }
+    } else {
+        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.2.6')
+
+    }
+
+});
+
+// 4.3 DELETE CLIENT
+client.post('/delete', async(req, res) => {
+    if (!dbAdminSnapshot.clients) {
+        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.3.1')
+    }
+    var clientDB = dbAdminSnapshot.clients,
+        clientKey = Object.keys(clientDB),
+        clientID = String(req.body.clientID).trim()
+    if (!req.body.clientID || !clientKey.includes(clientID)) {
+        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.3.2')
+    }
+
+    if (!clientDB[clientID].deleted) {
+        firebase.database().ref(`/admin/clients/${clientID}/`).update({ "deleted": true, "lastModifiedOn": String(new Date()), "lastModifiedBy": String(new Date()) }).then(() => {
+            return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.3.3')
+        })
+    } else {
+        return response(res, 403, 'Forbidden', 'Client Account is already deleted', undefined, 'A-4.3.4')
+    }
+
+});
+
+// 4.4 ADD PLAN
+client.post('/addplan', async(req, res) => {
+    if (!dbAdminSnapshot.clients) {
+        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.4.1')
+    }
+    var pushData = {},
+        clientDB = dbAdminSnapshot.clients,
+        clientKey = Object.keys(clientDB),
+        plan_id = String(new Date().getTime()) + randomIntDigit(0, 999)
+    if (!req.body.plan || !req.body.planstartdate || !req.body.duration || !req.body.clientID) {
+        return response(res, 400, 'Invalid', 'Input Data properly', undefined, 'A-4.4.2')
+    }
+    var clientID = String(req.body.clientID).trim()
+    if (!clientKey.includes(clientID)) {
+        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.4.3')
+    }
+    var plan = String(req.body.plan),
+        startDate = String(req.body.planstartdate),
+        duration = String(req.body.duration)
+    if (req.body.price) {
+        var price = String(req.body.price)
+        if (isNaN(price)) {
+            return response(res, 400, 'Invalid', 'Price Value Invalid', undefined, 'A-4.4.4')
+        }
+        pushData = {
+            price: price
+        }
+    }
+    if (isNaN(duration)) {
+        return response(res, 400, 'Invalid', 'Duration Value Invalid', undefined, 'A-4.4.5')
+    }
+    pushData = {
+        startdate: startDate,
+        plan: plan,
+        duration: duration,
+        createdBy: "ADMIN",
+        createdOn: String(new Date()),
+        plan_id: plan_id
+    }
+    firebase.database().ref(`/admin/clients/${clientID}/plans/`).push(pushData).then(() => {
+        return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.4.6')
+    })
+});
+
+// 4.5 UPDATE PLAN
+client.post('/updateplan', async(req, res) => {
+    if (!dbAdminSnapshot.clients) {
+        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.5.1')
+    }
+    var clientDB = dbAdminSnapshot.clients,
+        clientKey = Object.keys(clientDB),
+        clientID = String(req.body.clientID),
+        pushData = {}
+    if (!req.body.clientID || !clientKey.includes(clientID)) {
+        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.5.2')
+    }
+    var planDB = clientDB[clientID].plans,
+        planKey = Object.keys(planDB),
+        planID = String(req.body.planID)
+    if (!req.body.planID || !planKey.includes(planID)) {
+        return response(res, 400, 'Invalid', 'Invalid Plan Key', undefined, 'A-4.5.2')
     }
     if (req.body.plan) {
         var plan = String(req.body.plan)
         pushData.plan = plan
     }
-    if (req.body.price) {
-        var price = String(req.body.price)
-        if (!regex.regexNumber(price)) {
-            return response(res, 400, 'Invalid', 'Price Value Invalid', undefined, 'A-4.1.11')
-        }
-        pushData.price = price
-    }
-    if (req.body.planStartDate) {
-        var startDate = String(req.body.planStartDate)
-        pushData.startDate = startDate
+    if (req.body.startdate) {
+        var startdate = String(req.body.startdate)
+        pushData.startdate = startdate
     }
     if (req.body.duration) {
         var duration = String(req.body.duration)
-        pushData.duration = duration
-        if (!regex.regexNumber(duration)) {
-            return response(res, 400, 'Invalid', 'Duration Value Invalid', undefined, 'A-4.1.12')
+        if (isNaN(duration)) {
+            return response(res, 400, 'Invalid', 'Duration Value Invalid', undefined, 'A-4.5.4')
         }
+        pushData.duration = duration
     }
-    if (pushData) {
+    if (req.body.price) {
+        var price = String(req.body.price)
+        if (isNaN(price)) {
+            return response(res, 400, 'Invalid', 'Price Value Invalid', undefined, 'A-4.5.7')
+        }
+        pushData.price = price
+    }
+
+    if (!clientDB[clientID].plans[planID].deleted) {
         pushData.lastModifiedOn = String(new Date())
-        pushData.lastModifiedBy = "Admin"
-
-        firebase.database().ref(`/admin/clients/${clientID}/`).update(pushData).then(() => {
-            return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.1.13')
-
+        pushData.lastModifiedBy = "ADMIN"
+        firebase.database().ref(`/admin/clients/${clientID}/plans/${planID}/`).update(pushData).then(() => {
+            return response(res, 200, 'Success', 'Plan Successfully Updated', undefined, 'A-4.5.8')
         })
+    } else {
+        return response(res, 403, 'Forbidden', 'Plan Is Deleted Or Not Available', undefined, 'A-4.5.9')
     }
+
+
 });
 
-//4.3 DELETE CLIENT
-client.post('/delete', async(req, res) => {
-    var snapshot = await firebase.database().ref('/admin/clients/').once('value').then((snapshot) => {
-            if (snapshot.exists()) {
-                return snapshot.val()
-            }
-        }),
-        clientDB = snapshot,
-        clientKey = Object.keys(clientDB)
-    if (!req.body.clientID) {
-        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.1.14')
+// 4.6 DELETE PLAN
+client.post('/removeplan', async(req, res) => {
+    if (!dbAdminSnapshot.clients) {
+        return response(res, 404, 'Forbidden', 'Not Found Client', undefined, 'A-4.6.1')
     }
-    var clientID = String(req.body.clientID).trim()
-    if (snapshot) {
-        var clientID = req.body.clientID
-        if (!clientKey.includes(clientID)) {
-            return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.1.15')
+    var clientDB = dbAdminSnapshot.clients,
+        clientKey = Object.keys(clientDB),
+        clientID = String(req.body.clientID),
+        pushData = {
+            deleted: true,
+            lastModifiedOn: String(new Date()),
+            lastModifiedBy: "ADMIN"
         }
-        if (clientDB[clientID].deleted) {
-            return response(res, 403, 'Forbidden', 'Client Account is already deleted', undefined, 'A-4.1.16')
-
-        }
+    if (!req.body.clientID || !clientKey.includes(clientID)) {
+        return response(res, 400, 'Invalid', 'Invalid Client Key', undefined, 'A-4.6.2')
     }
-    firebase.database().ref(`/admin/clients/${clientID}/`).update({ "deleted": true }).then(() => {
-        return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.1.17')
-
+    var planDB = clientDB[clientID].plans,
+        planKey = Object.keys(planDB),
+        planID = String(req.body.planID)
+    if (!req.body.planID || !planKey.includes(planID)) {
+        return response(res, 400, 'Invalid', 'Invalid Plan Key', undefined, 'A-4.6.3')
+    }
+    firebase.database().ref(`/admin/clients/${clientID}/plans/${planID}/`).update(pushData).then(() => {
+        return response(res, 200, 'Success', 'Plan Successfully Removed', undefined, 'A-4.6.4')
     })
+
 })
+
 module.exports = client;
