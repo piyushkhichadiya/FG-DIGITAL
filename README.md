@@ -15,8 +15,10 @@ npm i
 Open secrets.js in config/ directory and paste your admin SDK from the firebase console. and set other secrets accordingly.
 
 ## Start
+Replace with prod or production for production environment
 
 ```bash
+set NODE_ENV=dev
 npm start
 ```
 
