@@ -158,7 +158,7 @@ client.post('/plan/add', (req, res) => {
         return response(res, 400, 'invalid', 'Duration Value invalid', undefined, 'A-4.4.5')
     }
     pushData = {
-        startDate: startDate,
+        start_date: startDate,
         plan: plan,
         duration: duration,
         createdBy: "ADMIN",
@@ -197,7 +197,7 @@ client.post('/plan/update', (req, res) => {
             return response(res, 400, 'invalid', 'Invalid Date', undefined, 'A-4.5.5')
         }
         var startDate = String(req.body.start_date)
-        pushData.startDate = startDate
+        pushData.start_date = startDate
     }
     if (req.body.duration) {
         var duration = String(req.body.duration)
