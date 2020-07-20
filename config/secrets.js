@@ -11,17 +11,13 @@ module.exports = {
                 sdk: {
                     // PASTE SDK
                 },
-                databaseURL: {
-                    // PASTE URL
-                }
+                databaseURL: '' // PASTE DATABASE URL HERE
             },
             production: {
                 sdk: {
                     // PASTE SDK
                 },
-                databaseURL: {
-                    // PASTE URL
-                }
+                databaseURL: '' // PASTE DATABASE URL HERE
             }
         }
     }
