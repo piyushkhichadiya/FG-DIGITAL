@@ -1,5 +1,3 @@
-const { storage } = require('firebase-admin');
-
 const profileAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     { response, randomString, storageDirectory, bcryptHash, jwtSign, bcryptHashCompare } = require('../functions/functions'),

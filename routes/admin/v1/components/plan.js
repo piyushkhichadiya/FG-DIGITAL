@@ -1,5 +1,3 @@
-const { Template } = require('ejs');
-
 var planAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     { response } = require('../functions/functions')
