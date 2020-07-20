@@ -1,6 +1,6 @@
 const client = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, randomIntDigit } = require('../functions/functions'),
+    { response, bcryptHash, bcryptHashCompare, randomIntDigit } = require('../functions/functions'),
     fs = require('fs'),
     regex = require('../functions/regex')
 
@@ -18,22 +18,23 @@ client.use((req, res, next) => {
 
 //------------------------------- 4. CLIENT -------------------------------
 
-//4.1 CREATE CLIENT ID
-client.post('/create', (req, res) => {
+// 4.1 CREATE CLIENT ID
+client.post('/create', async(req, res) => {
     if (!req.body.name || !req.body.email || !req.body.password) {
         return response(res, 400, 'Body required', 'name,email or password missing', undefined, 'A-4.1.1')
     }
     var name = String(req.body.name).trim(),
         email = String(req.body.email).trim().toLowerCase(),
         password = String(req.body.password)
-
+    password = await bcryptHash(password)
     if (!regex.email(email)) {
         return response(res, 400, 'invalid', 'Email value is invalid', undefined, 'A-4.1.2')
     }
+
     var pushData = {
         name: name,
         email: email,
-        password: password,
+        password: bcryptHash(password),
         createdOn: String(new Date()),
         createdBy: "ADMIN"
     }
@@ -56,7 +57,7 @@ client.post('/create', (req, res) => {
     })
 })
 
-//4.2 Profile Update
+// 4.2 Profile Update
 client.post('/update', (req, res) => {
     var pushData = {}
     if (dbAdminSnapshot.clients) {
@@ -131,7 +132,7 @@ client.post('/plan/add', (req, res) => {
         clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB),
         plan_id = Math.floor(new Date().valueOf() * Math.random())
-    if (!req.body.plan || !req.body.planstartdate || !req.body.duration || !req.body.clientID) {
+    if (!req.body.plan || !req.body.start_date || !req.body.duration || !req.body.clientID) {
         return response(res, 400, 'invalid', 'Input Data properly', undefined, 'A-4.4.2')
     }
     var clientID = String(req.body.clientID).trim()
@@ -139,8 +140,11 @@ client.post('/plan/add', (req, res) => {
         return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.4.3')
     }
     var plan = String(req.body.plan),
-        startDate = String(req.body.planstartdate),
+        startDate = String(req.body.start_date),
         duration = String(req.body.duration)
+    if (String(new Date(startDate)) == "Invalid Date") {
+        return response(res, 400, 'invalid', 'Invalid Date', undefined, 'A-4.5.7')
+    }
     if (req.body.price) {
         var price = String(req.body.price)
         if (isNaN(price)) {
@@ -154,7 +158,7 @@ client.post('/plan/add', (req, res) => {
         return response(res, 400, 'invalid', 'Duration Value invalid', undefined, 'A-4.4.5')
     }
     pushData = {
-        startdate: startDate,
+        startDate: startDate,
         plan: plan,
         duration: duration,
         createdBy: "ADMIN",
@@ -182,15 +186,18 @@ client.post('/plan/update', (req, res) => {
         planKey = Object.keys(planDB),
         planID = String(req.body.planID)
     if (!req.body.planID || !planKey.includes(planID)) {
-        return response(res, 400, 'invalid', 'invalid Plan Key', undefined, 'A-4.5.2')
+        return response(res, 400, 'invalid', 'invalid Plan Key', undefined, 'A-4.5.3')
     }
     if (req.body.plan) {
         var plan = String(req.body.plan)
         pushData.plan = plan
     }
-    if (req.body.startdate) {
-        var startdate = String(req.body.startdate)
-        pushData.startdate = startdate
+    if (req.body.start_date) {
+        if (String(new Date(req.body.start_date)) == "Invalid Date") {
+            return response(res, 400, 'invalid', 'Invalid Date', undefined, 'A-4.5.5')
+        }
+        var startDate = String(req.body.start_date)
+        pushData.startDate = startDate
     }
     if (req.body.duration) {
         var duration = String(req.body.duration)
