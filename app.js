@@ -66,6 +66,7 @@ app.use('/client/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS'
 app.get('/', (req, res) => { res.sendFile(process.cwd() + '/views/static/index.html') })
 app.use('/admin', require('./routes/admin/adminView.route'))
 app.use('/employee', require('./routes/employee/employeeView.route.js'))
+app.use('/client', require('./routes/client/clientView.route.js'))
 
 app.use('*', (req, res) => { return res.redirect('/') })
 
