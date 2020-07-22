@@ -55,7 +55,7 @@ client.post('/create', async(req, res) => {
         return response(res, 200, 'success', 'User created successfully', undefined, 'A-4.1.5')
 
     })
-})
+});
 
 // 4.2 Profile Update
 client.post('/update', (req, res) => {
@@ -253,6 +253,6 @@ client.post('/plan/remove', (req, res) => {
         return response(res, 200, 'success', 'Plan Successfully Removed', undefined, 'A-4.6.4')
     })
 
-})
+});
 
 module.exports = client;

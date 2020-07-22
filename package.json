@@ -4,6 +4,7 @@
     "description": "FG Digital Client, Employee and Admin Management Portal",
     "main": "index.js",
     "scripts": {
+        "pretest": "eslint --ignore-path .gitignore .",
         "start": "nodemon server.js"
     },
     "author": "Smit Luvani, Jenil Narola",
@@ -21,5 +22,8 @@
         "jsonwebtoken": "^8.5.1",
         "nodemailer": "^6.4.10",
         "nodemon": "^2.0.4"
+    },
+    "devDependencies": {
+        "eslint": "^7.5.0"
     }
 }

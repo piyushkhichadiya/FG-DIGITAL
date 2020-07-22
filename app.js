@@ -4,15 +4,12 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     session = require('express-session'),
     multipartParser = require('express-fileupload'),
-    cookieParser = require('cookie-parser');
+    cookieParser = require('cookie-parser')
 
 //----------------------------- CONFIGURATION -------------------------------
 
 // Set View File Type and Engine
-app.set('views', path.join(__dirname, 'views'));
-app.engine('html', require('ejs').renderFile);
-app.set('view engine', 'ejs');
-app.use(express.static('./views/static'));
+app.use(express.static('./views/static'))
 
 // Syntax Error Handling [ex. JSON]
 app.use(bodyParser.json(), (error, req, res, next) => {
@@ -36,17 +33,17 @@ app.use((req, res, next) => {
 })
 
 // Multipart Body Parsing [JSON BODY, FILE(s)]
-app.use(multipartParser());
+app.use(multipartParser())
 
 // Basic Directory Generate
 const directory_gen = require('./config/directory');
-directory_gen('admin');
+directory_gen('admin')
 
 //----------------------------- DATABASE -------------------------------
-var firebase = require('./config/database');
-var obj_firebase = new firebase();
-obj_firebase.initialization();
-// console.log(obj_firebase.status());
+var firebase = require('./config/database')
+var obj_firebase = new firebase()
+obj_firebase.initialization()
+    // console.log(obj_firebase.status());
 
 //------------------------- SESSION & COOKIE ---------------------------
 
@@ -61,14 +58,15 @@ app.use(session({ secret: 'MY-SECRET', resave: true, saveUninitialized: true, co
 // APIs
 
 // v1
-app.use('/admin/v1', require('./routes/admin/api.admin'));
-app.use('/employee/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS') });
-app.use('/client/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS') });
+app.use('/admin/v1', require('./routes/admin/api.admin'))
+app.use('/employee/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS') })
+app.use('/client/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS') })
 
 // Views
+app.get('/', (req, res) => { res.sendFile(process.cwd() + '/views/static/index.html') })
+app.use('/admin', require('./routes/admin/adminView.route'))
+app.use('/employee', require('./routes/employee/employeeView.route.js'))
 
-app.use('/', (req, res) => { return res.redirect('index.html') })
-
-app.use('*', (req, res) => { return res.redirect('/') });
+app.use('*', (req, res) => { return res.redirect('/') })
 
 module.exports = app;
