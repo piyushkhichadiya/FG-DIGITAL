@@ -1,4 +1,4 @@
-var planAPI = require('express').Router(),
+const planAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     { response } = require('../functions/functions')
 

@@ -28,8 +28,17 @@ adminAPI.use('/profile', require('./v1/components/profile'));
 // 3. PLAN
 adminAPI.use('/plan', require('./v1/components/plan'));
 
-// 4. CLIENT PROFILE
+// 4. CLIENT
 adminAPI.use('/client', require('./v1/components/client'));
+
+// 5. EMPLOYEE
+adminAPI.use('/employee', require('./v1/components/employee'));
+
+// 6. CLIENT PROJECTS
+// adminAPI.use('/project');
+
+// 7. SERVICES
+// adminAPI.use('/service');
 
 adminAPI.use('*', (req, res) => {
     return response(res, 400, 'unknownApi', 'The API that the request is calling is not recognized.', undefined, 'A-API');
