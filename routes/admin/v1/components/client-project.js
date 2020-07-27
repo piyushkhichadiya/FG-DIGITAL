@@ -7,7 +7,7 @@ const projectAPI = require('express').Router(),
 
 //---------------------------- GLOBAL VARIABLE -----------------------------
 var dbAdminSnapshot, adminAuthToken;
-client.use((req, res, next) => {
+projectAPI.use((req, res, next) => {
     dbAdminSnapshot = req.session.dbAdminSnapshot
     adminAuthToken = req.session.decode_adminAuthToken
     next();
