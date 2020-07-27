@@ -8,8 +8,8 @@ var express = require('express'),
 
 //----------------------------- CONFIGURATION -------------------------------
 
-// Set View File Type and Engine
-app.use(express.static('./views/static'))
+// Set Static Assets
+app.use(express.static('./public/static'))
 
 // Syntax Error Handling [ex. JSON]
 app.use(bodyParser.json(), (error, req, res, next) => {
