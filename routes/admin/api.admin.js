@@ -35,7 +35,7 @@ adminAPI.use('/client', require('./v1/components/client'));
 adminAPI.use('/employee', require('./v1/components/employee'));
 
 // 6. CLIENT PROJECTS
-// adminAPI.use('/project');
+adminAPI.use('/project', require('./v1/components/client-project'));
 
 // 7. SERVICES
 // adminAPI.use('/service');
