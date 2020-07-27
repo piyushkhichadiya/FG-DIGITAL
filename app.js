@@ -38,6 +38,7 @@ app.use(multipartParser())
 // Basic Directory Generate
 const directory_gen = require('./config/directory');
 directory_gen('admin')
+directory_gen('employee')
 
 //----------------------------- DATABASE -------------------------------
 var firebase = require('./config/database')
