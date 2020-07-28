@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Add Plan - FG Digital</title>
+  <title>Client Info - FG Digital</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -121,12 +121,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Add Plan</h1>
+            <h1>Client Info</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="javascript:void(0);">Plan</a></li>
-              <li class="breadcrumb-item active">Add Plan</li>
+              <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+              <li class="breadcrumb-item active">Client Info</li>
             </ol>
           </div>
         </div>
@@ -137,33 +137,46 @@
     <section class="content">
       <div class="container-fluid">
         <div class="card-body card">
-        <div class="row">
-           	<label for="inputEmail3" class="col-md-2 col-form-label">Plan Name:</label>
-	        <div class="col-md-3">
-	            <input type="text" class="form-control" id="inputEmail3" placeholder="Plan">
+          <h4 class="header-title">Basic Info</h4>
+          <div class="row">
+              <label for="inputEmail3" class="col-md-2 col-form-label">Name:</label>
+              <div class="col-md-3">
+                <input type="text" class="form-control" id="inputEmail3" placeholder="Name">
+              </div>
+          </div>
+          <div class="row mt-2">
+              <label for="inputEmail3" class="col-md-2 col-form-label">Email:</label>
+              <div class="col-md-3">
+                <input type="email" class="form-control" id="inputEmail3" placeholder="Enter Email">
+              </div>
+          </div>
+          <div class="row mt-2">
+              <label for="inputEmail3" class="col-md-2 col-form-label">Contact:</label>
+              <div class="col-md-3">
+                <input type="text" class="form-control" id="inputEmail3" placeholder="Contact">
+              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-5">
+              <button class="btn btn-outline-primary mt-2 float-right">Update</button>
             </div>
-         </div>
-         <div class="row">
-           	<label for="inputEmail3" class="col-md-2 mt-2 col-form-label">Amount:</label>
-	        <div class="col-md-3">
-	            <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="Amount">
-            </div>
-         </div>
-         <div class="row">
-           	<label for="inputEmail3" class="col-md-2 mt-2 col-form-label">Days:</label>
-	        <div class="col-md-3">
-	            <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="Days">
-            </div>
-         </div>
-         <div class="row">
-         	<div class="col-md-12 mt-4">
-         		<button class="btn btn-outline-primary float-right mr-2 ml-2">Add</button>
-	         	<button class="btn btn-outline-primary float-right ml-2">Update</button>
-	         	<button class="btn btn-outline-primary float-right">Remove</button>
-	         	
-         	</div>
-         </div>
-      </div>
+          </div>
+          <hr>
+          <h4 class="header-title">Change Password</h4>
+          <div class="row">
+               <div class="col-md-3">
+                  <label for="exampleInputPassword1">New Password</label>
+                  <input type="password" class="form-control" placeholder="Enter New Password">
+               </div>   
+               <div class="col-md-3">
+                  <label for="exampleInputPassword1">Confirm Password</label>
+                  <input type="password" class="form-control" placeholder="Confirm Password">
+               </div> 
+              <div class="col-md-2" style="margin-top: 3.2%;">
+                   <button class="btn btn-outline-primary">Update Password</button>
+              </div>
+          </div>
+        </div>
       <!-- Card body -->
       </div>
       <!-- /.container-fluid -->
@@ -200,10 +213,6 @@
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
 <!-- page script -->
+<script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script>
 </body>
-<script>
-  $("#example1").DataTable({
-      "responsive": true,
-    });
-</script>
 </html>
