@@ -1,0 +1,137 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "FG Digital",
+        "description": "Project Management Portal",
+        "version": "1.0.0"
+    },
+    "host": "localhost",
+    "basePath": "/admin/v1",
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "tags": [{
+        "name": "1. User Account",
+        "description": "APIs for user related functionality before get authenticated"
+    }, {
+        "name": "2. Profile",
+        "description": "Admin Profile & Account details"
+    }, {
+        "name": "3. Plan",
+        "description": "Setting up plans to allocate client"
+    }],
+    "paths": {
+        "/user/create": {
+            "post": {
+                "tags": ["1. User Account"],
+                "summary": "Create Admin Account",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "Unique Email address and Password",
+                    "schema": {
+                        "required": ["email", "password"],
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "email": "test@gmail.com",
+                            "password": "my-secret-password",
+                            "remember": true
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/user/login": {
+            "post": {
+
+                "tags": ["1. User Account"],
+                "summary": "Authentication for Access admin panel",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "Email Address and Password",
+                    "schema": {
+                        "required": ["email", "password"],
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            },
+                            "remember": {
+                                "type": "boolean"
+                            }
+                        },
+                        "example": {
+                            "email": "test@gmail.com",
+                            "password": "my-secret-password",
+                            "remember": true
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": ["2. Profile"],
+                "summary": "Authentication for Access admin panel",
+                "responses": {}
+            }
+        },
+        "/profile/update": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "Update Profile Details",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "name",
+                        "in": "formData",
+                        "description": "Username",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "profile_image",
+                        "in": "formData",
+                        "description": "file to upload",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/profile/password": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "Change Password",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["password"],
+                        "properties": {
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        }
+    }
+}
