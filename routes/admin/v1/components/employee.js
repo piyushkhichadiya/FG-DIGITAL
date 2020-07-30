@@ -348,19 +348,19 @@ employeeAPI.post('/social-account/add', (req, res) => {
     if (req.body.employee_id) {
         var employee_id = String(req.body.employee_id)
     } else {
-        return response(res, 400, 'required', 'Employee ID is required')
+        return response(res, 400, 'required', 'Employee ID is required', undefined, 'A-5.6.1')
     }
 
     if (req.body.account_name) {
         var account_name = String(req.body.account_name).trim()
     } else {
-        return response(res, 400, 'required', 'Account Name is required')
+        return response(res, 400, 'required', 'Account Name is required', undefined, 'A-5.6.2')
     }
 
     if (req.body.reference) {
         var reference = String(req.body.reference).trim()
     } else {
-        return response(res, 400, 'required', 'Reference is required')
+        return response(res, 400, 'required', 'Reference is required', undefined, 'A-5.6.3')
     }
 
     // DB
@@ -380,15 +380,15 @@ employeeAPI.post('/social-account/add', (req, res) => {
                 }
 
                 return firebase.database().ref(`/admin/employees/${dbEmployeesKey[i]}/social_accounts`).push(tempObj).then(() => {
-                    return response(res, 200, 'success', 'Social Account added successfully')
+                    return response(res, 200, 'success', 'Social Account added successfully', undefined, 'A-5.6.4')
                 })
 
             } else if (i == dbEmployeesKey.length - 1) {
-                return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, '')
+                return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, 'A-5.6.5')
             }
         }
     } else {
-        return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, '')
+        return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, 'A-5.6.6')
     }
 })
 
@@ -399,13 +399,13 @@ employeeAPI.post('/social-account/update', (req, res) => {
     if (req.body.employee_id) {
         var employee_id = String(req.body.employee_id)
     } else {
-        return response(res, 400, 'required', 'Employee ID is required')
+        return response(res, 400, 'required', 'Employee ID is required', undefined, 'A-5.7.1')
     }
 
     if (req.body.account_id) {
         var account_id = String(req.body.account_id)
     } else {
-        return response(res, 400, 'required', 'Social Account ID is required')
+        return response(res, 400, 'required', 'Social Account ID is required', undefined, 'A-5.7.2')
     }
 
     // DB
@@ -421,7 +421,7 @@ employeeAPI.post('/social-account/update', (req, res) => {
                     var tempAccount = tempEmployee.social_accounts[account_id]
                     if (!tempAccount.deleted) {
                         if (!req.body.account_name || !req.body.reference) {
-                            return response(res, 403, 'forbidden', 'Nothing to modify')
+                            return response(res, 403, 'forbidden', 'Nothing to modify', undefined, 'A-5.7.3')
                         }
 
                         if (req.body.account_name) {
@@ -437,22 +437,22 @@ employeeAPI.post('/social-account/update', (req, res) => {
                         delete tempAccount.lastModifiedBy_id
 
                         return firebase.database().ref(`/admin/employees/${dbEmployeesKey[i]}/social_accounts/${account_id}`).update(tempAccount).then(() => {
-                            return response(res, 200, 'success', 'Social Account details updated successfully');
+                            return response(res, 200, 'success', 'Social Account details updated successfully', undefined, 'A-5.7.4');
                         })
 
                     } else {
-                        return response(res, 404, 'notFound', 'Incorrect Social Account ID')
+                        return response(res, 404, 'notFound', 'Incorrect Social Account ID', undefined, 'A-5.7.5')
                     }
                 } else {
-                    return response(res, 404, 'notFound', 'Incorrect Social Account ID')
+                    return response(res, 404, 'notFound', 'Incorrect Social Account ID', undefined, 'A-5.7.6')
                 }
 
             } else if (i == dbEmployeesKey.length - 1) {
-                return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, '')
+                return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, 'A-5.7.7')
             }
         }
     } else {
-        return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, '')
+        return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, 'A-5.7.8')
     }
 })
 
@@ -463,13 +463,13 @@ employeeAPI.get('/social-account/remove', (req, res) => {
     if (req.query.employee_id) {
         var employee_id = String(req.query.employee_id)
     } else {
-        return response(res, 400, 'required', 'Employee ID is required')
+        return response(res, 400, 'required', 'Employee ID is required', undefined, 'A-5.8.1')
     }
 
     if (req.query.account_id) {
         var account_id = String(req.query.account_id)
     } else {
-        return response(res, 400, 'required', 'Social Account ID is required')
+        return response(res, 400, 'required', 'Social Account ID is required', undefined, 'A-5.8.2')
     }
 
     // DB
@@ -490,21 +490,21 @@ employeeAPI.get('/social-account/remove', (req, res) => {
                         delete tempAccount.lastModifiedBy_id
 
                         return firebase.database().ref(`/admin/employees/${dbEmployeesKey[i]}/social_accounts/${account_id}`).update(tempAccount).then(() => {
-                            return response(res, 200, 'success', 'Social Account removed successfully');
+                            return response(res, 200, 'success', 'Social Account removed successfully', undefined, 'A-5.8.3');
                         })
                     } else {
-                        return response(res, 404, 'notFound', 'Incorrect Social Account ID')
+                        return response(res, 404, 'notFound', 'Incorrect Social Account ID', undefined, 'A-5.8.4')
                     }
                 } else {
-                    return response(res, 404, 'notFound', 'Incorrect Social Account ID')
+                    return response(res, 404, 'notFound', 'Incorrect Social Account ID', undefined, 'A-5.8.5')
                 }
 
             } else if (i == dbEmployeesKey.length - 1) {
-                return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, '')
+                return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, 'A-5.8.6')
             }
         }
     } else {
-        return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, '')
+        return response(res, 404, 'notFound', 'Employee not found. Incorrect Employee ID', undefined, 'A-5.8.7')
     }
 })
 
