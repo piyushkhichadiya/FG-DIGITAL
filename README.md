@@ -4,23 +4,21 @@ A website with project management portal of Private Company FG Digital
 
 ## Installation
 
-Use cmd to install all the required packages.
+Use CMD or Bash to install all the required packages.
 
 ```bash
 npm i
 ```
 
-## Setup Database
+## Configurations
 
-Open secrets.js in config/ directory and paste your admin SDK from the firebase console. and set other secrets accordingly.
+We will put secrets.js soon so you can get idea about putting secrets.
 
 ## Start
 Replace with prod or production for production environment
 
 ```bash
-set NODE_ENV=dev
+set NODE_ENV=development
+set PORT=80
 npm start
 ```
-
-## Contributing
-Currently, we are not taking any contributions. for major changes, open issue, we will discuss there.
