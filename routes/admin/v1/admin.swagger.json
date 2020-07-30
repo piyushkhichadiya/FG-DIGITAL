@@ -1,0 +1,546 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "FG Digital",
+        "description": "ADMIN APIs - Project Management Portal",
+        "version": "1.0.0"
+    },
+    "host": "localhost",
+    "basePath": "/admin/v1",
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "tags": [{
+            "name": "1. User Account",
+            "description": "APIs for user related functionality before get authenticated"
+        }, {
+            "name": "2. Profile",
+            "description": "Admin Profile & Account details"
+        }, {
+            "name": "3. Plan",
+            "description": "Setting up plans to allocate client"
+        }, {
+            "name": "4. Client",
+            "description": "Client Account and Relative actions"
+        },
+        {
+            "name": "5. Employee",
+            "description": "Employee Account and related operations"
+        }
+    ],
+    "paths": {
+        "/user/create": {
+            "post": {
+                "tags": ["1. User Account"],
+                "summary": "Create Admin Account",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "Unique Email address and Password",
+                    "schema": {
+                        "required": ["email", "password"],
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "email": "test@gmail.com",
+                            "password": "my-secret-password",
+                            "remember": true
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/user/login": {
+            "post": {
+
+                "tags": ["1. User Account"],
+                "summary": "Authentication for Access admin panel",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "Email Address and Password",
+                    "schema": {
+                        "required": ["email", "password"],
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            },
+                            "remember": {
+                                "type": "boolean"
+                            }
+                        },
+                        "example": {
+                            "email": "test@gmail.com",
+                            "password": "my-secret-password",
+                            "remember": true
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": ["2. Profile"],
+                "summary": "Authentication for Access admin panel",
+                "responses": {}
+            }
+        },
+        "/profile/update": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "Update Profile Details",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "name",
+                        "in": "formData",
+                        "description": "Username",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "profile_image",
+                        "in": "formData",
+                        "description": "file to upload",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/profile/password": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "Change Password",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["password"],
+                        "properties": {
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/plan/add": {
+            "post": {
+                "tags": ["3. Plan"],
+                "summary": "Add New Plan",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["plan_name", "price", "days"],
+                        "properties": {
+                            "plan_name": {
+                                "type": "string"
+                            },
+                            "price": {
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "days": {
+                                "type": "integer",
+                                "minimum": 1
+                            }
+                        },
+                        "example": {
+                            "plan_name": "Customize Plan X",
+                            "price": "50000",
+                            "days": "50"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/plan/update": {
+            "post": {
+                "tags": ["3. Plan"],
+                "summary": "Update existing plan",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["plan_id"],
+                        "properties": {
+                            "plan_id": {
+                                "type": "string"
+                            },
+                            "plan_name": {
+                                "type": "string"
+                            },
+                            "price": {
+                                "type": "integer",
+                                "minimum": 1
+                            },
+                            "days": {
+                                "type": "integer",
+                                "minimum": 1
+                            }
+                        },
+                        "example": {
+                            "plan_id": "-s65d51ve891s3",
+                            "plan_name": "Customize Plan X",
+                            "price": "50000",
+                            "days": "50"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/plan/remove": {
+            "get": {
+                "tags": ["3. Plan"],
+                "summary": "Remove Existing Plan",
+                "parameters": [{
+                    "in": "query",
+                    "name": "plan_id",
+                    "description": "Get Plan ID using /plan/get",
+                    "required": true,
+                    "items": {
+                        "type": "string"
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/plan/get": {
+            "get": {
+                "tags": ["3. Plan"],
+                "summary": "Get Existing Plans",
+                "responses": {}
+            }
+        },
+        "/client/create": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "Create New Client",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["email", "password", "name"],
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "email": "test@gmail.com",
+                            "password": "my-secret-password",
+                            "name": "Client XYZ"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/client/update": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "Update existing client details",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["clientID"],
+                        "properties": {
+                            "clientID": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "clientID": "-as65v16161as89ve",
+                            "email": "test-new@gmail.com",
+                            "name": "Client ABC"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/client/remove": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "Remove existing client and all plans/projects",
+                "parameters": [{
+                    "in": "query",
+                    "name": "clientID",
+                    "description": "Get Client ID using /client/get/",
+                    "required": true,
+                    "items": { "type": "string" }
+                }]
+            }
+        },
+        "/employee/add": {
+            "post": {
+                "tags": ["5. Employee"],
+                "summary": "Add New Employee",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["email", "password", "name"],
+                        "properties": {
+                            "email": { "type": "string" },
+                            "password": { "type": "string" },
+                            "name": { "type": "string" }
+                        },
+                        "example": {
+                            "email": "test@gmail.com",
+                            "password": "my-secret-password",
+                            "name": "Employee PQR"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/employee/get": {
+            "get": {
+                "tags": ["5. Employee"],
+                "summary": "Get Employee Details",
+                "parameters": [{
+                    "in": "query",
+                    "name": "employee_id",
+                    "description": "Employee ID",
+                    "required": false,
+                    "items": { "type": "string" }
+                }],
+                "responses": {}
+            }
+        },
+        "/employee/update/{employee_id}": {
+            "post": {
+                "tags": ["5. Employee"],
+                "summary": "Update existing employee",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                    "in": "path",
+                    "name": "employee_id",
+                    "description": "Employee ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 20201
+                    }
+                }, {
+                    "in": "formData",
+                    "name": "name",
+                    "required": false,
+                    "type": "string",
+                    "description": "Employee Name",
+                    "schema": {
+                        "example": "John Patel"
+                    }
+                }, {
+                    "in": "formData",
+                    "name": "position",
+                    "description": "Employee Position (Ex. Website Developer, Marketing Specialist, Application Developer, Content Writer, SEO Specialist, Social Media Manager, Graphics Designer, Videographer, Video Editor )",
+                    "required": false,
+                    "type": "string",
+                    "schema": {
+                        "example": "Website Developer"
+                    }
+                }, {
+                    "in": "formData",
+                    "name": "skills",
+                    "description": "Employee Skills",
+                    "required": false,
+                    "type": "string",
+                    "schema": {
+                        "example": "HTML, Video Editing, PHP, JavaScript"
+                    }
+                }, {
+                    "in": "formData",
+                    "name": "profile_image",
+                    "description": "Employee Profile Image",
+                    "required": false,
+                    "type": "file"
+                }, {
+                    "in": "formData",
+                    "name": "email",
+                    "description": "Employee Email Address",
+                    "required": false,
+                    "type": "string",
+                    "schema": {
+                        "example": "John123@gmail.com"
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/employee/change-password": {
+            "post": {
+                "tags": ["5. Employee"],
+                "summary": "Change Employee Password",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["employee_id"],
+                        "properties": {
+                            "employee_id": { "type": "string" },
+                            "password": { "type": "string" }
+                        },
+                        "example": {
+                            "employee_id": "20201",
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/employee/remove": {
+            "get": {
+                "tags": ["5. Employee"],
+                "summary": "Remove existing employee",
+                "parameters": [{
+                    "in": "query",
+                    "name": "employee_id",
+                    "type": "integer",
+                    "description": "Employee ID",
+                    "required": true,
+                    "schema": {
+                        "example": 20201
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/employee/social-account/add": {
+            "post": {
+                "tags": ["5. Employee"],
+                "summary": "Add social media account",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["employee_id", "account_name", "reference"],
+                        "properties": {
+                            "employee_id": { "type": "integer", "description": "Get ID using /employee/get" },
+                            "account_name": { "type": "string" },
+                            "reference": { "type": "string" }
+                        },
+                        "example": {
+                            "employee_id": 20201,
+                            "account_name": "Facebook",
+                            "reference": "ABC"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/employee/social-account/update": {
+            "post": {
+                "tags": ["5. Employee"],
+                "summary": "Update existing social account details",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["employee_id", "account_id"],
+                        "properties": {
+                            "employee_id": { "type": "integer", "description": "Get ID using /employee/get" },
+                            "account_id": { "type": "string", "description": "Get Account ID using /employee/get" },
+                            "account_name": { "type": "string" },
+                            "reference": { "type": "string" }
+                        },
+                        "example": {
+                            "employee_id": 20201,
+                            "account_id": "-MDEEyyvvIQLvPhmLzZa",
+                            "account_name": "Facebook",
+                            "reference": "ABC"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/employee/social-account/remove": {
+            "get": {
+                "tags": ["5. Employee"],
+                "summary": "Remove existing social account",
+                "parameters": [{
+                    "in": "query",
+                    "name": "employee_id",
+                    "type": "integer",
+                    "description": "Employee ID",
+                    "required": true,
+                    "schema": {
+                        "example": 20201
+                    }
+                }, {
+                    "in": "query",
+                    "name": "account_id",
+                    "type": "string",
+                    "description": "Social Account ID",
+                    "required": true,
+                    "schema": { "example": "-MDUWHxmzI4N9LFBDpU_" }
+                }],
+                "responses": {}
+            }
+        },
+        "/client/plan/add": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "Add new plan to client account",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["clientID", "plan", "start_date", "duration"],
+                        "properties": {
+                            "clientID": { "type": "string" },
+                            "plan": { "type": "string", "description": "Get Plan Name using /plan/get" },
+                            "start_date": { "type": "string", "format": "date" },
+                            "duration": { "type": "integer" }
+                        },
+                        "example": {
+                            "clientID": "-MCKMpR3RGE-EmVBF-JQ",
+                            "plan": "Customized Plan",
+                            "start_date": "2020/05/30",
+                            "duration": 30
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        }
+    }
+}

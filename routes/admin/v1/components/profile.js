@@ -29,7 +29,7 @@ profileAPI.get('/', (req, res) => {
         profile_image: dbUser.profile_image
     }
 
-    return response(res, 200, 'success', 'profile', postData, 'A-2.1.1');
+    return response(res, 200, 'success', undefined, postData, 'A-2.1.1');
 });
 
 // 2.2 UPDATE PROFILE
@@ -40,6 +40,7 @@ profileAPI.post('/update', (req, res) => {
     if (req.body.name) {
         dbUser.name = String(req.body.name);
     }
+
     if (req.files && req.files.profile_image) {
 
         if (Array.isArray(req.files.profile_image)) {

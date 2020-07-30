@@ -40,6 +40,7 @@ adminAPI.use('/project', require('./v1/components/client-project'));
 // 7. SERVICES
 // adminAPI.use('/service');
 
+// 400 UNKNOWN APIs
 adminAPI.use('*', (req, res) => {
     return response(res, 400, 'unknownApi', 'The API that the request is calling is not recognized.', undefined, 'A-API');
 });

@@ -88,18 +88,18 @@ planAPI.post('/update', (req, res) => {
 });
 
 // 3.3 REMOVE PLAN
-planAPI.post('/remove', (req, res) => {
-    if (!req.body.plan_id) {
+planAPI.get('/remove', (req, res) => {
+    if (!req.query.plan_id) {
         return response(res, 400, 'required', 'Plan ID is required', undefined, 'A-3.3.1');
     }
 
-    if (dbAdminSnapshot.plans && dbAdminSnapshot.plans[req.body.plan_id] && !dbAdminSnapshot.plans[req.body.plan_id].deleted) {
-        var dbPlan = dbAdminSnapshot.plans[req.body.plan_id];
+    if (dbAdminSnapshot.plans && dbAdminSnapshot.plans[req.query.plan_id] && !dbAdminSnapshot.plans[req.query.plan_id].deleted) {
+        var dbPlan = dbAdminSnapshot.plans[req.query.plan_id];
 
         dbPlan.lastModifiedOn = String(new Date());
         dbPlan.deleted = true;
 
-        firebase.database().ref('/admin/plans/' + req.body.plan_id).update(dbPlan).then(() => {
+        firebase.database().ref('/admin/plans/' + req.query.plan_id).set(dbPlan).then(() => {
             return response(res, 200, 'success', undefined, undefined, 'A-3.3.3');
         })
     } else {
