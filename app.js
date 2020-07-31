@@ -9,7 +9,7 @@ var express = require('express'),
 //--------------------------- CONFIGURATION ---------------------------
 
 // Set Static Assets
-app.use(express.static('./public/static'))
+app.use(express.static('public'))
 
 // Syntax Error Handling [ex. JSON]
 app.use(bodyParser.json(), (error, req, res, next) => {
@@ -58,8 +58,13 @@ app.use(session({ secret: 'MY-SECRET', resave: true, saveUninitialized: true, co
 //-------------------- API DOCUMENTATION [SWAGGER] ---------------------
 
 let SwaggerOptions = {
-    explorer: true,
-    customCss: '.swagger-ui .topbar { display: none }'
+    explorer: false,
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: "APIs - FG Digital",
+    customfavIcon: "/adminLTE/images/favicon.ico",
+    swaggerOptions: {
+        docExpansion: "none",
+    }
 }
 
 // v1
@@ -67,7 +72,39 @@ if (process.env.NODE_ENV == 'development' || process.env.NODE_ENV == 'dev') {
     if (process.env.PORT && process.env.PORT != 80) {
         console.log('\x1b[36m%s\x1b[0m', '[SWAGGER] API DOCUMENTATION REQUIRED PORT 80');
     } else {
-        app.use('/api/admin', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), SwaggerOptions));
+
+        // ADMIN
+        app.use('/api/admin', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
+            explorer: false,
+            customCss: '.swagger-ui .topbar { display: none }',
+            customSiteTitle: "Admin APIs v1.0",
+            customfavIcon: "/adminLTE/images/favicon.ico",
+            swaggerOptions: {
+                docExpansion: "none",
+            }
+        }));
+
+        // EMPLOYEE
+        app.use('/api/employee', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
+            explorer: false,
+            customCss: '.swagger-ui .topbar { display: none }',
+            customSiteTitle: "Employee APIs v1.0",
+            customfavIcon: "/adminLTE/images/favicon.ico",
+            swaggerOptions: {
+                docExpansion: "none",
+            }
+        }));
+
+        // CLIENT
+        app.use('/api/client', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
+            explorer: false,
+            customCss: '.swagger-ui .topbar { display: none }',
+            customSiteTitle: "Client APIs v1.0",
+            customfavIcon: "/adminLTE/images/favicon.ico",
+            swaggerOptions: {
+                docExpansion: "none",
+            }
+        }));
     }
 }
 
@@ -81,7 +118,7 @@ app.use('/employee/v1', (req, res) => { return res.status(400).send('UNKNOWN-API
 app.use('/client/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS') })
 
 // Views
-app.get('/', (req, res) => { res.sendFile(process.cwd() + '/views/static/index.html') })
+app.use('/', require('./routes/static.view'))
 app.use('/admin', require('./routes/admin/view.route'))
 app.use('/employee', require('./routes/employee/view.route.js'))
 app.use('/client', require('./routes/client/view.route.js'))
