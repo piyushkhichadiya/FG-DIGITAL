@@ -106,7 +106,11 @@
                         "in": "formData",
                         "description": "Username",
                         "required": false,
-                        "type": "string"
+                        "type": "string",
+                        "example": "Enter Your Name",
+                        "schema": {
+                            "example": "Jenil Narola"
+                        }
                     },
                     {
                         "name": "profile_image",
@@ -293,11 +297,11 @@
             }
         },
         "/client/remove": {
-            "post": {
+            "get": {
                 "tags": ["4. Client"],
                 "summary": "Remove existing client and all plans/projects",
                 "parameters": [{
-                    "in": "query",
+                    "in": "body",
                     "name": "clientID",
                     "description": "Get Client ID using /client/get/",
                     "required": true,
@@ -541,6 +545,45 @@
                 }],
                 "responses": {}
             }
+        },
+        "/client/get": {
+            "get": {
+                "tags": ["4. Client"],
+                "summary": "Get All Client",
+                "parameters": [{
+                    "in": "query",
+                    "name": "client_id",
+                    "description": "Client ID",
+                    "required": false,
+                    "items": { "type": "string" }
+                }],
+                "responses": {}
+            }
+
+        },
+        "/client/change-password": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "Change password client",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "client_id and password",
+                    "schema": {
+                        "required": ["client_id"],
+                        "properties": {
+                            "client_id": { "type": "string" },
+                            "password": { "type": "string" }
+                        },
+                        "example": {
+                            "client_id": "20201",
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
         }
+
     }
 }

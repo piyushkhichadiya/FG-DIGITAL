@@ -75,8 +75,8 @@ if (process.env.NODE_ENV == 'development' || process.env.NODE_ENV == 'dev') {
 
         // ADMIN
         app.use('/api/admin', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
-            explorer: false,
-            customCss: '.swagger-ui .topbar { display: none }',
+            explorer: true,
+            // customCss: '.swagger-ui .topbar { display: none }',
             customSiteTitle: "Admin APIs v1.0",
             customfavIcon: "/adminLTE/images/favicon.ico",
             swaggerOptions: {
