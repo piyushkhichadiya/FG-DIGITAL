@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Add Plan - FG Digital</title>
+  <title>Team Members - FG Digital</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -19,7 +19,7 @@
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
   <style>
-  	
+    
   </style>
 </head>
 <body class="hold-transition sidebar-mini sidebar-collapse">
@@ -121,12 +121,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Add Plan</h1>
+            <h1>Team Members</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="javascript:void(0);">Plan</a></li>
-              <li class="breadcrumb-item active">Add Plan</li>
+              <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+              <li class="breadcrumb-item active">Team Members</li>
             </ol>
           </div>
         </div>
@@ -136,37 +136,58 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        <div class="card-body card">
-        <div class="row">
-           	<label for="inputEmail3" class="col-md-2 col-form-label">Plan Name:</label>
-	        <div class="col-md-3">
-	            <input type="text" class="form-control" id="inputEmail3" placeholder="Plan">
-            </div>
-         </div>
-         <div class="row">
-           	<label for="inputEmail3" class="col-md-2 mt-2 col-form-label">Amount:</label>
-	        <div class="col-md-3">
-	            <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="Amount">
-            </div>
-         </div>
-         <div class="row">
-           	<label for="inputEmail3" class="col-md-2 mt-2 col-form-label">Days:</label>
-	        <div class="col-md-3">
-	            <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="Days">
-            </div>
-         </div>
-         <div class="row">
-         	<div class="col-md-12 mt-4">
-         		<button class="btn btn-outline-primary float-right mr-2 ml-2">Add</button>
-	         	<button class="btn btn-outline-primary float-right ml-2">Update</button>
-	         	<button class="btn btn-outline-primary float-right">Remove</button>
-	         	
-         	</div>
-         </div>
-      </div>
+        <div class="card card-body">
+        	<div class="row">
+	          <div class="col-md-12">
+	              <div class="pull-right">
+	                <button class="btn btn-outline-primary float-right mb-3">Add Member</button>
+	              </div>
+	          </div>
+              <!-- /.card-header -->
+              <div class="col-md-12">
+                <table id="example1" class="table table-bordered table-striped w-100">
+                  <thead>
+                  <tr>
+                    <th>Sr. No.</th>
+                    <th>ID</th>
+                    <th>Profile Image</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>01</td>
+                    <td>001</td>
+                    <td><img src="https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png" style="width: 70px; border-radius:50%;"></td>
+                    <td>Viren Oberoi</td>
+                    <td>viren@123</td>
+                    <td>99</td>
+                    <td>ready</td>
+                  </tr>
+                  </tbody>
+                  <tfoot>
+                  <tr>
+                    <th>Sr. No.</th>
+                    <th>ID</th>
+                    <th>Profile Image</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <!-- /.card-body -->
+        	</div>
+        	<!-- /.row -->
+      	</div>
       <!-- Card body -->
-      </div>
-      <!-- /.container-fluid -->
+	  </div>
+	  <!-- /.container-fluid -->
     </section>
     <!-- /.content -->
   </div>

@@ -3,13 +3,13 @@ const secrets = require('../../../../config/secrets'),
     bcrypt = require('bcryptjs');
 
 module.exports = {
-    response: (res, status, response, message, data, customCode) => {
+    response: (res, status, response, message, data, code) => {
         return res.status(status).json({
             status: status,
             response: response,
             message: message,
             data: data,
-            response_code: customCode
+            code: code
         })
     },
     jwtSign: (string) => {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Employee - FG Digital</title>
+  <title>Add Team Member - FG Digital</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -19,7 +19,7 @@
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
   <style>
-    
+  	
   </style>
 </head>
 <body class="hold-transition sidebar-mini sidebar-collapse">
@@ -121,12 +121,12 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1>Employee</h1>
+            <h1>Add Member</h1>
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-              <li class="breadcrumb-item active">Employee</li>
+              <li class="breadcrumb-item"><a href="javascript:void(0);">Member</a></li>
+              <li class="breadcrumb-item active">Add Member</li>
             </ol>
           </div>
         </div>
@@ -136,58 +136,103 @@
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        <div class="card card-body">
-        	<div class="row">
-	          <div class="col-md-12">
-	              <div class="pull-right">
-	                <button class="btn btn-outline-primary float-right mt-4 mr-4 mb-3">Add Member</button>
-	              </div>
-	          </div>
-              <!-- /.card-header -->
-              <div class="col-md-12">
-                <table id="example1" class="table table-bordered table-striped">
-                  <thead>
-                  <tr>
-                    <th>Sr. No.</th>
-                    <th>ID</th>
-                    <th>Profile Image</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                    <td>01</td>
-                    <td>001</td>
-                    <td><img src="https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png" style="width: 70px; border-radius:50%;"></td>
-                    <td>Viren Oberoi</td>
-                    <td>viren@123</td>
-                    <td>99</td>
-                    <td>ready</td>
-                  </tr>
-                  </tbody>
-                  <tfoot>
-                  <tr>
-                    <th>Sr. No.</th>
-                    <th>ID</th>
-                    <th>Profile Image</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                  </tfoot>
-                </table>
-              </div>
-              <!-- /.card-body -->
-        	</div>
-        	<!-- /.row -->
-      	</div>
+        <div class="card-body card">
+	        <div class="row">
+	       </div>
+         	<h4 class="header-title">Basic Info</h4>
+         <div class="row">
+           <div class="col-md-10">
+           	<div class="row m-1">
+           		<label class="col-md-2 col-form-label">Member ID:</label>
+           		<input type="text" class="col-md-3 form-control" id="inputEmail3" placeholder="Member ID" disabled>
+           	</div>
+           	<div class="row m-1">
+           		<label class="col-md-2 col-form-label">Name:</label>
+           		<input type="text" class="col-md-3 form-control" id="inputEmail3" placeholder="Name">
+           		<label class="col-md-2 offset-md-1 col-form-label">Position:</label>
+         			<select class="col-md-3 form-control">
+	                  <option>Position 1</option>
+	                  <option>Position 2</option>
+	                  <option>Position 3</option>
+	                  <option>Position 4</option>
+	                  <option>Position 5</option>
+	                </select>
+           	</div>
+           	<div class="row m-1">
+           		<label class="col-md-2 col-form-label">Email:</label>
+           		<input type="email" class="col-md-3 form-control" id="inputEmail3" placeholder="Email">
+           		<label class="col-md-2 offset-md-1 col-form-label">password:</label>
+           		<input type="password" class="col-md-3 form-control" placeholder="password">
+           	</div>
+
+           </div>
+           <div class="col-md-2" align="center">
+                  <img src="https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png" class="ml-2" style="width: 100px; border-radius:50%;"><br>
+                  <p><i class="fas fa-camera ml-2" ></i></p>
+           </div>
+           <div class="col-md-12">
+              <button class="btn btn-outline-primary float-right">Add Member</button>
+           </div>
+         </div>
+         <hr>
+         <h4 class="header-title">Other Details</h4>   
+         <div class="row">
+       		  <label for="inputEmail3" class="col-md-12 col-form-label">Skills:</label>
+          	<div class="col-md-4">
+          		<textarea class="form-control" rows="2" placeholder="Skills...."></textarea>
+        	  </div>
+         </div>
+         <div class="row">
+         	<label for="inputEmail3" class="col-md-12 col-form-label">Social Accounts:</label>
+         	<div class="col-md-2 mt-2">
+         		<select class="form-control">
+                  <option>A/C 1</option>
+                  <option>A/C 2</option>
+                  <option>A/C 3</option>
+                  <option>A/C 4</option>
+                  <option>A/C 5</option>
+                </select>
+         	</div>
+         	<div class="col-md-2">
+              <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="U_id or Link">
+          </div>
+          <div class="col-md-3 mt-2">
+            <button class="btn btn-outline-primary">Add Account</button>
+            <button class="btn btn-outline-danger">Remove</button>
+          </div>
+         </div>
+         <div class="row">
+         	<label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
+         	  <div class="col-md-4">
+              <input type="text" class="form-control" id="inputEmail3" placeholder="Contact Details">
+            </div>
+         </div>
+         <div class="row mt-2">
+         	<div class="col-md-12">
+         		<button class="btn btn-outline-primary mt-1 ml-2 float-right">Update</button>
+         		<button class="btn btn-outline-primary mt-1 float-right">Remove</button>
+         	</div>
+         </div>
+         <hr>
+         <h4 class="header-title">Update Password</h4>
+         <div class="row">
+             <div class="col-md-3">
+                <label for="exampleInputPassword1">New Password</label>
+                <input type="password" class="form-control" placeholder="Enter New Password">
+             </div>   
+             <div class="col-md-3">
+                <label for="exampleInputPassword1">Confirm Password</label>
+                <input type="password" class="form-control" placeholder="Confirm Password">
+             </div>
+             <div class="col-md-2" style="margin-top: 2.5%;">
+                <button class="btn btn-outline-primary">Update Password</button>
+             </div>
+        </div> 
+        
+      </div>
       <!-- Card body -->
-	  </div>
-	  <!-- /.container-fluid -->
+      </div>
+      <!-- /.container-fluid -->
     </section>
     <!-- /.content -->
   </div>

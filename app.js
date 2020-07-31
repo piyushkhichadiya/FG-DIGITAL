@@ -1,12 +1,12 @@
 var express = require('express'),
-    path = require('path'),
     app = express(),
     bodyParser = require('body-parser'),
     session = require('express-session'),
     multipartParser = require('express-fileupload'),
-    cookieParser = require('cookie-parser')
+    cookieParser = require('cookie-parser'),
+    swaggerUI = require('swagger-ui-express')
 
-//----------------------------- CONFIGURATION -------------------------------
+//--------------------------- CONFIGURATION ---------------------------
 
 // Set Static Assets
 app.use(express.static('./public/static'))
@@ -38,12 +38,14 @@ app.use(multipartParser())
 // Basic Directory Generate
 const directory_gen = require('./config/directory');
 directory_gen('admin')
+directory_gen('employee')
 
-//----------------------------- DATABASE -------------------------------
+//----------------------------- DATABASE ------------------------------
 var firebase = require('./config/database')
 var obj_firebase = new firebase()
 obj_firebase.initialization()
-    // console.log(obj_firebase.status());
+
+// console.log(obj_firebase.status());
 
 //------------------------- SESSION & COOKIE ---------------------------
 
@@ -52,6 +54,22 @@ app.use(cookieParser())
 
 // Portal [SESSION]
 app.use(session({ secret: 'MY-SECRET', resave: true, saveUninitialized: true, cookie: { secure: false, sameSite: true } }))
+
+//-------------------- API DOCUMENTATION [SWAGGER] ---------------------
+
+let SwaggerOptions = {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }'
+}
+
+// v1
+if (process.env.NODE_ENV == 'development' || process.env.NODE_ENV == 'dev') {
+    if (process.env.PORT && process.env.PORT != 80) {
+        console.log('\x1b[36m%s\x1b[0m', '[SWAGGER] API DOCUMENTATION REQUIRED PORT 80');
+    } else {
+        app.use('/api/admin', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), SwaggerOptions));
+    }
+}
 
 //------------------------- API & VIEW ROUTES --------------------------
 
