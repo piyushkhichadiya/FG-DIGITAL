@@ -4,7 +4,8 @@ var express = require('express'),
     session = require('express-session'),
     multipartParser = require('express-fileupload'),
     cookieParser = require('cookie-parser'),
-    swaggerUI = require('swagger-ui-express')
+    swaggerUI = require('swagger-ui-express'),
+    packageInfo = require('./package.json')
 
 //--------------------------- CONFIGURATION ---------------------------
 
@@ -40,12 +41,19 @@ const directory_gen = require('./config/directory');
 directory_gen('admin')
 directory_gen('employee')
 
+// Console Clear
+console.clear();
+console.log(`npm start: ${packageInfo.scripts.start}
+
+Port:${process.env.PORT || 80}
+App Version: ${packageInfo.version}`)
+
 //----------------------------- DATABASE ------------------------------
 var firebase = require('./config/database')
 var obj_firebase = new firebase()
 obj_firebase.initialization()
 
-// console.log(obj_firebase.status());
+console.log(`Database: ${obj_firebase.status().status}`);
 
 //------------------------- SESSION & COOKIE ---------------------------
 
@@ -68,45 +76,48 @@ let SwaggerOptions = {
 }
 
 // v1
-if (process.env.NODE_ENV == 'development' || process.env.NODE_ENV == 'dev') {
-    if (process.env.PORT && process.env.PORT != 80) {
-        console.log('\x1b[36m%s\x1b[0m', '[SWAGGER] API DOCUMENTATION REQUIRED PORT 80');
-    } else {
+if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && (process.env.PORT == 80 || !process.env.PORT)) {
 
-        // ADMIN
-        app.use('/api/admin', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
-            explorer: true,
-            // customCss: '.swagger-ui .topbar { display: none }',
-            customSiteTitle: "Admin APIs v1.0",
-            customfavIcon: "/adminLTE/images/favicon.ico",
-            swaggerOptions: {
-                docExpansion: "none",
-            }
-        }));
 
-        // EMPLOYEE
-        app.use('/api/employee', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
-            explorer: false,
-            customCss: '.swagger-ui .topbar { display: none }',
-            customSiteTitle: "Employee APIs v1.0",
-            customfavIcon: "/adminLTE/images/favicon.ico",
-            swaggerOptions: {
-                docExpansion: "none",
-            }
-        }));
+    // ADMIN
+    app.use('/api/admin', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
+        explorer: false,
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: "Admin APIs v1.0",
+        customfavIcon: "/adminLTE/images/favicon.ico",
+        swaggerOptions: {
+            docExpansion: "none",
+        }
+    }));
 
-        // CLIENT
-        app.use('/api/client', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
-            explorer: false,
-            customCss: '.swagger-ui .topbar { display: none }',
-            customSiteTitle: "Client APIs v1.0",
-            customfavIcon: "/adminLTE/images/favicon.ico",
-            swaggerOptions: {
-                docExpansion: "none",
-            }
-        }));
-    }
+    // EMPLOYEE
+    app.use('/api/employee', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
+        explorer: false,
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: "Employee APIs v1.0",
+        customfavIcon: "/adminLTE/images/favicon.ico",
+        swaggerOptions: {
+            docExpansion: "none",
+        }
+    }));
+
+    // CLIENT
+    app.use('/api/client', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
+        explorer: false,
+        customCss: '.swagger-ui .topbar { display: none }',
+        customSiteTitle: "Client APIs v1.0",
+        customfavIcon: "/adminLTE/images/favicon.ico",
+        swaggerOptions: {
+            docExpansion: "none",
+        }
+    }));
+
+    console.log(`Swagger Ui: Success`);
+} else {
+    console.log(`Swagger Ui: FAILED => Environment: ${process.env.NODE_ENV||''} > Port: ${process.env.PORT||80}`)
 }
+
+console.log(`------------------------------- School Score [${packageInfo.name}] -------------------------------`);
 
 //------------------------- API & VIEW ROUTES --------------------------
 
