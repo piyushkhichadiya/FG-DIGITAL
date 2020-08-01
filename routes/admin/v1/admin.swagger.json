@@ -26,6 +26,10 @@
         {
             "name": "5. Employee",
             "description": "Employee Account and related operations"
+        },
+        {
+            "name": "6. Client-project",
+            "description": "Activity Related to project of client"
         }
     ],
     "paths": {
@@ -106,7 +110,11 @@
                         "in": "formData",
                         "description": "Username",
                         "required": false,
-                        "type": "string"
+                        "type": "string",
+                        "example": "Enter Your Name",
+                        "schema": {
+                            "example": "Jenil Narola"
+                        }
                     },
                     {
                         "name": "profile_image",
@@ -293,11 +301,11 @@
             }
         },
         "/client/remove": {
-            "post": {
+            "get": {
                 "tags": ["4. Client"],
                 "summary": "Remove existing client and all plans/projects",
                 "parameters": [{
-                    "in": "query",
+                    "in": "body",
                     "name": "clientID",
                     "description": "Get Client ID using /client/get/",
                     "required": true,
@@ -541,6 +549,109 @@
                 }],
                 "responses": {}
             }
+        },
+        "/client/get": {
+            "get": {
+                "tags": ["4. Client"],
+                "summary": "Get All Client",
+                "parameters": [{
+                    "in": "query",
+                    "name": "client_id",
+                    "description": "Client ID",
+                    "required": false,
+                    "items": { "type": "string" }
+                }],
+                "responses": {}
+            }
+
+        },
+        "/client/change-password": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "Change password client",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "client_id and password",
+                    "schema": {
+                        "required": ["client_id"],
+                        "properties": {
+                            "client_id": { "type": "string" },
+                            "password": { "type": "string" }
+                        },
+                        "example": {
+                            "client_id": "20201",
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/get": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Get All Project Details",
+                "parameters": [{
+                    "in": "query",
+                    "name": "client_id",
+                    "description": "get project",
+                    "required": false,
+                    "items": { "type": "string" }
+                }],
+                "responses": {}
+            }
+
+        },
+        "/project/team/add": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Assign Team member to project",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "client_id"],
+                        "properties": {
+                            "employee_id": { "type": "string" },
+                            "project_id": { "type": "string" }
+                        },
+                        "example": {
+                            "employee_id": "20201",
+                            "project_id": "1376735095048"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/team/update": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Update Permission to team member",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "client_id"],
+                        "properties": {
+                            "employee_id": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "active": { "type": "boolean" },
+                            "review": { "type": "boolean" },
+                            "activity": { "type": "boolean" }
+
+                        },
+                        "example": {
+                            "employee_id": "20201",
+                            "project_id": "1376735095048",
+                            "active": "true"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
         }
+
     }
 }
