@@ -580,7 +580,7 @@
                             "password": { "type": "string" }
                         },
                         "example": {
-                            "client_id": "20201",
+                            "client_id": "-MDa5rMi4PeMnbevEOyV",
                             "password": "my-secret-password"
                         }
                     }

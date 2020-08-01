@@ -146,19 +146,19 @@ client.post('/plan/add', (req, res) => {
         startDate = String(req.body.start_date),
         duration = String(req.body.duration)
     if (String(new Date(startDate)) == "Invalid Date") {
-        return response(res, 400, 'invalid', 'Invalid Date', undefined, 'A-4.5.7')
+        return response(res, 400, 'invalid', 'Invalid Date', undefined, 'A-4.4.4')
     }
     if (req.body.price) {
         var price = String(req.body.price)
         if (isNaN(price)) {
-            return response(res, 400, 'invalid', 'Price Value invalid', undefined, 'A-4.4.4')
+            return response(res, 400, 'invalid', 'Price Value invalid', undefined, 'A-4.4.5')
         }
         pushData = {
             price: price
         }
     }
     if (isNaN(duration)) {
-        return response(res, 400, 'invalid', 'Duration Value invalid', undefined, 'A-4.4.5')
+        return response(res, 400, 'invalid', 'Duration Value invalid', undefined, 'A-4.4.6')
     }
     pushData = {
         start_date: startDate,
@@ -169,7 +169,7 @@ client.post('/plan/add', (req, res) => {
         project_id: plan_id
     }
     firebase.database().ref(`/admin/clients/${clientID}/plans/`).push(pushData).then(() => {
-        return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.4.6')
+        return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.4.7')
     })
 });
 
@@ -212,7 +212,7 @@ client.post('/plan/update', (req, res) => {
     if (req.body.price) {
         var price = String(req.body.price)
         if (isNaN(price)) {
-            return response(res, 400, 'invalid', 'Price Value invalid', undefined, 'A-4.5.7')
+            return response(res, 400, 'invalid', 'Price Value invalid', undefined, 'A-4.5.6')
         }
         pushData.price = price
     }
@@ -221,13 +221,11 @@ client.post('/plan/update', (req, res) => {
         pushData.lastModifiedOn = String(new Date())
         pushData.lastModifiedBy = "ADMIN"
         firebase.database().ref(`/admin/clients/${clientID}/plans/${planID}/`).update(pushData).then(() => {
-            return response(res, 200, 'success', 'Plan Successfully Updated', undefined, 'A-4.5.8')
+            return response(res, 200, 'success', 'Plan Successfully Updated', undefined, 'A-4.5.7')
         })
     } else {
-        return response(res, 403, 'forbidden', 'Plan Is Deleted Or Not Available', undefined, 'A-4.5.9')
+        return response(res, 403, 'forbidden', 'Plan Is Deleted Or Not Available', undefined, 'A-4.5.8')
     }
-
-
 });
 
 // 4.6 DELETE PLAN
@@ -309,7 +307,7 @@ client.get('/get', (req, res) => {
                     lastModified_by: tempClient.createdBy,
                     plans: plan
                 }
-                return response(res, 200, 'success', undefined, clientSingle)
+                return response(res, 200, 'success', undefined, clientSingle, 'A-4.7.2')
             }
 
         } else {
@@ -353,7 +351,7 @@ client.post('/change-password', (req, res) => {
             clientKeys = Object.keys(clientDB)
         for (var i = 0; i < clientKeys.length; i++) {
             var tempClient = clientDB[clientKeys[i]]
-            console.log(clientKeys[i] == clientID);
+
             if (clientKeys[i] == clientID && !tempClient.deleted) {
                 password = bcryptHash(password);
                 // Password and Token update + LOG update
@@ -365,7 +363,7 @@ client.post('/change-password', (req, res) => {
                     return response(res, 200, 'success', 'Client Password is updated', undefined, 'A-4.8.3')
                 })
             } else if (i == clientKeys.length - 1) {
-                return response(res, 404, 'forbidden', 'Client Id is not matched', undefined, 'A-4.8.4')
+                return response(res, 404, 'notFound', 'Incorrect Client ID', undefined, 'A-4.8.4')
             }
         }
     }
