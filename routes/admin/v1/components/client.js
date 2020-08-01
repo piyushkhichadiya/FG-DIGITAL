@@ -296,6 +296,7 @@ client.get('/get', (req, res) => {
         }
         // SINGLE CLIENT DETAIL
         if (req.query.client_id) {
+
             if (clientID == clientKey[i]) {
                 var clientSingle = {
                     client_id: clientKey[i],
@@ -306,6 +307,9 @@ client.get('/get', (req, res) => {
                     lastModified_on: tempClient.createdOn,
                     lastModified_by: tempClient.createdBy,
                     plans: plan
+                }
+                if (plan.length == 0) {
+                    delete clientSingle.plans
                 }
                 return response(res, 200, 'success', undefined, clientSingle, 'A-4.7.2')
             }
@@ -321,6 +325,9 @@ client.get('/get', (req, res) => {
                 lastModified_by: tempClient.createdBy,
                 plans: plan
             })
+            if (plan.length == 0) {
+                delete pushData[pushData.length - 1].plans
+            }
         }
 
     }

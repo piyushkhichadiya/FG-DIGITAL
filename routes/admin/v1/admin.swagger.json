@@ -651,6 +651,99 @@
                 }],
                 "responses": {}
             }
+        },
+        "/project/team/remove": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "project_id": "1376735095048"
+                    },
+                    "schema": {
+                        "project_id": "1376735095048"
+                    }
+                }, {
+                    "in": "query",
+                    "name": "employee_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "employee_id": "20201"
+                    },
+                    "schema": {
+                        "employee_id": "20201"
+                    }
+                }],
+                "responses": {}
+
+            }
+        },
+        "/project/team/deactivate": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "project_id": "1376735095048"
+                    },
+                    "schema": {
+                        "project_id": "1376735095048"
+                    }
+                }, {
+                    "in": "query",
+                    "name": "employee_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "employee_id": "20201"
+                    },
+                    "schema": {
+                        "employee_id": "20201"
+                    }
+                }],
+                "responses": {}
+
+            }
+        },
+        "/project/team/activate": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "project_id": "1376735095048"
+                    },
+                    "schema": {
+                        "project_id": "1376735095048"
+                    }
+                }, {
+                    "in": "query",
+                    "name": "employee_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "employee_id": "20201"
+                    },
+                    "schema": {
+                        "employee_id": "20201"
+                    }
+                }],
+                "responses": {}
+
+            }
         }
 
     }

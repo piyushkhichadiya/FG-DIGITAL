@@ -117,7 +117,7 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
     console.log(`Swagger Ui: FAILED => Environment: ${process.env.NODE_ENV||''} > Port: ${process.env.PORT||80}`)
 }
 
-console.log(`------------------------------- School Score [${packageInfo.name}] -------------------------------`);
+console.log(`------------------------------- ${packageInfo.name} -------------------------------`);
 
 //------------------------- API & VIEW ROUTES --------------------------
 

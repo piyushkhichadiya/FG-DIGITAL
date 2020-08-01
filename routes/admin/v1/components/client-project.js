@@ -81,7 +81,6 @@ projectAPI.post('/team/add', async(req, res) => {
         employeeID = String(req.body.employee_id),
         employeeDB = dbAdminSnapshot.employees,
         employeeKeys = Object.keys(employeeDB)
-    console.log(getKeyDB);
     for (var i = 0; i < employeeKeys.length; i++) {
         var tempEmployee = employeeDB[employeeKeys[i]]
         if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted) {
@@ -91,12 +90,13 @@ projectAPI.post('/team/add', async(req, res) => {
                 for (var j = 0; j < teamKeys.length; j++) {
                     var tempTeam = teamDB[teamKeys[j]]
                     if (tempTeam.employee_id == employeeID) {
-                        return response(res, 403, 'forbidden', 'Emplyee already assigned to this project', undefined, '6.3.2')
+                        return response(res, 403, 'forbidden', 'Employee already assigned to this project', undefined, '6.3.2')
                     } else if (j == teamKeys.length - 1) {
                         pushData.employee_id = employeeID
-                        console.log(pushData);
+                        pushData.createdOn = String(new Date())
+                        pushData.createdBy = "ADMIN"
                         return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
-                            return response(res, 200, 'success', undefined, undefined, 'A-6.3.2')
+                            return response(res, 200, 'success', undefined, undefined, 'A-6.3.3')
                         })
                     }
                 }
@@ -104,12 +104,12 @@ projectAPI.post('/team/add', async(req, res) => {
                 pushData.employee_id = employeeID
                 console.log(pushData);
                 return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
-                    return response(res, 200, 'success', undefined, undefined, 'A-6.3.3')
+                    return response(res, 200, 'success', undefined, undefined, 'A-6.3.4')
                 })
             }
 
         } else if (i == employeeKeys.length - 1) {
-            return response(res, 403, 'Forbidden', 'Employee Not Found In List Or Removed', undefined, 'A-6.3.4')
+            return response(res, 403, 'Forbidden', 'Incorrect Employee ID', undefined, 'A-6.3.5')
         }
     }
 })
@@ -118,13 +118,16 @@ projectAPI.post('/team/add', async(req, res) => {
 
 projectAPI.post('/team/update', async(req, res) => {
     if (!req.body.project_id || !req.body.employee_id) {
-        return response(res, 400, 'required', 'Input is not properly', undefined, 'A-6.4.1')
+        return response(res, 400, 'required', 'Project ID and Employee ID are required', undefined, 'A-6.4.1')
     }
     var projectID = String(req.body.project_id),
         getKeyDB = getKeys(projectID),
         employeeID = String(req.body.employee_id),
         employeeDB = dbAdminSnapshot.employees,
         employeeKeys = Object.keys(employeeDB)
+    if (getKeyDB.client_key || getKeyDB.plan_key) {
+        return
+    }
     for (var i = 0; i < employeeKeys.length; i++) {
         var tempEmployee = employeeDB[employeeKeys[i]]
         if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted) {
@@ -133,25 +136,29 @@ projectAPI.post('/team/update', async(req, res) => {
                     teamKeys = Object.keys(teamDB)
                 for (var j = 0; j < teamKeys.length; j++) {
                     var tempTeam = teamDB[teamKeys[j]]
-                    if (tempTeam.employee_id == employeeID) {
-                        tempTeam.review = false
-                        tempTeam.activity = false
-                        tempTeam.active = false
+                    if (tempTeam.employee_id == employeeID && !tempTeam.deleted) {
+                        tempTeam.lastModifiedOn = String(new Date())
+                        tempTeam.lastModifiedBy = "ADMIN"
                         if (req.body.review) {
                             tempTeam.review = true
+                        } else if (req.body.review == false) {
+                            tempTeam.review = false
                         }
                         if (req.body.activity) {
                             tempTeam.activity = true
+                        } else if (req.body.activity == false) {
+                            tempTeam.activity = false
                         }
                         if (req.body.active) {
                             tempTeam.active = true
+                        } else if (req.body.active == false) {
+                            tempTeam.active = false
                         }
-                        console.log(tempTeam);
                         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamKeys[j]}/`).update(tempTeam).then(() => {
                             return response(res, 200, 'success', 'Permission Successfully Updated', undefined, 'A-6.4.2')
                         })
                     } else if (j == teamKeys.length - 1) {
-                        return response(res, 403, 'forbidden', 'Employee is not active', undefined, 'A-6.4.3')
+                        return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, undefined, 'A-6.4.3')
                     }
                 }
             }
@@ -163,27 +170,121 @@ projectAPI.post('/team/update', async(req, res) => {
 
 // 6.5 TEAM REMOVE
 
-
-function getKeys(project_id) {
-    var clientDB = dbAdminSnapshot.clients,
-        clientKey = Object.keys(clientDB)
-    for (var i = 0; i <= clientKey.length; i++) {
-        var planDB = clientDB[clientKey[i]].plans,
-            planKey = Object.keys(planDB)
-        for (var j = 0; j <= planKey.length; j++) {
-            var tempPlan = planDB[planKey[j]]
-            if (tempPlan.project_id == project_id) {
-                pushData = {
-                    "client_key": clientKey[i],
-                    "plan_key": planKey[j]
-                }
-                return pushData
-            } else if (j == planKey.length - 1) {
-                return response(res, 404, 'notfound', 'Not Found any project with this ID', undefined, 'F-6.1')
+projectAPI.get('/team/remove', (req, res) => {
+    if (!req.query.project_id || !req.query.employee_id) {
+        return response(res, 400, 'required', 'Input is not proper', undefined, 'A-6.5.1')
+    }
+    var projectID = String(req.query.project_id),
+        getKeyDB = getKeys(projectID),
+        employeeID = String(req.query.employee_id)
+    if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
+        var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
+            teamDBKeys = Object.keys(teamDB)
+        for (var i = 0; i < teamDBKeys.length; i++) {
+            var tempTeam = teamDB[teamDBKeys[i]]
+            if (tempTeam.employee_id == employeeID) {
+                tempTeam.active = false
+                tempTeam.deleted = true
+                tempTeam.lastModifiedOn = String(new Date())
+                tempTeam.lastModifiedBy = "ADMIN"
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamDBKeys[i]}/`).update(tempTeam).then(() => {
+                    return response(res, 200, 'success', 'Deleted Successfully', undefined, undefined, 'A-6.5.2')
+                })
+            } else if (i == teamDBKeys.length - 1) {
+                return response(res, 403, 'forbidden', 'Internal Error', undefined, undefined, 'A-6.5.3')
             }
         }
     }
-    return response(res, 404, 'notfound', 'Not Found any project with this ID', undefined, 'F-6.2')
+})
+
+// 6.6 TEAM DEACTIVATE
+
+projectAPI.get('/team/deactivate', (req, res) => {
+    if (!req.query.project_id || !req.query.employee_id) {
+        return response(res, 400, 'required', 'Input is not proper', undefined, 'A-6.6.1')
+    }
+    var projectID = String(req.query.project_id),
+        getKeyDB = getKeys(projectID),
+        employeeID = String(req.query.employee_id)
+    if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
+        var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
+            teamDBKeys = Object.keys(teamDB)
+        for (var i = 0; i < teamDBKeys.length; i++) {
+            var tempTeam = teamDB[teamDBKeys[i]]
+            if (tempTeam.employee_id == employeeID && !tempTeam.deleted) {
+                tempTeam.active = false
+                tempTeam.lastModifiedOn = String(new Date())
+                tempTeam.lastModifiedBy = "ADMIN"
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamDBKeys[i]}/`).update(tempTeam).then(() => {
+                    return response(res, 200, 'success', 'Deleted Successfully', undefined, undefined, 'A-6.6.2')
+                })
+            } else if (i == teamDBKeys.length - 1) {
+                return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, undefined, 'A-6.6.3')
+            }
+        }
+    }
+
+})
+
+// 6.7 TEAM ACTIVATE
+
+projectAPI.get('/team/activate', (req, res) => {
+    if (!req.query.project_id || !req.query.employee_id) {
+        return response(res, 400, 'required', 'Input is not proper', undefined, 'A-6.5.1')
+    }
+    var projectID = String(req.query.project_id),
+        getKeyDB = getKeys(projectID),
+        employeeID = String(req.query.employee_id)
+    if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
+        var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
+            teamDBKeys = Object.keys(teamDB)
+        for (var i = 0; i < teamDBKeys.length; i++) {
+            var tempTeam = teamDB[teamDBKeys[i]]
+            if (tempTeam.employee_id == employeeID && !tempTeam.deleted) {
+                tempTeam.active = true
+                tempTeam.lastModifiedOn = String(new Date())
+                tempTeam.lastModifiedBy = "ADMIN"
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamDBKeys[i]}/`).update(tempTeam).then(() => {
+                    return response(res, 200, 'success', 'Deleted Successfully', undefined, undefined, 'A-6.5.2')
+                })
+            } else if (i == teamDBKeys.length - 1) {
+                return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, undefined, 'A-6.5.3')
+            }
+        }
+    }
+
+})
+
+
+
+function getKeys(project_id) {
+    if (!dbAdminSnapshot.clients) {
+        return response(res, 404, 'notfound', 'No any client active', undefined, undefined, 'A-F-6.3')
+    }
+    var clientDB = dbAdminSnapshot.clients,
+        clientKey = Object.keys(clientDB)
+    for (var i = 0; i <= clientKey.length; i++) {
+        if (clientDB[clientKey[i]].plans) {
+            var planDB = clientDB[clientKey[i]].plans,
+                planKey = Object.keys(planDB)
+            for (var j = 0; j <= planKey.length; j++) {
+                var tempPlan = planDB[planKey[j]]
+                if (tempPlan.project_id == project_id && !tempPlan.deleted) {
+                    pushData = {
+                        "client_key": clientKey[i],
+                        "plan_key": planKey[j]
+                    }
+                    return pushData
+                } else if (j == planKey.length - 1) {
+                    return response(res, 404, 'notfound', 'Not Found any project with this ID', undefined, 'F-6.1')
+                }
+            }
+        } else if (i == clientKey.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-F-6.2')
+
+        }
+    }
+    return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-F-6.2')
 
 }
 module.exports = projectAPI
