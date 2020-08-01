@@ -297,7 +297,7 @@ client.get('/get', (req, res) => {
             }
         }
         // SINGLE CLIENT DETAIL
-        if (clientID) {
+        if (req.query.client_id) {
             if (clientID == clientKey[i]) {
                 var clientSingle = {
                     client_id: clientKey[i],
@@ -310,22 +310,21 @@ client.get('/get', (req, res) => {
                     plans: plan
                 }
                 return response(res, 200, 'success', undefined, clientSingle)
-            } else {
-                return response(res, 400, 'invalid', 'Client Id Is Invalid', undefined, 'A-4.7.2')
-
             }
 
+        } else {
+            pushData.push({
+                client_id: clientKey[i],
+                email: tempClient.email,
+                name: tempClient.name,
+                created_on: tempClient.createdOn,
+                created_by: tempClient.createdBy,
+                lastModified_on: tempClient.createdOn,
+                lastModified_by: tempClient.createdBy,
+                plans: plan
+            })
         }
-        pushData.push({
-            client_id: clientKey[i],
-            email: tempClient.email,
-            name: tempClient.name,
-            created_on: tempClient.createdOn,
-            created_by: tempClient.createdBy,
-            lastModified_on: tempClient.createdOn,
-            lastModified_by: tempClient.createdBy,
-            plans: plan
-        })
+
     }
     if (pushData.length > 0) {
         return response(res, 200, 'success', 'Client Details', pushData, 'A-4.7.3')

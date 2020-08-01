@@ -26,6 +26,10 @@
         {
             "name": "5. Employee",
             "description": "Employee Account and related operations"
+        },
+        {
+            "name": "6. Client-project",
+            "description": "Activity Related to project of client"
         }
     ],
     "paths": {
@@ -578,6 +582,70 @@
                         "example": {
                             "client_id": "20201",
                             "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/get": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Get All Project Details",
+                "parameters": [{
+                    "in": "query",
+                    "name": "client_id",
+                    "description": "get project",
+                    "required": false,
+                    "items": { "type": "string" }
+                }],
+                "responses": {}
+            }
+
+        },
+        "/project/team/add": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Assign Team member to project",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "client_id"],
+                        "properties": {
+                            "employee_id": { "type": "string" },
+                            "project_id": { "type": "string" }
+                        },
+                        "example": {
+                            "employee_id": "20201",
+                            "project_id": "1376735095048"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/team/update": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Update Permission to team member",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "client_id"],
+                        "properties": {
+                            "employee_id": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "active": { "type": "boolean" },
+                            "review": { "type": "boolean" },
+                            "activity": { "type": "boolean" }
+
+                        },
+                        "example": {
+                            "employee_id": "20201",
+                            "project_id": "1376735095048",
+                            "active": "true"
                         }
                     }
                 }],
