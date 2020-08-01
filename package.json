@@ -1,6 +1,6 @@
 {
     "name": "fg-digital",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "FG Digital Client, Employee and Admin Management Portal",
     "main": "index.js",
     "scripts": {
