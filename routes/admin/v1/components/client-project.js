@@ -20,11 +20,10 @@ projectAPI.use((req, res, next) => {
 
 projectAPI.get(['/', '/get'], (req, res) => {
     if (!req.query.client_id) {
-        return response(res, 400, 'required', 'ClientID is not found', undefined, 'A-6.1.1')
+        return response(res, 400, 'required', 'ClientID is required', undefined, 'A-6.1.1')
     }
     if (!dbAdminSnapshot.clients) {
-        return response(res, 403, 'forbidden', 'Not matched any client', undefined, 'A-6.1.2')
-
+        return response(res, 404, 'notfound', 'Incorrect Client ID', undefined, 'A-6.1.2')
     }
     var dbClient = dbAdminSnapshot.clients,
         dbClientKey = Object.keys(dbClient),
@@ -36,18 +35,17 @@ projectAPI.get(['/', '/get'], (req, res) => {
                 planKey = Object.keys(planDB)
             for (var j = 0; j < planKey.length; j++) {
                 var tempPlan = planDB[planKey[j]]
-                console.log(tempPlan);
                 if (!tempPlan.deleted) {
                     pushData.push(tempPlan)
                 }
             }
             if (pushData.length > 0) {
-                return response(res, '200', 'success', undefined, pushData)
+                return response(res, '200', 'success', undefined, pushData, 'A-6.1.5')
             } else {
-                return response(res, '403', 'forbidden', 'No Any Plan Purchased By Client', undefined, 'A-6.1.2')
+                return response(res, '404', 'notFound', 'No Any Plan Purchased By Client', undefined, 'A-6.1.3')
             }
         } else if (i == dbClientKey.length - 1) {
-            return response(res, 403, 'forbidden', 'Client Key Not Matched with any user', undefined, 'A-6.1.3')
+            return response(res, 403, 'forbidden', 'Client Key Not Matched with any user', undefined, 'A-6.1.4')
         }
     }
 
@@ -58,7 +56,7 @@ projectAPI.get(['/', '/get'], (req, res) => {
 
 projectAPI.get('/project/:project_id', (req, res) => {
     if (!req.params.project_id) {
-        return response(res, 400, 'required', 'ClientID is not found', undefined, '6.1.1')
+        return response(res, 400, 'required', 'ClientID is not found', undefined, 'A-6.2.1')
     }
     //REMAINING DUE TO INSUFFICIENT DATA
 })
@@ -90,7 +88,7 @@ projectAPI.post('/team/add', async(req, res) => {
                 for (var j = 0; j < teamKeys.length; j++) {
                     var tempTeam = teamDB[teamKeys[j]]
                     if (tempTeam.employee_id == employeeID) {
-                        return response(res, 403, 'forbidden', 'Employee already assigned to this project', undefined, '6.3.2')
+                        return response(res, 403, 'forbidden', 'Employee already assigned to this project', undefined, 'A-6.3.2')
                     } else if (j == teamKeys.length - 1) {
                         pushData.employee_id = employeeID
                         pushData.createdOn = String(new Date())
@@ -158,7 +156,7 @@ projectAPI.post('/team/update', async(req, res) => {
                             return response(res, 200, 'success', 'Permission Successfully Updated', undefined, 'A-6.4.2')
                         })
                     } else if (j == teamKeys.length - 1) {
-                        return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, undefined, 'A-6.4.3')
+                        return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, 'A-6.4.3')
                     }
                 }
             }
@@ -188,10 +186,10 @@ projectAPI.get('/team/remove', (req, res) => {
                 tempTeam.lastModifiedOn = String(new Date())
                 tempTeam.lastModifiedBy = "ADMIN"
                 return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamDBKeys[i]}/`).update(tempTeam).then(() => {
-                    return response(res, 200, 'success', 'Deleted Successfully', undefined, undefined, 'A-6.5.2')
+                    return response(res, 200, 'success', 'Deleted Successfully', undefined, 'A-6.5.2')
                 })
             } else if (i == teamDBKeys.length - 1) {
-                return response(res, 403, 'forbidden', 'Internal Error', undefined, undefined, 'A-6.5.3')
+                return response(res, 403, 'forbidden', 'Internal Error', undefined, 'A-6.5.3')
             }
         }
     }
@@ -206,7 +204,7 @@ projectAPI.get('/team/deactivate', (req, res) => {
     var projectID = String(req.query.project_id),
         getKeyDB = getKeys(projectID),
         employeeID = String(req.query.employee_id)
-    if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
+    if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team && getKeyDB) {
         var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
             teamDBKeys = Object.keys(teamDB)
         for (var i = 0; i < teamDBKeys.length; i++) {
@@ -216,13 +214,15 @@ projectAPI.get('/team/deactivate', (req, res) => {
                 tempTeam.lastModifiedOn = String(new Date())
                 tempTeam.lastModifiedBy = "ADMIN"
                 return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamDBKeys[i]}/`).update(tempTeam).then(() => {
-                    return response(res, 200, 'success', 'Deleted Successfully', undefined, undefined, 'A-6.6.2')
+                    return response(res, 200, 'success', 'Deleted Successfully', undefined, 'A-6.6.2')
                 })
             } else if (i == teamDBKeys.length - 1) {
-                return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, undefined, 'A-6.6.3')
+                return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, 'A-6.6.3')
             }
         }
     }
+    return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6-6.4')
+
 
 })
 
@@ -230,12 +230,12 @@ projectAPI.get('/team/deactivate', (req, res) => {
 
 projectAPI.get('/team/activate', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
-        return response(res, 400, 'required', 'Input is not proper', undefined, 'A-6.5.1')
+        return response(res, 400, 'required', 'Project Id and employee Id are required', undefined, 'A-6.7.1')
     }
     var projectID = String(req.query.project_id),
         getKeyDB = getKeys(projectID),
         employeeID = String(req.query.employee_id)
-    if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
+    if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team && getKeyDB) {
         var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
             teamDBKeys = Object.keys(teamDB)
         for (var i = 0; i < teamDBKeys.length; i++) {
@@ -245,29 +245,170 @@ projectAPI.get('/team/activate', (req, res) => {
                 tempTeam.lastModifiedOn = String(new Date())
                 tempTeam.lastModifiedBy = "ADMIN"
                 return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamDBKeys[i]}/`).update(tempTeam).then(() => {
-                    return response(res, 200, 'success', 'Deleted Successfully', undefined, undefined, 'A-6.5.2')
+                    return response(res, 200, 'success', 'Deleted Successfully', undefined, 'A-6.7.2')
                 })
             } else if (i == teamDBKeys.length - 1) {
-                return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, undefined, 'A-6.5.3')
+                return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, 'A-6.7.3')
             }
         }
+    }
+    return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.7.4')
+
+})
+
+// 6.8 SOCIAL ACCOUNT ADD
+
+projectAPI.post('/social-account/add', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.8.1')
+    }
+    if (!req.body.account_name) {
+        return response(res, 400, 'required', 'Account Name is required', undefined, 'A-6.8.2')
+    }
+    if (!req.body.reference) {
+        return response(res, 400, 'required', 'Reference is required', undefined, 'A-6.8.3')
+
+    }
+    var projectID = String(req.query.project_id),
+        accountName = String(req.body.account_name),
+        reference = String(req.body.reference),
+        getKeyDB = getKeys(projectID),
+        pushData = {
+            "account_name": accountName,
+            "reference": reference,
+            "createdOn": String(new Date()),
+            "createdBy": "ADMIN"
+        }
+    if (getKeyDB) {
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/social_account`).push(pushData).then(() => {
+            return response(res, 200, 'success', 'Social Account Created', undefined, 'A-6.8.4')
+        })
+    } else {
+        return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.8.5')
+    }
+
+
+})
+
+// 6.9 SOCIAL ACCOUNT UPDATE
+
+projectAPI.post('/social-account/update', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.9.1')
+    }
+    if (!req.body.account_key) {
+        return response(res, 400, 'required', 'Account Key is required', undefined, 'A-6.9.2')
+    }
+    if (!req.body.reference) {
+        return response(res, 400, 'required', 'Reference is required', undefined, 'A-6.9.3')
+    }
+    var accountKey = String(req.body.account_key),
+        projectID = String(req.query.project_id),
+        getKeyDB = getKeys(projectID),
+        reference = String(req.body.reference)
+    if (getKeyDB && dbAdminSnapshot.clients[getKeyDB.client_key].social_account) {
+        var clientSocialDB = dbAdminSnapshot.clients[getKeyDB.client_key].social_account,
+            clientSocialKey = Object.keys(clientSocialDB)
+        for (var i = 0; i < clientSocialKey.length; i++) {
+            if (clientSocialKey[i] == accountKey && !clientSocialKey[i].deleted) {
+                var tempData = clientSocialDB[clientSocialKey[i]]
+                tempData.reference = reference
+                tempData.lastModifiedOn = String(new Date())
+                tempData.lastModifiedBy = "ADMIN"
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/social_account/${accountKey}`).update(tempData).then(() => {
+                    return response(res, 200, 'success', 'Social Account Updated', undefined, 'A-6.9.4')
+
+                })
+            } else if (i == clientSocialKey.length - 1) {
+                return response(res, 404, 'notfound', 'Incorrect Account ID', undefined, 'A-6.9.5')
+
+            }
+        }
+    } else {
+        return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.9.6')
+
+    }
+})
+
+// 6.10 SOCIAL ACCOUNT REMOVE 
+
+projectAPI.post('/social-account/remove', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.10.1')
+    }
+    if (!req.query.account_key) {
+        return response(res, 400, 'required', 'Account Key is required', undefined, 'A-6.10.2')
+    }
+
+    var accountKey = String(req.query.account_key),
+        projectID = String(req.query.project_id),
+        getKeyDB = getKeys(projectID)
+    if (getKeyDB && dbAdminSnapshot.clients[getKeyDB.client_key].social_account) {
+        var clientSocialDB = dbAdminSnapshot.clients[getKeyDB.client_key].social_account,
+            clientSocialKey = Object.keys(clientSocialDB)
+        for (var i = 0; i < clientSocialKey.length; i++) {
+            if (clientSocialKey[i] == accountKey && !clientSocialKey[i].deleted) {
+                var tempData = clientSocialDB[clientSocialKey[i]]
+                tempData.deleted = true
+                tempData.lastModifiedOn = String(new Date())
+                tempData.lastModifiedBy = "ADMIN"
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/social_account/${accountKey}`).update(tempData).then(() => {
+                    return response(res, 200, 'success', 'Social Account Removed Successfully', undefined, 'A-6.10.3')
+                })
+            } else if (i == clientSocialKey.length - 1) {
+                return response(res, 404, 'notfound', 'Incorrect Account ID', undefined, 'A-6.10.4')
+            }
+        }
+    } else {
+        return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.10.5')
     }
 
 })
 
+// 6.11 UPDATE PROJECT INFO
 
+projectAPI.post('/update', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.11.1')
+    }
+    var pushData = {}
+    if (req.body.project_name) {
+        pushData.project_name = String(req.body.project_name)
+    }
+    if (req.body.project_description) {
+        pushData.project_description = String(req.body.project_description)
+    }
+    var projectID = String(req.query.project_id),
+        getKeyDB = getKeys(projectID)
+    if (getKeyDB) {
+        if (Object.keys(pushData).length > 0) {
+            pushData.lastModifiedOn = String(new Date()),
+                pushData.lastModifiedBy = "ADMIN"
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/`).update(pushData).then(() => {
+                return response(res, 200, 'success', 'Account Updated Successfully', undefined, 'A-6.11.2')
+
+            })
+
+        } else {
+            return response(res, 400, 'required', 'Enter Data To Update', undefined, 'A-6.11.3')
+
+        }
+    } else {
+        return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.11.4')
+    }
+})
 
 function getKeys(project_id) {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'notfound', 'No any client active', undefined, undefined, 'A-F-6.3')
+        return false
     }
     var clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB)
-    for (var i = 0; i <= clientKey.length; i++) {
-        if (clientDB[clientKey[i]].plans) {
+    for (var i = 0; i < clientKey.length; i++) {
+        if (clientDB[clientKey[i]].plans && !clientDB[clientKey[i]].deleted) {
             var planDB = clientDB[clientKey[i]].plans,
                 planKey = Object.keys(planDB)
-            for (var j = 0; j <= planKey.length; j++) {
+            for (var j = 0; j < planKey.length; j++) {
                 var tempPlan = planDB[planKey[j]]
                 if (tempPlan.project_id == project_id && !tempPlan.deleted) {
                     pushData = {
@@ -276,15 +417,14 @@ function getKeys(project_id) {
                     }
                     return pushData
                 } else if (j == planKey.length - 1) {
-                    return response(res, 404, 'notfound', 'Not Found any project with this ID', undefined, 'F-6.1')
+                    return false
                 }
             }
         } else if (i == clientKey.length - 1) {
-            return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-F-6.2')
-
+            return false
         }
     }
-    return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-F-6.2')
+    return false
 
 }
 module.exports = projectAPI

@@ -596,7 +596,7 @@
                     "in": "query",
                     "name": "client_id",
                     "description": "get project",
-                    "required": false,
+                    "required": true,
                     "items": { "type": "string" }
                 }],
                 "responses": {}
@@ -743,6 +743,134 @@
                 }],
                 "responses": {}
 
+            }
+        },
+        "/project/social-account/add": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Add Social Account",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "example": {
+                            "project_id": "1376735095048"
+                        },
+                        "schema": {
+                            "project_id": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "required": ["account_name", "reference"],
+                            "properties": {
+                                "account_name": { "type": "string" },
+                                "reference": { "type": "string" }
+                            },
+                            "example": {
+                                "account_name": "Facebook",
+                                "reference": "www.facebook.com"
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
+
+            }
+        },
+        "/project/social-account/update": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Update Social Account",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "example": {
+                            "project_id": "1376735095048"
+                        },
+                        "schema": {
+                            "project_id": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "required": ["account_key", "reference"],
+                            "properties": {
+                                "account_key": { "type": "string" },
+                                "reference": { "type": "string" }
+                            },
+                            "example": {
+                                "account_key": "-MDx3AwtJCYTVn6Kjk8l",
+                                "reference": "www.instagram.com"
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/social-account/remove": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Social Account",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "project_id": "1376735095048",
+                        "account_key": "-MDx3AwtJCYTVn6Kjk8l"
+                    },
+                    "schema": {
+                        "project_id": "1376735095048",
+                        "account_key": "-MDx3AwtJCYTVn6Kjk8l"
+
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/update": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Update Account Info",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "example": {
+                            "project_id": "1376735095048"
+                        },
+                        "schema": {
+                            "project_id": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "schema": {
+                            "required": ["project_name", "project_description"],
+                            "properties": {
+                                "project_name": { "type": "string" },
+                                "project_description": { "type": "string" }
+                            },
+                            "example": {
+                                "project_name": "Social Media",
+                                "project_description": "Test description for project"
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
             }
         }
 
