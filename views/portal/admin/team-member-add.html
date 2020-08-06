@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Add Team Member - FG Digital</title>
-  <!-- Tell the browser to be responsive to screen width -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="dist/css/ionicons.min.css">
-  <!-- DataTables -->
-  <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="dist/css/adminlte.min.css">
-  <!-- Google Font: Source Sans Pro -->
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-  <style>
-  	
-  </style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Add Team Member - FG Digital</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="dist/css/ionicons.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <style>
+
+    </style>
 </head>
+
 <body class="hold-transition sidebar-mini sidebar-collapse">
     <div class="wrapper">
         <!-- Navbar -->
@@ -32,7 +34,7 @@
                     <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
                 </li>
             </ul>
-            
+
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Notifications Dropdown Menu -->
@@ -62,7 +64,7 @@
                         <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div>
                 </li>
-                
+
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -114,162 +116,167 @@
             <!-- /.sidebar -->
         </aside>
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Add Member</h1>
-          </div>
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="javascript:void(0);">Member</a></li>
-              <li class="breadcrumb-item active">Add Member</li>
-            </ol>
-          </div>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Add Member</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">Member</a></li>
+                                <li class="breadcrumb-item active">Add Member</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="card-body card">
+                        <h4 class="header-title">Basic Info</h4>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label">Member ID:</label>
+                                    <input type="text" class="col-md-5 form-control" id="inputEmail3" placeholder="Member ID" disabled>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label">Name:</label>
+                                    <input type="text" class="col-md-5 form-control" id="inputEmail3" placeholder="Name">
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label">Position:</label>
+                                    <select class="col-md-5 form-control">
+                                        <option>Position 1</option>
+                                        <option>Position 2</option>
+                                        <option>Position 3</option>
+                                        <option>Position 4</option>
+                                        <option>Position 5</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label">Email:</label>
+                                    <input type="text" class="col-md-8 form-control" id="inputEmail3" placeholder="Email">
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-3 col-form-label">Password:</label>
+                                    <input type="password" class="col-md-4 form-control mr-1 mt-1" placeholder="New Password">
+                                    <input type="password" class="col-md-4 form-control mr-1 mt-1" placeholder="Confirm Password">
+                                </div>
+
+                            </div>
+                            <div class="col-md-2" align="center">
+                                <img src="https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png" class="ml-2" style="width: 100px; border-radius:50%;"><br>
+                                <p><i class="fas fa-camera ml-2"></i></p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <button class="btn btn-outline-primary float-right">Add Member</button>
+                        </div>
+                        <hr>
+                        <h4 class="header-title">Other Details</h4>
+                        <div class="row">
+                            <label for="inputEmail3" class="col-md-12 col-form-label">Skills:</label>
+                            <div class="col-md-4">
+                                <textarea class="form-control" rows="2" placeholder="Skills...."></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label for="inputEmail3" class="col-md-12 col-form-label">Social Accounts:</label>
+                            <div class="col-md-2 mt-2">
+                                <select class="form-control">
+                                    <option value="Stack Overflow">Stack Overflow</option>
+                                    <option value="Github">Github</option>
+                                    <option value="Hacker Rank">Hacker Rank</option>
+                                    <option value="LinkedIn">LinkedIn</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="U_id or Link">
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <button class="btn btn-outline-primary">Add Account</button>
+                                <button class="btn btn-outline-danger">Remove</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="inputEmail3" placeholder="Contact Details">
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <button class="btn btn-outline-primary mt-1 ml-2 float-right">Update</button>
+                                <button class="btn btn-outline-primary mt-1 float-right">Remove</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <h4 class="header-title">Update Password</h4>
+                        <div class="row">
+                            <div class="col-md-3 mt-2">
+                                <input type="password" class="form-control" placeholder="Enter New Password">
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <input type="password" class="form-control" placeholder="Confirm Password">
+                            </div>
+                            <div class="col-md-2 mt-2">
+                                <button class="btn btn-outline-primary">Update Password</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Card body -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
         </div>
-      </div><!-- /.container-fluid -->
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <div class="card-body card">
-	        <div class="row">
-	       </div>
-         	<h4 class="header-title">Basic Info</h4>
-         <div class="row">
-           <div class="col-md-10">
-           	<div class="row m-1">
-           		<label class="col-md-2 col-form-label">Member ID:</label>
-           		<input type="text" class="col-md-3 form-control" id="inputEmail3" placeholder="Member ID" disabled>
-           	</div>
-           	<div class="row m-1">
-           		<label class="col-md-2 col-form-label">Name:</label>
-           		<input type="text" class="col-md-3 form-control" id="inputEmail3" placeholder="Name">
-           		<label class="col-md-2 offset-md-1 col-form-label">Position:</label>
-         			<select class="col-md-3 form-control">
-	                  <option>Position 1</option>
-	                  <option>Position 2</option>
-	                  <option>Position 3</option>
-	                  <option>Position 4</option>
-	                  <option>Position 5</option>
-	                </select>
-           	</div>
-           	<div class="row m-1">
-           		<label class="col-md-2 col-form-label">Email:</label>
-           		<input type="email" class="col-md-3 form-control" id="inputEmail3" placeholder="Email">
-           		<label class="col-md-2 offset-md-1 col-form-label">password:</label>
-           		<input type="password" class="col-md-3 form-control" placeholder="password">
-           	</div>
-
-           </div>
-           <div class="col-md-2" align="center">
-                  <img src="https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png" class="ml-2" style="width: 100px; border-radius:50%;"><br>
-                  <p><i class="fas fa-camera ml-2" ></i></p>
-           </div>
-           <div class="col-md-12">
-              <button class="btn btn-outline-primary float-right">Add Member</button>
-           </div>
-         </div>
-         <hr>
-         <h4 class="header-title">Other Details</h4>   
-         <div class="row">
-       		  <label for="inputEmail3" class="col-md-12 col-form-label">Skills:</label>
-          	<div class="col-md-4">
-          		<textarea class="form-control" rows="2" placeholder="Skills...."></textarea>
-        	  </div>
-         </div>
-         <div class="row">
-         	<label for="inputEmail3" class="col-md-12 col-form-label">Social Accounts:</label>
-         	<div class="col-md-2 mt-2">
-         		<select class="form-control">
-                  <option>A/C 1</option>
-                  <option>A/C 2</option>
-                  <option>A/C 3</option>
-                  <option>A/C 4</option>
-                  <option>A/C 5</option>
-                </select>
-         	</div>
-         	<div class="col-md-2">
-              <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="U_id or Link">
-          </div>
-          <div class="col-md-3 mt-2">
-            <button class="btn btn-outline-primary">Add Account</button>
-            <button class="btn btn-outline-danger">Remove</button>
-          </div>
-         </div>
-         <div class="row">
-         	<label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
-         	  <div class="col-md-4">
-              <input type="text" class="form-control" id="inputEmail3" placeholder="Contact Details">
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-         </div>
-         <div class="row mt-2">
-         	<div class="col-md-12">
-         		<button class="btn btn-outline-primary mt-1 ml-2 float-right">Update</button>
-         		<button class="btn btn-outline-primary mt-1 float-right">Remove</button>
-         	</div>
-         </div>
-         <hr>
-         <h4 class="header-title">Update Password</h4>
-         <div class="row">
-             <div class="col-md-3">
-                <label for="exampleInputPassword1">New Password</label>
-                <input type="password" class="form-control" placeholder="Enter New Password">
-             </div>   
-             <div class="col-md-3">
-                <label for="exampleInputPassword1">Confirm Password</label>
-                <input type="password" class="form-control" placeholder="Confirm Password">
-             </div>
-             <div class="col-md-2" style="margin-top: 2.5%;">
-                <button class="btn btn-outline-primary">Update Password</button>
-             </div>
-        </div> 
-        
-      </div>
-      <!-- Card body -->
-      </div>
-      <!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
-  <footer class="main-footer">
-    <div class="float-right d-none d-sm-block">
-        <p id="lbl_ui_version"> VERSION INFO </p>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+        </footer>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
     </div>
-    <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
-  </footer>
+    <!-- ./wrapper -->
 
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
-</div>
-<!-- ./wrapper -->
-
-<!-- jQuery -->
-<script src="plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- DataTables -->
-<script src="plugins/datatables/jquery.dataTables.min.js"></script>
-<script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-<script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-<script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<!-- AdminLTE App -->
-<script src="dist/js/adminlte.min.js"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="dist/js/demo.js"></script>
-<!-- page script -->
+    <!-- jQuery -->
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="dist/js/demo.js"></script>
+    <!-- page script -->
 </body>
 <script>
-  $("#example1").DataTable({
-      "responsive": true,
+    $("#example1").DataTable({
+        "responsive": true,
     });
 </script>
+
 </html>
