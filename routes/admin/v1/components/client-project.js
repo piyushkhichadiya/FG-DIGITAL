@@ -27,7 +27,7 @@ projectAPI.get(['/', '/get'], (req, res) => {
     }
     var dbClient = dbAdminSnapshot.clients,
         dbClientKey = Object.keys(dbClient),
-        client_id = String(req.query.client_id),
+        client_id = String(req.query.client_id).trim(),
         pushData = []
     for (var i = 0; i < dbClientKey.length; i++) {
         if (client_id == dbClientKey[i]) {
@@ -36,6 +36,9 @@ projectAPI.get(['/', '/get'], (req, res) => {
             for (var j = 0; j < planKey.length; j++) {
                 var tempPlan = planDB[planKey[j]]
                 if (!tempPlan.deleted) {
+                    if (tempPlan.team) {
+                        delete tempPlan.team
+                    }
                     pushData.push(tempPlan)
                 }
             }
@@ -65,7 +68,7 @@ projectAPI.get('/project/:project_id', (req, res) => {
 
 projectAPI.post('/team/add', async(req, res) => {
     if (!req.body.project_id || !req.body.employee_id) {
-        return response(res, 400, 'required', 'Input is not properly', undefined, 'A-6.3.1')
+        return response(res, 400, 'required', 'Project Id and Employee ID both are required', undefined, 'A-6.3.1')
     }
     var pushData = { review: false, activity: false, active: true }
     if (req.body.review) {
@@ -74,41 +77,46 @@ projectAPI.post('/team/add', async(req, res) => {
     if (req.body.activity) {
         pushData.activity = true
     }
-    var projectId = String(req.body.project_id),
+    var projectId = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectId),
-        employeeID = String(req.body.employee_id),
+        employeeID = String(req.body.employee_id.trim()),
         employeeDB = dbAdminSnapshot.employees,
         employeeKeys = Object.keys(employeeDB)
-    for (var i = 0; i < employeeKeys.length; i++) {
-        var tempEmployee = employeeDB[employeeKeys[i]]
-        if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted) {
-            if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
-                var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
-                    teamKeys = Object.keys(teamDB)
-                for (var j = 0; j < teamKeys.length; j++) {
-                    var tempTeam = teamDB[teamKeys[j]]
-                    if (tempTeam.employee_id == employeeID) {
-                        return response(res, 403, 'forbidden', 'Employee already assigned to this project', undefined, 'A-6.3.2')
-                    } else if (j == teamKeys.length - 1) {
-                        pushData.employee_id = employeeID
-                        pushData.createdOn = String(new Date())
-                        pushData.createdBy = "ADMIN"
-                        return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
-                            return response(res, 200, 'success', undefined, undefined, 'A-6.3.3')
-                        })
+    if (getKeyDB) {
+        for (var i = 0; i < employeeKeys.length; i++) {
+            var tempEmployee = employeeDB[employeeKeys[i]]
+            if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted) {
+                if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
+                    var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
+                        teamKeys = Object.keys(teamDB)
+                    for (var j = 0; j < teamKeys.length; j++) {
+                        var tempTeam = teamDB[teamKeys[j]]
+                        if (tempTeam.employee_id == employeeID) {
+                            return response(res, 403, 'forbidden', 'Employee already assigned to this project', undefined, 'A-6.3.2')
+                        } else if (j == teamKeys.length - 1) {
+                            pushData.employee_id = employeeID
+                            pushData.createdOn = String(new Date())
+                            pushData.createdBy = "ADMIN"
+                            return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
+                                return response(res, 200, 'success', undefined, undefined, 'A-6.3.3')
+                            })
+                        }
                     }
+                } else {
+                    pushData.employee_id = employeeID
+                    console.log(pushData);
+                    return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
+                        return response(res, 200, 'success', undefined, undefined, 'A-6.3.4')
+                    })
                 }
-            } else {
-                pushData.employee_id = employeeID
-                console.log(pushData);
-                return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
-                    return response(res, 200, 'success', undefined, undefined, 'A-6.3.4')
-                })
-            }
 
-        } else if (i == employeeKeys.length - 1) {
-            return response(res, 403, 'Forbidden', 'Incorrect Employee ID', undefined, 'A-6.3.5')
+            } else if (i == employeeKeys.length - 1) {
+                return response(res, 403, 'Forbidden', 'Incorrect Employee ID', undefined, 'A-6.3.5')
+            }
         }
+    } else {
+        return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.3.6')
+
     }
 })
 
@@ -118,17 +126,14 @@ projectAPI.post('/team/update', async(req, res) => {
     if (!req.body.project_id || !req.body.employee_id) {
         return response(res, 400, 'required', 'Project ID and Employee ID are required', undefined, 'A-6.4.1')
     }
-    var projectID = String(req.body.project_id),
+    var projectID = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectID),
-        employeeID = String(req.body.employee_id),
+        employeeID = String(req.body.employee_id).trim(),
         employeeDB = dbAdminSnapshot.employees,
         employeeKeys = Object.keys(employeeDB)
-    if (getKeyDB.client_key || getKeyDB.plan_key) {
-        return
-    }
     for (var i = 0; i < employeeKeys.length; i++) {
         var tempEmployee = employeeDB[employeeKeys[i]]
-        if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted) {
+        if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted && getKeyDB) {
             if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
                 var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
                     teamKeys = Object.keys(teamDB)
@@ -156,7 +161,7 @@ projectAPI.post('/team/update', async(req, res) => {
                             return response(res, 200, 'success', 'Permission Successfully Updated', undefined, 'A-6.4.2')
                         })
                     } else if (j == teamKeys.length - 1) {
-                        return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, 'A-6.4.3')
+                        return response(res, 403, 'forbidden', 'Employee is not active or removed from this project', undefined, 'A-6.4.3')
                     }
                 }
             }
@@ -174,7 +179,7 @@ projectAPI.get('/team/remove', (req, res) => {
     }
     var projectID = String(req.query.project_id),
         getKeyDB = getKeys(projectID),
-        employeeID = String(req.query.employee_id)
+        employeeID = String(req.query.employee_id).trim()
     if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
         var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
             teamDBKeys = Object.keys(teamDB)
@@ -201,9 +206,9 @@ projectAPI.get('/team/deactivate', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
         return response(res, 400, 'required', 'Input is not proper', undefined, 'A-6.6.1')
     }
-    var projectID = String(req.query.project_id),
+    var projectID = String(req.query.project_id).trim(),
         getKeyDB = getKeys(projectID),
-        employeeID = String(req.query.employee_id)
+        employeeID = String(req.query.employee_id).trim()
     if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team && getKeyDB) {
         var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
             teamDBKeys = Object.keys(teamDB)
@@ -232,9 +237,9 @@ projectAPI.get('/team/activate', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
         return response(res, 400, 'required', 'Project Id and employee Id are required', undefined, 'A-6.7.1')
     }
-    var projectID = String(req.query.project_id),
+    var projectID = String(req.query.project_id).trim(),
         getKeyDB = getKeys(projectID),
-        employeeID = String(req.query.employee_id)
+        employeeID = String(req.query.employee_id).trim()
     if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team && getKeyDB) {
         var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
             teamDBKeys = Object.keys(teamDB)
@@ -259,7 +264,7 @@ projectAPI.get('/team/activate', (req, res) => {
 // 6.8 SOCIAL ACCOUNT ADD
 
 projectAPI.post('/social-account/add', (req, res) => {
-    if (!req.query.project_id) {
+    if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.8.1')
     }
     if (!req.body.account_name) {
@@ -269,9 +274,9 @@ projectAPI.post('/social-account/add', (req, res) => {
         return response(res, 400, 'required', 'Reference is required', undefined, 'A-6.8.3')
 
     }
-    var projectID = String(req.query.project_id),
-        accountName = String(req.body.account_name),
-        reference = String(req.body.reference),
+    var projectID = String(req.body.project_id).trim(),
+        accountName = String(req.body.account_name).trim(),
+        reference = String(req.body.reference).trim(),
         getKeyDB = getKeys(projectID),
         pushData = {
             "account_name": accountName,
@@ -293,7 +298,7 @@ projectAPI.post('/social-account/add', (req, res) => {
 // 6.9 SOCIAL ACCOUNT UPDATE
 
 projectAPI.post('/social-account/update', (req, res) => {
-    if (!req.query.project_id) {
+    if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.9.1')
     }
     if (!req.body.account_key) {
@@ -302,10 +307,10 @@ projectAPI.post('/social-account/update', (req, res) => {
     if (!req.body.reference) {
         return response(res, 400, 'required', 'Reference is required', undefined, 'A-6.9.3')
     }
-    var accountKey = String(req.body.account_key),
-        projectID = String(req.query.project_id),
+    var accountKey = String(req.body.account_key).trim(),
+        projectID = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectID),
-        reference = String(req.body.reference)
+        reference = String(req.body.reference).trim()
     if (getKeyDB && dbAdminSnapshot.clients[getKeyDB.client_key].social_account) {
         var clientSocialDB = dbAdminSnapshot.clients[getKeyDB.client_key].social_account,
             clientSocialKey = Object.keys(clientSocialDB)
@@ -332,7 +337,7 @@ projectAPI.post('/social-account/update', (req, res) => {
 
 // 6.10 SOCIAL ACCOUNT REMOVE 
 
-projectAPI.post('/social-account/remove', (req, res) => {
+projectAPI.get('/social-account/remove', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.10.1')
     }
@@ -340,8 +345,8 @@ projectAPI.post('/social-account/remove', (req, res) => {
         return response(res, 400, 'required', 'Account Key is required', undefined, 'A-6.10.2')
     }
 
-    var accountKey = String(req.query.account_key),
-        projectID = String(req.query.project_id),
+    var accountKey = String(req.query.account_key).trim(),
+        projectID = String(req.query.project_id).trim(),
         getKeyDB = getKeys(projectID)
     if (getKeyDB && dbAdminSnapshot.clients[getKeyDB.client_key].social_account) {
         var clientSocialDB = dbAdminSnapshot.clients[getKeyDB.client_key].social_account,
@@ -373,10 +378,10 @@ projectAPI.post('/update', (req, res) => {
     }
     var pushData = {}
     if (req.body.project_name) {
-        pushData.project_name = String(req.body.project_name)
+        pushData.project_name = String(req.body.project_name).trim()
     }
     if (req.body.project_description) {
-        pushData.project_description = String(req.body.project_description)
+        pushData.project_description = String(req.body.project_description).trim()
     }
     var projectID = String(req.query.project_id),
         getKeyDB = getKeys(projectID)

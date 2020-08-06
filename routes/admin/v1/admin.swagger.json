@@ -767,10 +767,12 @@
                         "schema": {
                             "required": ["account_name", "reference"],
                             "properties": {
+                                "project_id": { "type": "string" },
                                 "account_name": { "type": "string" },
                                 "reference": { "type": "string" }
                             },
                             "example": {
+                                "project_id": "1376735095048",
                                 "account_name": "Facebook",
                                 "reference": "www.facebook.com"
                             }
@@ -786,33 +788,22 @@
                 "tags": ["6. Client-project"],
                 "summary": "Update Social Account",
                 "parameters": [{
-                        "in": "query",
-                        "name": "project_id",
-                        "required": true,
-                        "type": "string",
-                        "example": {
-                            "project_id": "1376735095048"
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["account_key", "reference"],
+                        "properties": {
+                            "project_id": { "type": "string" },
+                            "account_key": { "type": "string" },
+                            "reference": { "type": "string" }
                         },
-                        "schema": {
-                            "project_id": "1376735095048"
-                        }
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "schema": {
-                            "required": ["account_key", "reference"],
-                            "properties": {
-                                "account_key": { "type": "string" },
-                                "reference": { "type": "string" }
-                            },
-                            "example": {
-                                "account_key": "-MDx3AwtJCYTVn6Kjk8l",
-                                "reference": "www.instagram.com"
-                            }
+                        "example": {
+                            "project_id": "1376735095048",
+                            "account_key": "-MDx3AwtJCYTVn6Kjk8l",
+                            "reference": "www.instagram.com"
                         }
                     }
-                ],
+                }],
                 "responses": {}
             }
         },
