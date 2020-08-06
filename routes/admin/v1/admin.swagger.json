@@ -614,7 +614,9 @@
                         "required": ["project_id", "client_id"],
                         "properties": {
                             "employee_id": { "type": "string" },
-                            "project_id": { "type": "string" }
+                            "project_id": { "type": "string" },
+                            "review": { "type": "boolean" },
+                            "activity": { "type": "boolean" }
                         },
                         "example": {
                             "employee_id": "20201",
@@ -645,7 +647,7 @@
                         "example": {
                             "employee_id": "20201",
                             "project_id": "1376735095048",
-                            "active": "true"
+                            "active": true
                         }
                     }
                 }],
@@ -750,35 +752,22 @@
                 "tags": ["6. Client-project"],
                 "summary": "Add Social Account",
                 "parameters": [{
-                        "in": "query",
-                        "name": "project_id",
-                        "required": true,
-                        "type": "string",
-                        "example": {
-                            "project_id": "1376735095048"
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["account_name", "reference", "project_id"],
+                        "properties": {
+                            "project_id": { "type": "string" },
+                            "account_name": { "type": "string" },
+                            "reference": { "type": "string" }
                         },
-                        "schema": {
-                            "project_id": "1376735095048"
-                        }
-                    },
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "schema": {
-                            "required": ["account_name", "reference"],
-                            "properties": {
-                                "project_id": { "type": "string" },
-                                "account_name": { "type": "string" },
-                                "reference": { "type": "string" }
-                            },
-                            "example": {
-                                "project_id": "1376735095048",
-                                "account_name": "Facebook",
-                                "reference": "www.facebook.com"
-                            }
+                        "example": {
+                            "project_id": "1376735095048",
+                            "account_name": "Facebook",
+                            "reference": "www.facebook.com"
                         }
                     }
-                ],
+                }],
                 "responses": {}
 
             }
@@ -791,7 +780,7 @@
                     "in": "body",
                     "name": "body",
                     "schema": {
-                        "required": ["account_key", "reference"],
+                        "required": ["account_key", "project_id"],
                         "properties": {
                             "project_id": { "type": "string" },
                             "account_key": { "type": "string" },
@@ -808,31 +797,9 @@
             }
         },
         "/project/social-account/remove": {
-            "post": {
+            "get": {
                 "tags": ["6. Client-project"],
                 "summary": "Remove Social Account",
-                "parameters": [{
-                    "in": "query",
-                    "name": "project_id",
-                    "required": true,
-                    "type": "string",
-                    "example": {
-                        "project_id": "1376735095048",
-                        "account_key": "-MDx3AwtJCYTVn6Kjk8l"
-                    },
-                    "schema": {
-                        "project_id": "1376735095048",
-                        "account_key": "-MDx3AwtJCYTVn6Kjk8l"
-
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/project/update": {
-            "post": {
-                "tags": ["6. Client-project"],
-                "summary": "Update Account Info",
                 "parameters": [{
                         "in": "query",
                         "name": "project_id",
@@ -843,25 +810,53 @@
                         },
                         "schema": {
                             "project_id": "1376735095048"
+
                         }
                     },
                     {
-                        "in": "body",
-                        "name": "body",
+                        "in": "query",
+                        "name": "account_key",
+                        "required": true,
+                        "type": "string",
+                        "example": {
+                            "account_key": "-MDx3AwtJCYTVn6Kjk8l"
+                        },
                         "schema": {
-                            "required": ["project_name", "project_description"],
-                            "properties": {
-                                "project_name": { "type": "string" },
-                                "project_description": { "type": "string" }
-                            },
-                            "example": {
-                                "project_name": "Social Media",
-                                "project_description": "Test description for project"
-                            }
+                            "account_key": "-MDx3AwtJCYTVn6Kjk8l"
+
                         }
                     }
                 ],
                 "responses": {}
+            }
+        },
+        "/project/update": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Update Account Info",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_name", "project_description", "project_id"],
+                        "properties": {
+                            "project_name": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "project_description": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": "1376735095048",
+                            "project_name": "Social Media",
+                            "project_description": "Test description for project"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/review/create": {
+            "post": {
+                "tags": []
             }
         }
 
