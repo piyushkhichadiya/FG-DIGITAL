@@ -17,7 +17,6 @@ projectAPI.use((req, res, next) => {
 //------------------------------- 6. CLIENT-PROJECT -------------------------------
 
 // 6.1 GET ALL PROJECT DETAIL
-
 projectAPI.get(['/', '/get'], (req, res) => {
     if (!req.query.client_id) {
         return response(res, 400, 'required', 'ClientID is required', undefined, 'A-6.1.1')
@@ -56,7 +55,6 @@ projectAPI.get(['/', '/get'], (req, res) => {
 })
 
 // 6.2 GET PROJECT DETAILS BY ID
-
 projectAPI.get('/project/:project_id', (req, res) => {
     if (!req.params.project_id) {
         return response(res, 400, 'required', 'ClientID is not found', undefined, 'A-6.2.1')
@@ -65,7 +63,6 @@ projectAPI.get('/project/:project_id', (req, res) => {
 })
 
 // 6.3 ASSIGN EMPLOYEE TO PROJECT
-
 projectAPI.post('/team/add', async(req, res) => {
     if (!req.body.project_id || !req.body.employee_id) {
         return response(res, 400, 'required', 'Project Id and Employee ID both are required', undefined, 'A-6.3.1')
@@ -121,7 +118,6 @@ projectAPI.post('/team/add', async(req, res) => {
 })
 
 // 6.4 UPDATE PERMISSION OF EMPLOYEE ASSIGNED
-
 projectAPI.post('/team/update', async(req, res) => {
     if (!req.body.project_id || !req.body.employee_id) {
         return response(res, 400, 'required', 'Project ID and Employee ID are required', undefined, 'A-6.4.1')
@@ -172,7 +168,6 @@ projectAPI.post('/team/update', async(req, res) => {
 })
 
 // 6.5 TEAM REMOVE
-
 projectAPI.get('/team/remove', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
         return response(res, 400, 'required', 'Input is not proper', undefined, 'A-6.5.1')
@@ -201,7 +196,6 @@ projectAPI.get('/team/remove', (req, res) => {
 })
 
 // 6.6 TEAM DEACTIVATE
-
 projectAPI.get('/team/deactivate', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
         return response(res, 400, 'required', 'Input is not proper', undefined, 'A-6.6.1')
@@ -232,7 +226,6 @@ projectAPI.get('/team/deactivate', (req, res) => {
 })
 
 // 6.7 TEAM ACTIVATE
-
 projectAPI.get('/team/activate', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
         return response(res, 400, 'required', 'Project Id and employee Id are required', undefined, 'A-6.7.1')
@@ -262,7 +255,6 @@ projectAPI.get('/team/activate', (req, res) => {
 })
 
 // 6.8 SOCIAL ACCOUNT ADD
-
 projectAPI.post('/social-account/add', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.8.1')
@@ -296,7 +288,6 @@ projectAPI.post('/social-account/add', (req, res) => {
 })
 
 // 6.9 SOCIAL ACCOUNT UPDATE
-
 projectAPI.post('/social-account/update', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.9.1')
@@ -371,7 +362,6 @@ projectAPI.get('/social-account/remove', (req, res) => {
 })
 
 // 6.11 UPDATE PROJECT INFO
-
 projectAPI.post('/update', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.11.1')
