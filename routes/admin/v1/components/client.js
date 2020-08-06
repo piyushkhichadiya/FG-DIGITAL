@@ -129,7 +129,7 @@ clientAPI.post('/delete', (req, res) => {
 // 4.4 ADD PLAN
 clientAPI.post('/plan/add', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.4.1')
+        return response(res, 404, 'notFound', 'Incorrect Client ID', undefined, 'A-4.4.1')
     }
     var pushData = {},
         clientDB = dbAdminSnapshot.clients,
