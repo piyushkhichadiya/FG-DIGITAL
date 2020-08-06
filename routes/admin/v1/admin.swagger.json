@@ -725,22 +725,18 @@
                     "name": "project_id",
                     "required": true,
                     "type": "string",
-                    "example": {
-                        "project_id": "1376735095048"
-                    },
+                    "example": 1376735095048,
                     "schema": {
-                        "project_id": "1376735095048"
+                        "example": "1376735095048"
                     }
                 }, {
                     "in": "query",
                     "name": "employee_id",
                     "required": true,
                     "type": "string",
-                    "example": {
-                        "employee_id": "20201"
-                    },
+                    "example": "20201",
                     "schema": {
-                        "employee_id": "20201"
+                        "example": "20201"
                     }
                 }],
                 "responses": {}

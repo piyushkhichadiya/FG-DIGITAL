@@ -79,46 +79,42 @@ projectAPI.post('/team/add', async(req, res) => {
         employeeID = String(req.body.employee_id.trim()),
         employeeDB = dbAdminSnapshot.employees,
         employeeKeys = Object.keys(employeeDB)
-    if (getKeyDB) {
-        for (var i = 0; i < employeeKeys.length; i++) {
-            var tempEmployee = employeeDB[employeeKeys[i]]
-            if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted) {
-                if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
-                    var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
-                        teamKeys = Object.keys(teamDB)
-                    for (var j = 0; j < teamKeys.length; j++) {
-                        var tempTeam = teamDB[teamKeys[j]]
-                        if (tempTeam.employee_id == employeeID) {
-                            return response(res, 403, 'forbidden', 'Employee already assigned to this project', undefined, 'A-6.3.2')
-                        } else if (j == teamKeys.length - 1) {
-                            pushData.employee_id = employeeID
-                            pushData.createdOn = String(new Date())
-                            pushData.createdBy = "ADMIN"
-                            return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
-                                return response(res, 200, 'success', undefined, undefined, 'A-6.3.3')
-                            })
-                        }
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.3.6') }
+
+    for (var i = 0; i < employeeKeys.length; i++) {
+        var tempEmployee = employeeDB[employeeKeys[i]]
+        if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted) {
+            if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
+                var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
+                    teamKeys = Object.keys(teamDB)
+                for (var j = 0; j < teamKeys.length; j++) {
+                    var tempTeam = teamDB[teamKeys[j]]
+                    if (tempTeam.employee_id == employeeID) {
+                        return response(res, 403, 'forbidden', 'Employee already assigned to this project', undefined, 'A-6.3.2')
+                    } else if (j == teamKeys.length - 1) {
+                        pushData.employee_id = employeeID
+                        pushData.createdOn = String(new Date())
+                        pushData.createdBy = "ADMIN"
+                        return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
+                            return response(res, 200, 'success', undefined, undefined, 'A-6.3.3')
+                        })
                     }
-                } else {
-                    pushData.employee_id = employeeID
-                    console.log(pushData);
-                    return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
-                        return response(res, 200, 'success', undefined, undefined, 'A-6.3.4')
-                    })
                 }
-
-            } else if (i == employeeKeys.length - 1) {
-                return response(res, 403, 'Forbidden', 'Incorrect Employee ID', undefined, 'A-6.3.5')
+            } else {
+                pushData.employee_id = employeeID
+                console.log(pushData);
+                return firebase.database().ref(`admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/`).push(pushData).then(() => {
+                    return response(res, 200, 'success', undefined, undefined, 'A-6.3.4')
+                })
             }
-        }
-    } else {
-        return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.3.6')
 
+        } else if (i == employeeKeys.length - 1) {
+            return response(res, 403, 'Forbidden', 'Incorrect Employee ID', undefined, 'A-6.3.5')
+        }
     }
 })
 
 // 6.4 UPDATE PERMISSION OF EMPLOYEE ASSIGNED
-
 projectAPI.post('/team/update', async(req, res) => {
     if (!req.body.project_id || !req.body.employee_id) {
         return response(res, 400, 'required', 'Project ID and Employee ID are required', undefined, 'A-6.4.1')
@@ -128,9 +124,11 @@ projectAPI.post('/team/update', async(req, res) => {
         employeeID = String(req.body.employee_id).trim(),
         employeeDB = dbAdminSnapshot.employees,
         employeeKeys = Object.keys(employeeDB)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.3.6') }
     for (var i = 0; i < employeeKeys.length; i++) {
         var tempEmployee = employeeDB[employeeKeys[i]]
-        if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted && getKeyDB) {
+        if (tempEmployee.employee_id == employeeID && !tempEmployee.deleted) {
             if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team) {
                 var teamDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].team,
                     teamKeys = Object.keys(teamDB)
@@ -164,7 +162,7 @@ projectAPI.post('/team/update', async(req, res) => {
                 }
             }
         } else if (i == employeeKeys.length - 1) {
-            return response(res, 403, 'forbidden', 'Employee is not active or removed', undefined, 'A-6.4.4')
+            return response(res, 403, 'forbidden', 'Employee ID is not team member', undefined, 'A-6.4.4')
         }
     }
 })
@@ -191,7 +189,7 @@ projectAPI.get('/team/remove', (req, res) => {
                     return response(res, 200, 'success', 'Deleted Successfully', undefined, 'A-6.5.2')
                 })
             } else if (i == teamDBKeys.length - 1) {
-                return response(res, 403, 'forbidden', 'Employee is already removed', undefined, 'A-6.5.3')
+                return response(res, 403, 'forbidden', 'Incorrect Employee ID. Employee ID is not team member', undefined, 'A-6.5.3')
             }
         }
     }
@@ -340,7 +338,6 @@ projectAPI.post('/social-account/update', (req, res) => {
 })
 
 // 6.10 SOCIAL ACCOUNT REMOVE 
-
 projectAPI.get('/social-account/remove', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.10.1')
@@ -406,7 +403,6 @@ projectAPI.post('/update', (req, res) => {
 })
 
 // 6.12 REVIEW CREATE
-
 projectAPI.post('/review/create', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.12.1')
@@ -437,7 +433,6 @@ projectAPI.post('/review/create', (req, res) => {
 })
 
 // 6.13 REVIEW ADD POST
-
 projectAPI.post('/review/add-post', (re1, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.12.1')

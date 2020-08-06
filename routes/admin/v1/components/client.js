@@ -333,9 +333,8 @@ client.get('/get', (req, res) => {
     }
     if (pushData.length > 0) {
         return response(res, 200, 'success', 'Client Details', pushData, 'A-4.7.3')
-
     }
-    return response(res, 404, 'notfound', 'Not a', pushData, 'A-4.7.4')
+    return response(res, 404, 'notfound', 'Incorrect Client ID or No Clients Found', undefined, 'A-4.7.4')
 
 })
 
