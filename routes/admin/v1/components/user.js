@@ -6,9 +6,9 @@ const userAPI = require('express').Router(),
 
 //---------------------------- GLOBAL VARIABLE ------------------------------
 
-//--------------------------------- ROUTES -----------------------------------
+//--------------------------------- ROUTES ----------------------------------
 
-//------------------------------- 1. USER ACCOUNT -------------------------------
+//------------------------------- 1. USER ACCOUNT ---------------------------
 
 // 1.1 CREATE ADMIN
 userAPI.post('/create', (req, res) => {
@@ -71,6 +71,7 @@ userAPI.post('/login', (req, res) => {
 
             for (var i = 0; i < dbAdminUserKey.length; i++) {
                 var tempUser = dbAdminUser[dbAdminUserKey[i]];
+
                 if (tempUser.email == email && await bcryptHashCompare(password, tempUser.password)) {
                     // Store Auth Token in Cookie and Session
 

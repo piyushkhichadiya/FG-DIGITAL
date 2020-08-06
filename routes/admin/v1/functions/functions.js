@@ -1,17 +1,15 @@
-var secrets = require('../../../../config/secrets'),
+const secrets = require('../../../../config/secrets'),
     jwt = require('jsonwebtoken'),
     bcrypt = require('bcryptjs');
-const { callbackPromise } = require('nodemailer/lib/shared');
-const { response } = require('express');
 
 module.exports = {
-    response: (res, status, response, message, data, customCode) => {
+    response: (res, status, response, message, data, code) => {
         return res.status(status).json({
             status: status,
             response: response,
             message: message,
             data: data,
-            response_code: customCode
+            code: code
         })
     },
     jwtSign: (string) => {
@@ -26,7 +24,7 @@ module.exports = {
             var decodeValue;
             return jwt.verify(token, secrets.jwt(), (error, decode) => {
                 if (error) {
-                    return '12';
+                    return false;
                 } else {
                     return decode;
                 }

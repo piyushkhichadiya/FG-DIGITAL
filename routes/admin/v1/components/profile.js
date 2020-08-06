@@ -1,5 +1,3 @@
-const { storage } = require('firebase-admin');
-
 const profileAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     { response, randomString, storageDirectory, bcryptHash, jwtSign, bcryptHashCompare } = require('../functions/functions'),
@@ -8,6 +6,13 @@ const profileAPI = require('express').Router(),
 //----------------------------- CONFIGURATION ------------------------------
 
 //---------------------------- GLOBAL VARIABLE -----------------------------
+var dbAdminSnapshot, adminAuthToken, dbUser;
+profileAPI.use((req, res, next) => {
+    dbAdminSnapshot = req.session.dbAdminSnapshot
+    adminAuthToken = req.session.decode_adminAuthToken
+    dbUser = dbAdminSnapshot.users[adminAuthToken.user_key];
+    next();
+});
 
 //--------------------------------- ROUTES ---------------------------------
 
@@ -16,9 +21,6 @@ const profileAPI = require('express').Router(),
 
 // 2.1 GET PROFILE 
 profileAPI.get('/', (req, res) => {
-    var dbAdminAccount = req.session.dbAdminAccount,
-        adminAuthToken = req.session.decode_adminAuthToken,
-        dbUser = dbAdminAccount.users[adminAuthToken.user_key];
 
     var postData = {
         email: dbUser.email,
@@ -27,20 +29,18 @@ profileAPI.get('/', (req, res) => {
         profile_image: dbUser.profile_image
     }
 
-    return response(res, 200, 'success', 'profile', postData, 'A-2.1.1');
+    return response(res, 200, 'success', undefined, postData, 'A-2.1.1');
 });
 
 // 2.2 UPDATE PROFILE
 profileAPI.post('/update', (req, res) => {
-    var dbAdminAccount = req.session.dbAdminAccount,
-        adminAuthToken = req.session.decode_adminAuthToken,
-        dbUser = dbAdminAccount.users[adminAuthToken.user_key];
 
     dbUser.lastModifiedOn = String(new Date());
 
     if (req.body.name) {
         dbUser.name = String(req.body.name);
     }
+
     if (req.files && req.files.profile_image) {
 
         if (Array.isArray(req.files.profile_image)) {
@@ -87,9 +87,6 @@ profileAPI.post('/update', (req, res) => {
 
 // 2.3 CHANGE PASSWORD
 profileAPI.post('/password', async(req, res) => {
-    var dbAdminAccount = req.session.dbAdminAccount,
-        adminAuthToken = req.session.decode_adminAuthToken,
-        dbUser = dbAdminAccount.users[adminAuthToken.user_key];
 
     if (!req.body.password) {
         return response(res, 400, 'required', 'Password is required', undefined, 'A-2.3.1');
