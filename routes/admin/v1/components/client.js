@@ -1,8 +1,7 @@
 const clientAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, bcryptHash, bcryptHashCompare, randomIntDigit } = require('../functions/functions'),
-    fs = require('fs'),
-    regex = require('../functions/regex')
+    { response, bcryptHash } = require('../../../../functions/functions'),
+    regex = require('../../../../functions/regex')
 
 
 //----------------------------- CONFIGURATION ------------------------------
@@ -21,16 +20,17 @@ clientAPI.use((req, res, next) => {
 // 4.1 CREATE CLIENT ID
 clientAPI.post('/create', async(req, res) => {
     if (!req.body.name || !req.body.email || !req.body.password) {
-        return response(res, 400, 'Body required', 'name,email or password missing', undefined, 'A-4.1.1')
+        return response(res, 400, 'required', 'Name, Email and Password are required', undefined, 'A-4.1.1')
     }
     var name = String(req.body.name).trim(),
         email = String(req.body.email).trim().toLowerCase(),
         password = String(req.body.password),
         authToken = (Math.floor(Math.random() * (99999 - 11111) + 11111))
 
+
     password = await bcryptHash(password)
     if (!regex.email(email)) {
-        return response(res, 400, 'invalid', 'Email value is invalid', undefined, 'A-4.1.2')
+        return response(res, 400, 'invalid', 'Invalid Email', undefined, 'A-4.1.2')
     }
 
     var pushData = {

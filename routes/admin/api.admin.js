@@ -1,6 +1,6 @@
 var express = require('express'),
     adminAPI = express(),
-    { response } = require('./v1/functions/functions'),
+    { response, ConvertKeysToLowerCase } = require('../../functions/functions'),
     middleware = require('./v1/middleware/admin.middleware');
 
 //----------------------------- CONFIGURATION -------------------------------

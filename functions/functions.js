@@ -1,4 +1,4 @@
-const secrets = require('../../../../config/secrets'),
+const secrets = require('../config/secrets'),
     jwt = require('jsonwebtoken'),
     bcrypt = require('bcryptjs');
 
@@ -92,5 +92,19 @@ module.exports = {
     },
     storageDirectory: () => {
         return process.cwd() + '/public/storage';
+    },
+    ConvertKeysToLowerCase(jsonObject) {
+
+        // Convert All Key from JSON object to lower case
+        var output = {};
+        for (i in jsonObject) {
+
+            // Check Empty String
+            if (typeof(jsonObject[i]) == 'string' && String(jsonObject[i]).trim() == '') {
+                continue
+            }
+            output[i.toLowerCase()] = jsonObject[i];
+        }
+        return output;
     }
 }

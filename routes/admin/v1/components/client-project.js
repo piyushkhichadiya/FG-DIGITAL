@@ -1,7 +1,6 @@
 const projectAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, bcryptHash, bcryptHashCompare, randomIntDigit } = require('../functions/functions'),
-    regex = require('../functions/regex')
+    { response } = require('../../../../functions/functions')
 
 //----------------------------- CONFIGURATION ------------------------------
 

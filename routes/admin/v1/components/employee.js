@@ -1,8 +1,8 @@
 const employeeAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     fs = require('fs'),
-    { response, bcryptHash, storageDirectory } = require('../functions/functions'),
-    { email: isEmail } = require('../functions/regex')
+    { response, bcryptHash, storageDirectory } = require('../../../../functions/functions'),
+    { email: isEmail } = require('../../../../functions/regex')
 
 //----------------------------- CONFIGURATION -------------------------------
 

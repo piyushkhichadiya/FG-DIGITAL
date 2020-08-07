@@ -1,5 +1,5 @@
 const firebase = require('firebase-admin'),
-    { response, jwtDecode } = require('../functions/functions');
+    { response, jwtDecode } = require('../../../../functions/functions');
 
 module.exports = {
     adminAuthToken: async(req, res) => {

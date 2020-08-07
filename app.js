@@ -5,7 +5,8 @@ var express = require('express'),
     multipartParser = require('express-fileupload'),
     cookieParser = require('cookie-parser'),
     swaggerUI = require('swagger-ui-express'),
-    packageInfo = require('./package.json')
+    packageInfo = require('./package.json'),
+    { ConvertKeysToLowerCase } = require('./functions/functions')
 
 //--------------------------- CONFIGURATION ---------------------------
 
@@ -31,6 +32,12 @@ app.use((req, res, next) => {
     } catch {
         return res.status(400).json({ status: 400, response: 'badContent', message: 'URIError: Incorrect URI/ URL. URI/ URL may contain invalid character.' })
     }
+})
+
+// Convert All JSON Body keys to lowercase & Remove Empty strings
+app.use((req, res, next) => {
+    req.body = ConvertKeysToLowerCase(req.body);
+    next();
 })
 
 // Multipart Body Parsing [JSON BODY, FILE(s)]
