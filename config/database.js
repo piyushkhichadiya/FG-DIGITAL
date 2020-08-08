@@ -18,7 +18,7 @@ class Database {
                     return console.log('DEVELOPMENT DATABASE CREDENTIALS MISSING:\nCheck: /config/database.js & /config/secret.js')
                 }
 
-                status = 'SUCCESS'
+                status = 'Success'
                 message = 'DB INITIALIZATION SUCCESS FOR DEVELOPMENT'
                 break;
             case 'prod':
@@ -32,12 +32,12 @@ class Database {
                     return console.log('PRODUCTION DATABASE CREDENTIALS MISSING:\nCheck: /config/database.js & /config/secret.js')
                 }
 
-                status = 'SUCCESS'
+                status = 'Success'
                 message = 'DB INITIALIZATION SUCCESS FOR PRODUCTION'
                 break;
             default:
 
-                status = 'FAILED'
+                status = 'Failed'
                 message = 'NO ENVIRONMENT FOUND FOR DATABASE INITIALIZATION'
         }
     }

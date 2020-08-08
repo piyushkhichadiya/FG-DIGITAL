@@ -34,14 +34,14 @@ app.use((req, res, next) => {
     }
 })
 
+// Multipart Body Parsing [JSON BODY, FILE(s)]
+app.use(multipartParser())
+
 // Convert All JSON Body keys to lowercase & Remove Empty strings
 app.use((req, res, next) => {
     req.body = ConvertKeysToLowerCase(req.body);
     next();
 })
-
-// Multipart Body Parsing [JSON BODY, FILE(s)]
-app.use(multipartParser())
 
 // Basic Directory Generate
 const directory_gen = require('./config/directory');
@@ -52,7 +52,8 @@ directory_gen('employee')
 console.clear();
 console.log(`npm start: ${packageInfo.scripts.start}
 
-Port:${process.env.PORT || 80}
+Port: ${process.env.PORT || 80}
+Environment: ${process.env.NODE_ENV||'development'}
 App Version: ${packageInfo.version}`)
 
 //----------------------------- DATABASE ------------------------------
@@ -124,7 +125,7 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
     console.log(`Swagger Ui: FAILED => Environment: ${process.env.NODE_ENV||''} > Port: ${process.env.PORT||80}`)
 }
 
-console.log(`------------------------------- School Score [${packageInfo.name}] -------------------------------`);
+console.log(`------------------------------- FG Digital [${packageInfo.name}] -------------------------------`);
 
 //------------------------- API & VIEW ROUTES --------------------------
 
