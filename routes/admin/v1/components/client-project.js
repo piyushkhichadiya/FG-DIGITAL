@@ -1,3 +1,5 @@
+const directory = require('../../../../config/directory');
+
 const projectAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     { response, bcryptHash, bcryptHashCompare, randomIntDigit } = require('../functions/functions'),
@@ -89,7 +91,7 @@ projectAPI.post('/team/add', async(req, res) => {
                     for (var j = 0; j < teamKeys.length; j++) {
                         var tempTeam = teamDB[teamKeys[j]]
                         if (tempTeam.employee_id == employeeID) {
-                            return response(res, 403, 'forbidden', 'Employee already assigned to this project', undefined, 'A-6.3.2')
+                            return response(res, 409, 'duplicate', 'Employee already assigned to this project', undefined, 'A-6.3.2')
                         } else if (j == teamKeys.length - 1) {
                             pushData.employee_id = employeeID
                             pushData.createdOn = String(new Date())
@@ -108,11 +110,11 @@ projectAPI.post('/team/add', async(req, res) => {
                 }
 
             } else if (i == employeeKeys.length - 1) {
-                return response(res, 403, 'Forbidden', 'Incorrect Employee ID', undefined, 'A-6.3.5')
+                return response(res, 404, 'notFound', 'Incorrect Employee ID', undefined, 'A-6.3.5')
             }
         }
     } else {
-        return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.3.6')
+        return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'A-6.3.6')
 
     }
 })
@@ -284,8 +286,11 @@ projectAPI.post('/social-account/add', (req, res) => {
             "createdOn": String(new Date()),
             "createdBy": "ADMIN"
         }
+    if (accountName == "" || reference == "") {
+        return response(res, 400, 'required', 'Account Name and Reference both values are required', undefined, 'A-6.8.6')
+    }
     if (getKeyDB) {
-        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/social_account`).push(pushData).then(() => {
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/social_account`).push(pushData).then(() => {
             return response(res, 200, 'success', 'Social Account Created', undefined, 'A-6.8.4')
         })
     } else {
@@ -311,8 +316,11 @@ projectAPI.post('/social-account/update', (req, res) => {
         projectID = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectID),
         reference = String(req.body.reference).trim()
-    if (getKeyDB && dbAdminSnapshot.clients[getKeyDB.client_key].social_account) {
-        var clientSocialDB = dbAdminSnapshot.clients[getKeyDB.client_key].social_account,
+    if (reference == "") {
+        return response(res, 400, 'required', 'Reference value cannot be empty', undefined, 'A-6.9.8')
+    }
+    if (getKeyDB && dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].social_account) {
+        var clientSocialDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].social_account,
             clientSocialKey = Object.keys(clientSocialDB)
         for (var i = 0; i < clientSocialKey.length; i++) {
             if (clientSocialKey[i] == accountKey && !clientSocialDB[clientSocialKey[i]].deleted) {
@@ -320,11 +328,14 @@ projectAPI.post('/social-account/update', (req, res) => {
                 tempData.reference = reference
                 if (req.body.account_name) {
                     var accountName = String(req.body.account_name).trim()
+                    if (accountName == "") {
+                        return response(res, 400, 'required', 'Account Name value cannot be empty', undefined, 'A-6.9.7')
+                    }
                     tempData.account_name = accountName
                 }
                 tempData.lastModifiedOn = String(new Date())
                 tempData.lastModifiedBy = "ADMIN"
-                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/social_account/${accountKey}`).update(tempData).then(() => {
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/social_account/${accountKey}`).update(tempData).then(() => {
                     return response(res, 200, 'success', 'Social Account Updated', undefined, 'A-6.9.4')
 
                 })
@@ -351,8 +362,8 @@ projectAPI.get('/social-account/remove', (req, res) => {
     var accountKey = String(req.query.account_key).trim(),
         projectID = String(req.query.project_id).trim(),
         getKeyDB = getKeys(projectID)
-    if (getKeyDB && dbAdminSnapshot.clients[getKeyDB.client_key].social_account) {
-        var clientSocialDB = dbAdminSnapshot.clients[getKeyDB.client_key].social_account,
+    if (getKeyDB && dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].social_account) {
+        var clientSocialDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].social_account,
             clientSocialKey = Object.keys(clientSocialDB)
         for (var i = 0; i < clientSocialKey.length; i++) {
             if (clientSocialKey[i] == accountKey && !clientSocialDB[clientSocialKey[i]].deleted) {
@@ -360,7 +371,7 @@ projectAPI.get('/social-account/remove', (req, res) => {
                 tempData.deleted = true
                 tempData.lastModifiedOn = String(new Date())
                 tempData.lastModifiedBy = "ADMIN"
-                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/social_account/${accountKey}`).update(tempData).then(() => {
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/social_account/${accountKey}`).update(tempData).then(() => {
                     return response(res, 200, 'success', 'Social Account Removed Successfully', undefined, 'A-6.10.3')
                 })
             } else if (i == clientSocialKey.length - 1) {
@@ -427,7 +438,7 @@ projectAPI.post('/review/create', (req, res) => {
             "createdBy": "ADMIN"
         }
     if (getKeyDB) {
-        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/review`).push(pushData).then(() => {
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review`).push(pushData).then(() => {
             return response(res, 200, 'success', 'Social Account Created', undefined, 'A-6.12.3')
         })
     } else {
@@ -438,12 +449,80 @@ projectAPI.post('/review/create', (req, res) => {
 
 // 6.13 REVIEW ADD POST
 
-projectAPI.post('/review/add-post', (re1, res) => {
+projectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.project_id) {
-        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.12.1')
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.13.1')
     }
     if (!req.body.review_id) {
-        return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.12.2')
+        return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.13.2')
+    }
+    var getKeyDB = getKeys(project_id)
+    if (req.files && req.files.file) {
+        var file = req.files.file,
+            filenameData = [],
+            directory = ""
+        if (Array.isArray(file)) {
+            //FOR MULTIPLE FILE
+            if (file.length > 10) {
+                return response(res, 400, 'badContent', 'Not Allow more than 10 file.', undefined, 'A-6.13.3');
+            }
+            for (var i = 0; i < file.length; i++) {
+                var tempFile = file[i]
+                if ((tempFile.size / 1024 / 1024) > 10) {
+                    return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.13.3');
+                }
+                var tempName = ''
+                switch (tempFile.mimetype) {
+                    case 'image/jpeg':
+                        tempName = 'Post-' + randomIntDigit(1000000, 9999999) + '.jpeg';
+                        break;
+                    case 'image/png':
+                        tempName = 'Post-' + randomIntDigit(1000000, 9999999) + '.png';;
+                        break;
+                    default:
+                        return response(res, 403, 'forbidden', 'Invalid File Type. JPEG/PNG are only valid file types.', undefined, 'A-6.13.3')
+
+                }
+                fileNameData.push(tempName)
+            }
+            directory = process.cwd() + `/public/storage/admin/`
+            if (!fs.existsSync(directory)) {
+                fs.mkdirSync(directory, { recursive: true }, (error) => {
+                    if (error) {
+                        console.log(error);
+                    }
+                    console.log("success");
+                });
+            }
+            console.log(req.files.file);
+        } else {
+            //FOR SINGLE FILE
+        }
+        if (getKeyDB) {
+            if (fileNameData && fileNameData.length == 1) {
+                var file = req.files.file,
+                    tempName = String(fileNameData[0].fileNameData)
+                file.mv(directory + tempName, (error, abc) => {
+                    if (error) {
+                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, '#FC-3.8.1-16')
+                    }
+                })
+            } else if (fileNameData && fileNameData.length > 1) {
+                var file = req.files.file
+                for (var i = 0; i < file.length; i++) {
+                    var tempFile = file[i],
+                        tempName = fileNameData[i]
+                    tempFile.mv(directory + tempName, (error) => {
+                        if (error) {
+                            return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, '#FC-3.8.1-17')
+                        }
+                        console.log("success");
+                    })
+                }
+            }
+        } else {
+            return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.12.4')
+        }
     }
 })
 

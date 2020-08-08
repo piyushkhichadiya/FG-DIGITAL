@@ -856,9 +856,28 @@
         },
         "/project/review/create": {
             "post": {
-                "tags": []
+                "tags": ["6. Client-project"],
+                "summary": "Create Review",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "review_description", "review_title"],
+                        "properties": {
+                            "title": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "description": { "type": "string" }
+                        },
+                        "example": {
+                            "title": "Test Review",
+                            "project_id": "1376735095048",
+                            "description": "Test description for project"
+                        }
+                    }
+                }],
+                "responses": {}
             }
-        }
 
+        }
     }
 }

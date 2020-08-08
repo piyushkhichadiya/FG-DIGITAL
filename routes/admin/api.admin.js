@@ -15,6 +15,7 @@ adminAPI.use(/^(?!\/user).*/, async(req, res, next) => {
     } else {
         return;
     }
+    // next()
 });
 
 //------------------------------ ADMIN APIs ---------------------------------
