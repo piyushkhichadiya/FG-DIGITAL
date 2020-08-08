@@ -13,7 +13,4 @@ staticView.get(['/about', '/about.html'], (req, res) => { return res.sendFile(pr
 staticView.get(['/work', '/work.html'], (req, res) => { return res.sendFile(process.cwd() + '/views/static/work.html') })
 staticView.get(['/contact', '/contact.html'], (req, res) => { return res.sendFile(process.cwd() + '/views/static/contact.html') })
 
-// NOT FOUND
-staticView.get('*', (req, res) => { res.redirect('/') });
-
 module.exports = staticView;

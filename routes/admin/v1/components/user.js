@@ -1,6 +1,6 @@
 const userAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, bcryptHash, bcryptHashCompare, jwtSign } = require('../functions/functions')
+    { response, bcryptHash, bcryptHashCompare, jwtSign } = require('../../../../functions/functions')
 
 //----------------------------- CONFIGURATION -------------------------------
 

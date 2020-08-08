@@ -1,9 +1,7 @@
-const directory = require('../../../../config/directory');
-
-const projectAPI = require('express').Router(),
+const directory = require('../../../../config/directory'),
+    projectAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, bcryptHash, bcryptHashCompare, randomIntDigit, storageDirectory } = require('../functions/functions'),
-    regex = require('../functions/regex')
+    { response, storageDirectory } = require('../../../../functions/functions')
 
 //----------------------------- CONFIGURATION ------------------------------
 

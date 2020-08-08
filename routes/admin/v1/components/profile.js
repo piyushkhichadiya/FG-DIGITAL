@@ -1,6 +1,6 @@
 const profileAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, randomString, storageDirectory, bcryptHash, jwtSign, bcryptHashCompare } = require('../functions/functions'),
+    { response, randomString, storageDirectory, bcryptHash, jwtSign, bcryptHashCompare } = require('../../../../functions/functions'),
     fs = require('fs')
 
 //----------------------------- CONFIGURATION ------------------------------

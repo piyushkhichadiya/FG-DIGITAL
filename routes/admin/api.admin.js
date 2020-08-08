@@ -1,6 +1,6 @@
 var express = require('express'),
     adminAPI = express(),
-    { response } = require('./v1/functions/functions'),
+    { response, ConvertKeysToLowerCase } = require('../../functions/functions'),
     middleware = require('./v1/middleware/admin.middleware');
 
 //----------------------------- CONFIGURATION -------------------------------
@@ -39,7 +39,7 @@ adminAPI.use('/employee', require('./v1/components/employee'));
 adminAPI.use('/project', require('./v1/components/client-project'));
 
 // 7. SERVICES
-// adminAPI.use('/service');
+adminAPI.use('/service', require('./v1/components/services'));
 
 // 400 UNKNOWN APIs
 adminAPI.use('*', (req, res) => {

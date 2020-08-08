@@ -1,15 +1,14 @@
-const client = require('express').Router(),
+const clientAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, bcryptHash, bcryptHashCompare, randomIntDigit } = require('../functions/functions'),
-    fs = require('fs'),
-    regex = require('../functions/regex')
+    { response, bcryptHash } = require('../../../../functions/functions'),
+    regex = require('../../../../functions/regex')
 
 
 //----------------------------- CONFIGURATION ------------------------------
 
 //---------------------------- GLOBAL VARIABLE -----------------------------
 var dbAdminSnapshot, adminAuthToken;
-client.use((req, res, next) => {
+clientAPI.use((req, res, next) => {
     dbAdminSnapshot = req.session.dbAdminSnapshot
     adminAuthToken = req.session.decode_adminAuthToken
     next();
@@ -19,18 +18,19 @@ client.use((req, res, next) => {
 //------------------------------- 4. CLIENT -------------------------------
 
 // 4.1 CREATE CLIENT ID
-client.post('/create', async(req, res) => {
+clientAPI.post('/create', async(req, res) => {
     if (!req.body.name || !req.body.email || !req.body.password) {
-        return response(res, 400, 'Body required', 'name,email or password missing', undefined, 'A-4.1.1')
+        return response(res, 400, 'required', 'Name, Email and Password are required', undefined, 'A-4.1.1')
     }
     var name = String(req.body.name).trim(),
         email = String(req.body.email).trim().toLowerCase(),
         password = String(req.body.password),
         authToken = (Math.floor(Math.random() * (99999 - 11111) + 11111))
 
+
     password = await bcryptHash(password)
     if (!regex.email(email)) {
-        return response(res, 400, 'invalid', 'Email value is invalid', undefined, 'A-4.1.2')
+        return response(res, 400, 'invalid', 'Invalid Email', undefined, 'A-4.1.2')
     }
 
     var pushData = {
@@ -61,7 +61,7 @@ client.post('/create', async(req, res) => {
 });
 
 // 4.2 Profile Update
-client.post('/update', (req, res) => {
+clientAPI.post('/update', (req, res) => {
     var pushData = {}
     if (dbAdminSnapshot.clients) {
         var clientDB = dbAdminSnapshot.clients,
@@ -105,7 +105,7 @@ client.post('/update', (req, res) => {
 });
 
 // 4.3 DELETE CLIENT
-client.post('/delete', (req, res) => {
+clientAPI.post('/delete', (req, res) => {
     if (!dbAdminSnapshot.clients) {
         return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.3.1')
     }
@@ -127,9 +127,9 @@ client.post('/delete', (req, res) => {
 });
 
 // 4.4 ADD PLAN
-client.post('/plan/add', (req, res) => {
+clientAPI.post('/plan/add', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.4.1')
+        return response(res, 404, 'notFound', 'Incorrect Client ID', undefined, 'A-4.4.1')
     }
     var pushData = {},
         clientDB = dbAdminSnapshot.clients,
@@ -174,7 +174,7 @@ client.post('/plan/add', (req, res) => {
 });
 
 // 4.5 UPDATE PLAN
-client.post('/plan/update', (req, res) => {
+clientAPI.post('/plan/update', (req, res) => {
     if (!dbAdminSnapshot.clients) {
         return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.5.1')
     }
@@ -229,7 +229,7 @@ client.post('/plan/update', (req, res) => {
 });
 
 // 4.6 DELETE PLAN
-client.post('/plan/remove', (req, res) => {
+clientAPI.post('/plan/remove', (req, res) => {
     if (!dbAdminSnapshot.clients) {
         return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.6.1')
     }
@@ -257,7 +257,7 @@ client.post('/plan/remove', (req, res) => {
 });
 
 // 4.7 GET ALL CLIENT / SINGLE CLIENT DETAIL
-client.get('/get', (req, res) => {
+clientAPI.get('/get', (req, res) => {
     if (!dbAdminSnapshot.clients) {
         return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.7.1')
     }
@@ -339,7 +339,7 @@ client.get('/get', (req, res) => {
 })
 
 // 4.8 CHANGE PASSWORD
-client.post('/change-password', (req, res) => {
+clientAPI.post('/change-password', (req, res) => {
     // CHECK BODY 
     if (req.body.password) {
         var password = String(req.body.password)
@@ -376,4 +376,4 @@ client.post('/change-password', (req, res) => {
 
 })
 
-module.exports = client;
+module.exports = clientAPI;

@@ -1,6 +1,6 @@
 const planAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response } = require('../functions/functions')
+    { response } = require('../../../../functions/functions')
 
 //----------------------------- CONFIGURATION -------------------------------
 

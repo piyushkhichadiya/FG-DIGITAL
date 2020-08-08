@@ -1,10 +1,9 @@
 {
     "name": "fg-digital",
     "version": "1.0.0",
-    "description": "FG Digital Client, Employee and Admin Management Portal",
-    "main": "index.js",
+    "description": "Project Management Portal",
+    "main": "server.js",
     "scripts": {
-        "pretest": "eslint --ignore-path .gitignore .",
         "start": "nodemon server.js"
     },
     "author": "Smit Luvani, Jenil Narola",
@@ -13,9 +12,8 @@
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
         "cookie-parser": "^1.4.5",
-        "ejs": "^3.1.3",
         "express": "^4.17.1",
-        "express-fileupload": "^1.1.10",
+        "express-fileupload": "^1.1.9",
         "express-session": "^1.17.1",
         "firebase-admin": "^8.13.0",
         "fs": "0.0.1-security",
@@ -24,7 +22,32 @@
         "nodemon": "^2.0.4",
         "swagger-ui-express": "^4.1.4"
     },
-    "devDependencies": {
-        "eslint": "^7.6.0"
+    "devDependencies": {},
+    "contributors": [{
+            "name": "Smit Luvani",
+            "email": "svluvani@gmail.com",
+            "url": "https://github.com/smit-luvani"
+        },
+        {
+            "name": "Jenil Narola",
+            "email": "jenilnarola@gmail.com",
+            "url": "https://github.com/jenil-narola"
+        },
+        {
+            "name": "Piyush Khichadiya",
+            "email": "kpn9296@gmail.com",
+            "url": "https://github.com/piyushkhichadiya"
+        }
+    ],
+    "homepage": "https://fgdigitals.com",
+    "keywords": [
+        "Project Management Portal",
+        "REST API",
+        "UI"
+    ],
+    "repository": "github:smit-luvani/FG-DIGITAL",
+    "engines": {
+        "node": ">= 14.2.0",
+        "npm": ">= 6.14.7"
     }
 }

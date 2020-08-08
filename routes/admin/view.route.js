@@ -32,7 +32,7 @@ adminView.use(/^(?!\/login).*/, checkAuth);
 adminView.get('/login', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/login.html') });
 
 // Profile
-adminView.get('/profile', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/profile.html') });
+adminView.get(['/', '/profile'], (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/profile.html') });
 
 // Plan
 adminView.get('/plan', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/plan.html') });

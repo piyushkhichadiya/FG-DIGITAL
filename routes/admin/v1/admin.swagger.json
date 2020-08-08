@@ -30,6 +30,10 @@
         {
             "name": "6. Client-project",
             "description": "Activity Related to project of client"
+        },
+        {
+            "name": "7. Services",
+            "description": "Service to attach with plan or project"
         }
     ],
     "paths": {
@@ -873,7 +877,6 @@
                 }],
                 "responses": {}
             }
-
         }
     }
 }
