@@ -94,7 +94,6 @@ module.exports = {
         return process.cwd() + '/public/storage';
     },
     ConvertKeysToLowerCase(jsonObject) {
-
         // Convert All Key from JSON object to lower case
         var output = {};
         for (i in jsonObject) {

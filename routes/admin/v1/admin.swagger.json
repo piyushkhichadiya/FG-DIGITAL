@@ -877,6 +877,81 @@
                 }],
                 "responses": {}
             }
+        },
+        "/project/review/add-post": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Add Post Detail",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "name",
+                        "in": "formData",
+                        "description": "description",
+                        "required": false,
+                        "type": "string",
+                        "example": "Enter description",
+                        "schema": {
+                            "example": "Test description"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file to upload",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/remove-post": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Post",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "example": {
+                            "project_id": "1376735095048"
+                        },
+                        "schema": {
+                            "project_id": "1376735095048"
+
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "example": {
+                            "review_id": "-MEBjUo5rkwH5OnwS8Hn"
+                        },
+                        "schema": {
+                            "review_id": "-MEBjUo5rkwH5OnwS8Hn"
+
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "post_id",
+                        "required": true,
+                        "type": "string",
+                        "example": {
+                            "post_id": "-MECMEfkwU2d3ghacnt-"
+                        },
+                        "schema": {
+                            "post_id": "-MECMEfkwU2d3ghacnt-"
+
+                        }
+                    }
+                ],
+                "responses": {}
+
+            }
         }
     }
 }

@@ -1,7 +1,8 @@
 const directory = require('../../../../config/directory'),
     projectAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, storageDirectory } = require('../../../../functions/functions')
+    fs = require('fs'),
+    { response, storageDirectory, randomIntDigit, ConvertKeysToLowerCase } = require('../../../../functions/functions')
 
 //----------------------------- CONFIGURATION ------------------------------
 
@@ -428,14 +429,18 @@ projectAPI.post('/review/create', (req, res) => {
         projectID = String(req.body.project_id).trim(),
         title = String(req.body.title).trim(),
         description = String(req.body.description).trim(),
-        getKeyDB = getKeys(projectID),
-        pushData = {
-            "review_id": reviewID,
-            "title": title,
-            "description": description,
-            "createdOn": String(new Date()),
-            "createdBy": "ADMIN"
-        }
+        getKeyDB = getKeys(projectID)
+    if (title == " " || description == "") {
+        return response(res, 400, 'required', 'Title and description both are required', undefined, 'A-6.12.5')
+
+    }
+    pushData = {
+        "review_id": reviewID,
+        "title": title,
+        "description": description,
+        "createdOn": String(new Date()),
+        "createdBy": "ADMIN"
+    }
     if (getKeyDB) {
         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review`).push(pushData).then(() => {
             return response(res, 200, 'success', 'Social Account Created', undefined, 'A-6.12.3')
@@ -455,74 +460,178 @@ projectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.review_id) {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.13.2')
     }
-    var projectID = String(req.body.review_id),
-        getKeyDB = getKeys(projectID)
+    var projectID = String(req.body.project_id).trim(),
+        getKeyDB = getKeys(projectID),
+        reviewID = String(req.body.review_id).trim(),
+        pushData = {
+            createdOn: String(new Date()),
+            createdBy: "ADMIN",
+            images: []
+        }
+    if (req.body.description) {
+        var description = String(req.body.description).trim()
+        if (description == " ") {
+            return response(res, 400, 'required', 'Description is required', undefined, 'A-6.13.3')
+        }
+        pushData.description = description
+    }
     if (req.files && req.files.file) {
         var file = req.files.file,
-            filenameData = [],
-            directory = ""
+            fileNameData = [],
+            directory = storageDirectory() + '/admin/client-project/'
+        if (!fs.existsSync(directory)) {
+            fs.mkdirSync(directory, { recursive: true }, (error) => {
+                if (error) {}
+            });
+        }
         if (Array.isArray(file)) {
             //FOR MULTIPLE FILE
             if (file.length > 10) {
-                return response(res, 400, 'badContent', 'Not Allow more than 10 file.', undefined, 'A-6.13.3');
+                return response(res, 400, 'badContent', 'Not Allow more than 10 file.', undefined, 'A-6.13.4');
             }
             for (var i = 0; i < file.length; i++) {
                 var tempFile = file[i]
                 if ((tempFile.size / 1024 / 1024) > 10) {
-                    return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.13.3');
+                    return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.13.5');
                 }
                 var tempName = ''
                 switch (tempFile.mimetype) {
                     case 'image/jpeg':
-                        tempName = 'Post-' + randomIntDigit(1000000, 9999999) + '.jpeg';
+                        tempName = 'Post-' + randomIntDigit(100000, 999999) + '.jpeg';
                         break;
                     case 'image/png':
-                        tempName = 'Post-' + randomIntDigit(1000000, 9999999) + '.png';;
+                        tempName = 'Post-' + randomIntDigit(100000, 999999) + '.png';;
                         break;
                     default:
-                        return response(res, 403, 'forbidden', 'Invalid File Type. JPEG/PNG are only valid file types.', undefined, 'A-6.13.3')
+                        return response(res, 403, 'forbidden', 'Invalid File Type. JPEG/PNG are only valid file types.', undefined, 'A-6.13.6')
 
                 }
                 fileNameData.push(tempName)
+                pushData.images.push(tempName)
             }
-            directory = process.cwd() + storageDirectory + '/admin/'
-            if (!fs.existsSync(directory)) {
-                fs.mkdirSync(directory, { recursive: true }, (error) => {
-                    if (error) {
-                        console.log(error);
-                    }
-                    console.log("success");
-                });
-            }
-            console.log(req.files.file);
         } else {
-            //FOR SINGLE FILE
+            // FOR SINGLE FILE
+            var tempFile = file
+            if ((tempFile.size / 1024 / 1024) > 10) {
+                return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.13.7');
+            }
+            var tempName = ''
+            switch (tempFile.mimetype) {
+                case 'image/jpeg':
+                    tempName = 'Post-' + randomIntDigit(100000, 999999) + '.jpeg';
+                    break;
+                case 'image/png':
+                    tempName = 'Post-' + randomIntDigit(100000, 999999) + '.png';;
+                    break;
+                default:
+                    return response(res, 403, 'forbidden', 'Invalid File Type. JPEG/PNG are only valid file types.', undefined, 'A-6.13.8')
+
+            }
+            fileNameData.push(tempName)
+            pushData.images.push(tempName)
         }
         if (getKeyDB) {
-            if (fileNameData && fileNameData.length == 1) {
-                var file = req.files.file,
-                    tempName = String(fileNameData[0].fileNameData)
-                file.mv(directory + tempName, (error, abc) => {
-                    if (error) {
-                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, '#FC-3.8.1-16')
-                    }
-                })
-            } else if (fileNameData && fileNameData.length > 1) {
-                var file = req.files.file
-                for (var i = 0; i < file.length; i++) {
-                    var tempFile = file[i],
-                        tempName = fileNameData[i]
-                    tempFile.mv(directory + tempName, (error) => {
-                        if (error) {
-                            return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, '#FC-3.8.1-17')
+            var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+                reviewDBKey = Object.keys(reviewDB)
+            for (var j = 0; j < reviewDBKey.length; j++) {
+                var tempReview = reviewDB[reviewDBKey[j]]
+                if (reviewDBKey[j] == reviewID && !tempReview.deleted) {
+                    if (fileNameData && fileNameData.length == 1) {
+                        var file = req.files.file,
+                            tempName = String(fileNameData[0])
+                        file.mv(directory + tempName, (error, abc) => {
+                            if (error) {
+                                return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.13.9')
+                            }
+                        })
+                    } else if (fileNameData && fileNameData.length > 1) {
+                        var file = req.files.file
+                        for (var i = 0; i < file.length; i++) {
+                            var tempFile = file[i],
+                                tempName = fileNameData[i]
+                            tempFile.mv(directory + tempName, (error) => {
+                                if (error) {
+                                    return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.13.10')
+                                }
+                            })
                         }
-                        console.log("success");
+                    }
+                    return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewID}/post`).push(pushData).then(() => {
+                        return response(res, 200, 'success', 'Social Account Created', undefined, 'A-6.13.11')
                     })
+                } else if (j == reviewDBKey.length - 1) {
+                    return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.13.12')
                 }
             }
         } else {
-            return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.12.4')
+            return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.13.13')
         }
+    }
+})
+
+// 6.14 REMOVE ADD POST
+
+projectAPI.get('/review/remove-post', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.14.1')
+    }
+    if (!req.query.review_id || !req.query.post_id) {
+        return response(res, 400, 'required', 'Review ID and Post ID both are required', undefined, 'A-6.14.2')
+    }
+    var projectID = String(req.query.project_id).trim(),
+        reviewID = String(req.query.review_id).trim(),
+        postID = String(req.query.post_id).trim(),
+        getKeyDB = getKeys(projectID)
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.14.3') }
+    var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+        reviewDBKey = Object.keys(reviewDB),
+        directory = storageDirectory() + '/admin/client-project/'
+
+    for (var j = 0; j < reviewDBKey.length; j++) {
+        var tempReview = reviewDB[reviewDBKey[j]]
+        if (reviewDBKey[j] == reviewID && !tempReview.closed) {
+            if (tempReview.post) {
+                var postDB = tempReview.post,
+                    postDBKey = Object.keys(postDB)
+                for (var i = 0; i < postDBKey.length; i++) {
+                    if (postDBKey[i] == postID) {
+                        //removing Images
+                        if (postDB[postDBKey[i]].images) {
+                            var tempPost = postDB[postDBKey[i]].images
+                            for (var k = 0; k < tempPost.length; k++) {
+                                tempPost[k]
+                                fs.unlink(directory + tempPost[k], (err) => {
+                                    if (err) {}
+                                })
+                            }
+                        }
+                        var pushData = {
+                            deleted: true,
+                            lastModifiedBy: "ADMIN",
+                            lastModifiedOn: String(new Date())
+                        }
+                        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewID}/post/${postID}`).update(pushData).then(() => {
+                            return response(res, 200, 'success', 'Social Account Created', undefined, 'A-6.14.4')
+                        })
+                    } else if (i == postDBKey.length - 1) {
+                        return response(res, 404, 'notfound', 'Incorrect Post ID', undefined, 'A-6.14.5')
+                    }
+                }
+            }
+        } else if (j == reviewDBKey.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.14.6')
+        }
+    }
+})
+
+// 6.15 REVIEW CLOSE
+
+projectAPI.get('/review/close', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.14.1')
+    }
+    if (!req.query.review_id) {
+        return response(res, 400, 'required', 'Review ID and Post ID both are required', undefined, 'A-6.14.2')
     }
 })
 

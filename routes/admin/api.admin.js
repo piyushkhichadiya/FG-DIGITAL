@@ -1,6 +1,6 @@
 var express = require('express'),
     adminAPI = express(),
-    { response, ConvertKeysToLowerCase } = require('../../functions/functions'),
+    { response } = require('../../functions/functions'),
     middleware = require('./v1/middleware/admin.middleware');
 
 //----------------------------- CONFIGURATION -------------------------------
@@ -15,7 +15,6 @@ adminAPI.use(/^(?!\/user).*/, async(req, res, next) => {
     } else {
         return;
     }
-    // next()
 });
 
 //------------------------------ ADMIN APIs ---------------------------------
