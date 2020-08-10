@@ -195,16 +195,16 @@
             var temp_blog = data[i]
             var body_x = `<div class="col-md-4">
                             <div class="blog-entry">
-                                <a href="blog-single.html?id=${i}" class="block-20" style="background-image: url('${temp_blog.image}');">
+                                <a href="/blog-details?id=${i}" class="block-20" style="background-image: url('${temp_blog.image}');">
                                 </a>
                                 <div class="text py-4">
                                     <div class="meta mb-3">
-                                        <div><a href="blog-single.html?id=${i}">${temp_blog.date}</a></div>
-                                        <div><a href="blog-single.html?id=${i}">${temp_blog.author}</a></div>
-                                        <div><a href="blog-single.html?id=${i}" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
+                                        <div><a href="/blog-details?id=${i}">${temp_blog.date}</a></div>
+                                        <div><a href="/blog-details?id=${i}">${temp_blog.author}</a></div>
+                                        <div><a href="/blog-details?id=${i}" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                                     </div>
                                     <div class="desc">
-                                        <h3 class="heading"><a href="blog-single.html?id=${i}">${temp_blog.title}</a></h3>
+                                        <h3 class="heading"><a href="/blog-details?id=${i}">${temp_blog.title}</a></h3>
                                     </div>
                                 </div>
                             </div>

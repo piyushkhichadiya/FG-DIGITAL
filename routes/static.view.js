@@ -14,5 +14,6 @@ staticView.get('/work', (req, res) => { return res.sendFile(process.cwd() + '/vi
 staticView.get('/blog', (req, res) => { return res.sendFile(process.cwd() + '/views/static/blog.html') })
 staticView.get('/blog-details', (req, res) => { return res.sendFile(process.cwd() + '/views/static/blog-details.html') })
 staticView.get('/contact', (req, res) => { return res.sendFile(process.cwd() + '/views/static/contact.html') })
+staticView.get('/404', (req, res) => { res.sendFile(process.cwd() + '/views/404.html') }) // 404 Not Found
 
 module.exports = staticView;
