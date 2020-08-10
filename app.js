@@ -6,12 +6,17 @@ var express = require('express'),
     cookieParser = require('cookie-parser'),
     swaggerUI = require('swagger-ui-express'),
     packageInfo = require('./package.json'),
-    { ConvertKeysToLowerCase } = require('./functions/functions')
+    { ConvertKeysToLowerCase } = require('./functions/functions'),
+    favicon = require('serve-favicon'),
+    path = require('path')
 
 //--------------------------- CONFIGURATION ---------------------------
 
 // Set Static Assets
 app.use(express.static('public'))
+
+// Set Fav Icon for APIs & UI
+app.use(favicon(path.join(__dirname, 'public/static/images/logo-small.png')))
 
 // Syntax Error Handling [ex. JSON]
 app.use(bodyParser.json(), (error, req, res, next) => {
@@ -141,6 +146,6 @@ app.use('/', require('./routes/static.view'))
 app.use('/admin', require('./routes/admin/view.route'))
 app.use('/employee', require('./routes/employee/view.route.js'))
 app.use('/client', require('./routes/client/view.route.js'))
-app.use('*',(req,res)=>{return res.redirect('/404')}) //  404 Not Found
+app.use('*', (req, res) => { res.sendFile(process.cwd() + '/views/404.html') }) //  404 Not Found
 
 module.exports = app;
