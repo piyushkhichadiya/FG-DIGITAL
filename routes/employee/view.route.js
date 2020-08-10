@@ -20,7 +20,4 @@ adminView.use(routes, express.static('public/adminLTE'))
 // Login
 adminView.get('/login', (req, res) => { res.sendFile(process.cwd() + '/views/portal/employee/login.html') });
 
-// NOT FOUND
-adminView.get('*', (req, res) => { res.sendFile(process.cwd() + '/views/portal/employee/login.html') });
-
 module.exports = adminView;
