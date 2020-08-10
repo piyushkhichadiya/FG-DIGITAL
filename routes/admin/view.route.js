@@ -32,7 +32,7 @@ adminView.use(/^(?!\/login).*/, checkAuth);
 adminView.get('/login', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/login.html') });
 
 // Dashboard
-adminView.get('/', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/profile.html') });
+adminView.get('/', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/dashboard.html') });
 
 // Profile
 adminView.get('/profile', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/profile.html') });
@@ -54,5 +54,9 @@ adminView.get('/client/project-info', (req, res) => { res.sendFile(process.cwd()
 // Employee
 adminView.get('/employee', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/employee.html') });
 adminView.get(['/employee/add', '/employee/view'], (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/employee-add.html') });
+
+// Services
+adminView.get('/services', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/services.html') });
+adminView.get(['/service/create', '/service/view'], (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/service-detail.html') });
 
 module.exports = adminView;

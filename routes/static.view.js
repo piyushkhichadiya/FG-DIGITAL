@@ -8,11 +8,11 @@ staticView.use(express.static('public/static'))
 
 //------------------------- VIEW ROUTES ----------------------
 
-staticView.get(['/', '/index.html'], (req, res) => { return res.sendFile(process.cwd() + '/views/static/index.html') })
-staticView.get(['/about', '/about.html'], (req, res) => { return res.sendFile(process.cwd() + '/views/static/about.html') })
-staticView.get(['/work', '/work.html'], (req, res) => { return res.sendFile(process.cwd() + '/views/static/work.html') })
+staticView.get('/', (req, res) => { return res.sendFile(process.cwd() + '/views/static/index.html') })
+staticView.get('/about', (req, res) => { return res.sendFile(process.cwd() + '/views/static/about.html') })
+staticView.get('/work', (req, res) => { return res.sendFile(process.cwd() + '/views/static/work.html') })
 staticView.get('/blog', (req, res) => { return res.sendFile(process.cwd() + '/views/static/blog.html') })
 staticView.get('/blog-details', (req, res) => { return res.sendFile(process.cwd() + '/views/static/blog-details.html') })
-staticView.get(['/contact', '/contact.html'], (req, res) => { return res.sendFile(process.cwd() + '/views/static/contact.html') })
+staticView.get('/contact', (req, res) => { return res.sendFile(process.cwd() + '/views/static/contact.html') })
 
 module.exports = staticView;

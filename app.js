@@ -142,6 +142,6 @@ app.use('/admin', require('./routes/admin/view.route'))
 app.use('/employee', require('./routes/employee/view.route.js'))
 app.use('/client', require('./routes/client/view.route.js'))
 
-app.use('*', (req, res) => { return res.redirect('/') })
+app.use('*', (req, res) => { res.sendFile(process.cwd() + '/views/404.html') }) // 404 Not Found
 
 module.exports = app;
