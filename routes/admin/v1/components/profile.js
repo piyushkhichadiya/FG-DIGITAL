@@ -26,7 +26,8 @@ profileAPI.get('/', (req, res) => {
         email: dbUser.email,
         createdOn: dbUser.createdOn,
         name: dbUser.name,
-        profile_image: dbUser.profile_image
+        profile_image: dbUser.profile_image,
+        lastModifiedOn: dbUser.lastModifiedOn
     }
 
     return response(res, 200, 'success', undefined, postData, 'A-2.1.1');
@@ -122,6 +123,33 @@ profileAPI.post('/password', async(req, res) => {
     firebase.database().ref('/admin/users/' + adminAuthToken.user_key + '/').update(dbUser).then(() => {
         return response(res, 200, 'success', 'Password successfully changed', undefined, 'A-2.3.1');
     });
+});
+
+// 2.4 GET FILE
+profileAPI.get('/file/:filename', async(req, res) => {
+    var path = storageDirectory() + '/',
+        filename = String(req.params.filename)
+
+    console.log(filename);
+    if (!fs.existsSync(path)) {
+        fs.mkdirSync(path)
+    }
+    try {
+        var finder = finder = require('findit')(path),
+            finder_flag = false;
+        finder.on('directory', function(dir, stat, stop) {
+            var newPath = dir + '/'
+            console.log(dir);
+            if (fs.existsSync(newPath + filename)) {
+                finder_flag = true;
+                return res.sendFile(newPath + filename)
+            }
+        });
+
+        finder.on('end', function() {
+            if (!finder_flag) return res.status(404).send('FILE NOT FOUND');
+        });
+    } catch {}
 });
 
 module.exports = profileAPI;
