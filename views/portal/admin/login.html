@@ -17,9 +17,9 @@
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-  <style>
-  
-  </style>
+  <!-- Toastr -->
+  <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
+
 </head>
 <body class="hold-transition login-page" style="background-image: url(images/bg.jpg); background-size: cover; background-position: center;">
 <div class="login-box">
@@ -33,7 +33,7 @@
   	</div>
       <form action="#!" method="post">
         <div class="input-group mb-3">
-          <input type="email" class="form-control" placeholder="Email">
+          <input type="email" id="txt_email" class="form-control" value='' placeholder="Email" autocomplete="off">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -41,7 +41,7 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="Password">
+          <input type="password" id="txt_password" class="form-control" value='' placeholder="Password" autocomplete="off">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
@@ -74,6 +74,8 @@
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
+<!-- sweet alert -->
+<script src="plugins/toastr/toastr.min.js"></script>
 
 </body>
 <script>
@@ -84,27 +86,56 @@
     redirect=urlParams.get('redirect')
   }
 
-  $.post({
-    url:'/admin/v1/user/login',
-    data:JSON.stringify({
-      "email":"test@gmail.com",
-      "password":"Aa@123456",
-      "remember":true
-    }),
-    contentType:"application/json",
-    success:result=>{
-      window.location.href=redirect;
-    },error:error=>{
-      error=error.responseJSON
-      console.log(error)
-      $(document).Toasts('create', {
-        title: 'Error #'+error.code,
-        autohide: false,
-        delay: 1000,
-        body: error.message,
-        class: 'bg-warning',
-      })
-    }
-  })
+
+  $('#btn_submit').click(()=>{
+    
+    var email= $('#txt_email').val(),
+        password= $('#txt_password').val()
+        if(!email){
+          return $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: false,
+                    delay: 1000,
+                    body: 'Please Enter Your Email id',
+                    class: 'bg-danger',
+                  });
+        }else{
+          email=String(email).trim()
+        }
+
+        if(!password){
+          return $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: false,
+                    delay: 1000,
+                    body: 'Please Enter Your Password',
+                    class: 'bg-danger',
+                  });
+        }else{
+          password=String(password)
+        }
+
+        $.post({
+            url:'/admin/v1/user/login',
+            data:{
+              "email": email,
+              "password": password,
+              "remember":$('#id').prop('checked')
+            },
+            success:result=>{
+              window.location.href=redirect;
+            },error:error=>{
+              error=error.responseJSON
+              $(document).Toasts('create', {
+                title: 'Error #'+error.code,
+                autohide: false,
+                delay: 1000,
+                body: error.message,
+                class: 'bg-danger',
+              });
+            }
+          });
+  });
+
 </script>
 </html>
