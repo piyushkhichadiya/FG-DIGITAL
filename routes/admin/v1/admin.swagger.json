@@ -107,7 +107,7 @@
         "/profile": {
             "get": {
                 "tags": ["2. Profile"],
-                "summary": "Authentication for Access admin panel",
+                "summary": "Get Profile",
                 "responses": {}
             }
         },
@@ -156,6 +156,19 @@
                             "password": "my-secret-password"
                         }
                     }
+                }],
+                "responses": {}
+            }
+        },
+        "/profile/file/{filename}": {
+            "get": {
+                "tags": ["2. Profile"],
+                "summary": "To Get Any file from storage",
+                "parameters": [{
+                    "in": "path",
+                    "name": "filename",
+                    "required": true,
+                    "description": "Specify File Name"
                 }],
                 "responses": {}
             }
