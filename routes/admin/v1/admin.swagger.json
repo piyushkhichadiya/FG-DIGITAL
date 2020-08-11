@@ -97,6 +97,13 @@
                 "responses": {}
             }
         },
+        "/user/logout": {
+            "get": {
+                "tags": ["1. User Account"],
+                "summary": "To logout or expire session from portal",
+                "responses": {}
+            }
+        },
         "/profile": {
             "get": {
                 "tags": ["2. Profile"],
