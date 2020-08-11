@@ -14,7 +14,7 @@ var express = require('express'),
 app.use(express.static('public'))
 
 // Syntax Error Handling [ex. JSON]
-app.use(bodyParser.json(), (error, req, res, next) => {
+app.use(bodyParser.json(), bodyParser.urlencoded({ extended: false }), (error, req, res, next) => {
     if (error instanceof SyntaxError) {
         return res.status(400).json({ status: 400, response: 'badContent', message: 'SyntaxError: Incorrect Body' })
     }
