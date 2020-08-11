@@ -1,3 +1,5 @@
+const { static } = require('express')
+
 const express = require('express'),
     staticView = express.Router()
 
@@ -5,6 +7,9 @@ const express = require('express'),
 staticView.use(express.static('public/static'))
 
 // ---------- Trailing Slash Static Asset ---------- 
+var trailingRoutes = ['/about/', '/work/', '/blog/', '/blog-details/', '/contact/', '/privacy/']
+
+staticView.use(trailingRoutes, express.static('public/static'));
 
 //------------------------- VIEW ROUTES ----------------------
 
