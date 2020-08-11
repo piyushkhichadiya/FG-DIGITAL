@@ -57,16 +57,16 @@ directory_gen('employee')
 console.clear();
 console.log(`npm start: ${packageInfo.scripts.start}
 
-Port: ${process.env.PORT || 80}
-Environment: ${process.env.NODE_ENV||'development'}
-App Version: ${packageInfo.version}`)
+Port: \x1b[36m\x1b[1m${process.env.PORT || 80}\x1b[0m
+Environment: \x1b[36m\x1b[1m${process.env.NODE_ENV||''}\x1b[0m
+App Version: \x1b[33m\x1b[1m${packageInfo.version}\x1b[0m`)
 
 //----------------------------- DATABASE ------------------------------
 var firebase = require('./config/database')
 var obj_firebase = new firebase()
 obj_firebase.initialization()
 
-console.log(`Database: ${obj_firebase.status().status}`);
+console.log(`Database: \x1b[35m\x1b[1m${obj_firebase.status().status}\x1b[0m`);
 
 //------------------------- SESSION & COOKIE ---------------------------
 
@@ -78,18 +78,8 @@ app.use(session({ secret: 'MY-SECRET', resave: true, saveUninitialized: true, co
 
 //-------------------- API DOCUMENTATION [SWAGGER] ---------------------
 
-let SwaggerOptions = {
-    explorer: false,
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: "APIs - FG Digital",
-    customfavIcon: "/adminLTE/images/favicon.ico",
-    swaggerOptions: {
-        docExpansion: "none",
-    }
-}
-
 // v1
-if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && (process.env.PORT == 80 || !process.env.PORT)) {
+if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development')) {
 
 
     // ADMIN
@@ -125,9 +115,9 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
         }
     }));
 
-    console.log(`Swagger Ui: Success`);
+    console.log('Swagger Ui: \x1b[32m\x1b[1mSuccess\x1b[0m');
 } else {
-    console.log(`Swagger Ui: FAILED => Environment: ${process.env.NODE_ENV||''} > Port: ${process.env.PORT||80}`)
+    console.log('Swagger Ui: \x1b[31m\x1b[1mFailed: Development Environment is required \x1b[0m');
 }
 
 console.log(`------------------------------- FG Digital [${packageInfo.name}] -------------------------------`);
