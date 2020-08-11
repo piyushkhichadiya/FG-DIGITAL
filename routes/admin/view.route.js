@@ -1,3 +1,5 @@
+const { route } = require('./checkAuth')
+
 const express = require('express'),
     adminView = express.Router(),
     checkAuth = require('./checkAuth')
@@ -15,11 +17,14 @@ routes.push.apply(routes, ['/plan/', '/plan/add'])
 
 // Client & Projects
 routes.push.apply(routes, ['/client/', '/client/add',
-    '/client/project/', '/client/project/dashboard/', '/client/project-add/'
+    '/client/project/', '/client/project/dashboard/', '/client/project-add/', '/client/project-info/'
 ])
 
 // Employee
 routes.push.apply(routes, ['/employee/', '/employee/add/', '/employee/view/'])
+
+// Service
+routes.push.apply(routes, ['/services/', '/service/create/', '/service/view/'])
 
 adminView.use(routes, express.static('public/adminLTE'))
 
