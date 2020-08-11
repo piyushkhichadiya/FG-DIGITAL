@@ -51,7 +51,7 @@
         <div class="row">
           <div class="col-8">
             <div class="icheck-primary">
-              <input type="checkbox" id="remember" checked="checked">
+              <input type="checkbox" id="chk_remember" checked="checked">
               <label for="remember">
                 Remember Me
               </label>
@@ -86,28 +86,29 @@
     redirect=urlParams.get('redirect')
   }
 
+  $('#txt_email').focus();
 
-  $('#btn_submit').click(()=>{
-    
+  $('#btn_submit').click(()=>{  
     var email= $('#txt_email').val(),
         password= $('#txt_password').val()
         if(!email){
           return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: false,
-                    delay: 1000,
+                    title: 'Email not Found!',
+                    autohide: true,
+                    delay: 5000,
                     body: 'Please Enter Your Email id',
                     class: 'bg-danger',
-                  });
+                    });
+           $(document).on('removed.lte.toasts')
         }else{
           email=String(email).trim()
         }
 
         if(!password){
           return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: false,
-                    delay: 1000,
+                    title: 'Password not Found!',
+                    autohide: true,
+                    delay: 5000,
                     body: 'Please Enter Your Password',
                     class: 'bg-danger',
                   });
@@ -120,7 +121,7 @@
             data:{
               "email": email,
               "password": password,
-              "remember":$('#id').prop('checked')
+              "remember":$('#chk_remember').prop('checked')
             },
             success:result=>{
               window.location.href=redirect;
@@ -128,13 +129,25 @@
               error=error.responseJSON
               $(document).Toasts('create', {
                 title: 'Error #'+error.code,
-                autohide: false,
-                delay: 1000,
+                autohide: true,
+                delay: 5000,
                 body: error.message,
                 class: 'bg-danger',
               });
             }
           });
+  });
+
+  $("#txt_email").keydown(function (e) {
+    if (e.keyCode == 13) {
+      $('#btn_submit').click();
+      }
+  });
+
+  $("#txt_password").keydown(function (e) {
+    if (e.keyCode == 13) {
+      $('#btn_submit').click();
+      }
   });
 
 </script>
