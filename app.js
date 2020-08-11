@@ -79,7 +79,7 @@ app.use(session({ secret: 'MY-SECRET', resave: true, saveUninitialized: true, co
 //-------------------- API DOCUMENTATION [SWAGGER] ---------------------
 
 // v1
-if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development')) {
+if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && (process.env.PORT == 80 || !process.env.PORT)) {
 
 
     // ADMIN
