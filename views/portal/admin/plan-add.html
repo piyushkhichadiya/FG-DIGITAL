@@ -36,7 +36,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
+                <!-- <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="javascript:void(0);">
                         <i class="far fa-bell"></i>
                         <span class="badge badge-warning navbar-badge">15</span>
@@ -61,8 +61,8 @@
                         <div class="dropdown-divider"></div>
                         <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div>
-                </li>
-                
+                </li> -->
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" onclick="logout()" style="cursor: pointer"></i></li>
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -137,29 +137,29 @@
     <section class="content">
       <div class="container-fluid">
         <div class="card-body card">
-        <div class="row">
+        <div class="row form-group">
            	<label for="inputEmail3" class="col-md-2 col-form-label">Plan Name:</label>
 	        <div class="col-md-3">
-	            <input type="text" class="form-control" id="inputEmail3" placeholder="Plan">
+	            <input type="text" class="form-control" id="txt_pname" placeholder="Plan">
             </div>
          </div>
-         <div class="row">
-           	<label for="inputEmail3" class="col-md-2 mt-2 col-form-label">Amount:</label>
+         <div class="row form-group">
+           	<label for="inputEmail3" class="col-md-2 col-form-label">Amount:</label>
 	        <div class="col-md-3">
-	            <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="Amount">
+	            <input type="text" class="form-control" id="txt_amount" placeholder="Amount">
             </div>
          </div>
-         <div class="row">
-           	<label for="inputEmail3" class="col-md-2 mt-2 col-form-label">Days:</label>
+         <div class="row form-group">
+           	<label for="inputEmail3" class="col-md-2 col-form-label">Days:</label>
 	        <div class="col-md-3">
-	            <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="Days">
+	            <input type="text" class="form-control" id="txt_days" placeholder="Days">
             </div>
          </div>
-         <div class="row">
-         	<div class="col-md-12 mt-4">
-         		<button class="btn btn-outline-primary float-right mr-2 ml-2">Add</button>
-	         	<button class="btn btn-outline-primary float-right ml-2">Update</button>
-	         	<button class="btn btn-outline-primary float-right">Remove</button>
+         <div class="row form-group">
+         	<div class="col-md-12">
+         		<button class="btn btn-outline-primary float-right mr-2 ml-2" id="btn_add">Add</button>
+	         	<button class="btn btn-outline-primary float-right ml-2" id="btn_update">Update</button>
+	         	<button class="btn btn-outline-danger float-right" id="btn_remove">Remove</button>
 	         	
          	</div>
          </div>
@@ -199,11 +199,43 @@
 <script src="dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
-<!-- page script -->
+<!-- sweetalert -->
+<script src="dist/js/sweetalert2.js"></script>
+<!-- Logout -->
+<script src="dist/js/logout.js"></script>
+<!-- toaster -->
+<script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-  $("#example1").DataTable({
-      "responsive": true,
+  $('#btn_add').click(()=>{
+    plan= $('#txt_pname').val()
+    amount= $('#txt_amount').val()
+    days= $('#txt_days').val()
+    $.post({
+      url:'http://localhost/admin/v1/plan/add',
+      data:{
+        "plan_name": plan,
+        "price": amount,
+        "days": days,
+      },success:result=>{
+        $(document).Toasts('create', {
+          title: 'Success',
+          autohide: true,
+          delay: 5000,
+          body: 'Plan Details add Successfully',
+          class: 'bg-success',
+        });
+      },error:error=>{
+        $(document).Toasts('create', {
+          title: 'Error!',
+          autohide: true,
+          delay: 5000,
+          body: 'Something went wrong Please try again',
+          class: 'bg-danger',
+        });
+      }
     });
+  })
+ 
 </script>
 </html>

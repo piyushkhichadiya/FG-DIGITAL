@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <!-- Toastr -->
+    <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
 
     <style>
         
@@ -36,7 +38,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
+                <!-- <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="javascript:void(0);">
                         <i class="far fa-bell"></i>
                         <span class="badge badge-warning navbar-badge">15</span>
@@ -61,7 +63,8 @@
                         <div class="dropdown-divider"></div>
                         <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div>
-                </li>
+                </li> -->
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" onclick="logout()" style="cursor: pointer"></i></li>
                 
             </ul>
         </nav>
@@ -140,7 +143,7 @@
                 	<div class="card-body card">
                     <div class="row">
                         <div class="col-md-3">
-                                <img src="https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png" id="img_profile" style="width: 100px; border-radius:50%;"><br>
+                                <img src="images/logo-small.png" id="img_profile" style="width: 100px;height: 100px; border-radius:50%;"><br>
                                 <i class="fa fa-camera mt-2" id="icon_camera" style="margin-left: 41px;cursor: pointer;"></i>
                                 <input type="file" id="txt_file" accept=".png, .jpg, .jpeg" style="display: none">
                         </div>
@@ -157,20 +160,20 @@
                     </div>
                     <div class="row">
                     	<div class="col-md-12">
-                            <button class="btn btn-outline-primary float-right">Update Profile</button>
+                            <button class="btn btn-outline-primary float-right" id="btn_updateprofile">Update Profile</button>
                     	</div>
                     </div>
                     <hr>
                     <h4 class="header-text">Update Password</h4>
                     <div class="row">
                          <div class="col-md-3 mt-2">
-                            <input type="password" class="form-control" placeholder="Enter New Password">
+                            <input type="password" class="form-control" id="txt_password" placeholder="Enter New Password">
                          </div>   
                          <div class="col-md-3 mt-2">
-                            <input type="password" class="form-control" placeholder="Confirm Password">
+                            <input type="password" class="form-control" id="txt_cpassword" placeholder="Confirm Password">
                          </div>
                          <div class="col-md-3 mt-2">
-                         	<button class="btn btn-outline-primary">Update Password</button>
+                         	<button class="btn btn-outline-primary" id="btn_update">Update Password</button>
                          </div>
                     </div>
                 	</div>
@@ -203,7 +206,12 @@
     <script src="dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
-
+    <!-- sweetalert -->
+    <script src="dist/js/sweetalert2.js"></script>
+    <!-- Logout -->
+    <script src="dist/js/logout.js"></script>
+    <!-- Toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
     <!-- <script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script> -->
 
 </body>
@@ -214,7 +222,7 @@
 
     function readURL(input) {
         if (input.files[0]) {
-            var reader = new FileReader();
+            reader = new FileReader();
             reader.onload = function (e) {
                 $('#img_profile').attr('src', e.target.result);
             }
@@ -226,6 +234,12 @@
         readURL(this);
     });
 
+    $('#btn_updateprofile').click(()=>{
+        username= $('#txt_username').val()
+        alert(username)
+    });
+
+
     $(document).ready(()=>{
         $.getJSON("http://localhost/admin/v1/profile", (data)=>{
             globaldata = data.data
@@ -233,6 +247,59 @@
             $('#txt_email').val(email)
         });
     });
+
+    $('#btn_update').click(()=>{
+        var password= $('#txt_password').val(),
+            conpassword= $('#txt_cpassword').val()
+            if(!password || !conpassword){
+                return $(document).Toasts('create', {
+                    title: 'Both field Required!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please fill out both Field',
+                    class: 'bg-danger',
+
+                  });
+            }else{
+              password= String(password)
+              conpassword= String(conpassword)
+            }
+
+            if(password == conpassword){
+                $.post({
+                    url:'http://localhost/admin/v1/profile/password',
+                    data:{
+                      "password": password,
+                    },
+                    success:result=>{
+                      $(document).Toasts('create', {
+                        title: 'Password Changed',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Your Password has been chaged Successfully',
+                        class: 'bg-success',
+                      });
+                    $('#txt_password').val(null)
+                    $('#txt_cpassword').val(null)
+                    }
+                });
+            }else{
+                $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Password and Confirm password must be same',
+                    class: 'bg-danger',
+                });
+                $('#txt_password').val(null)
+                $('#txt_cpassword').val(null)
+            }
+            
+    })
+
+
+
+
 
 </script>
 </html>
