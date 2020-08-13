@@ -51,7 +51,7 @@ profileAPI.post('/update', (req, res) => {
         var file = req.files.profile_image,
             filename;
 
-        if ((file.size / 1024) > 1024) {
+        if ((file.size / 1024) > 100) {
             return response(res, 400, 'badContent', 'File size limit exceed 1024 KB (1 MB)', undefined, 'A-2.2.2');
         }
 

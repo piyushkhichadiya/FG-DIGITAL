@@ -109,6 +109,10 @@ planAPI.get('/remove', (req, res) => {
 
 // 3.4 GET PLAN
 planAPI.get(['/', '/get'], (req, res) => {
+    /**
+     * Query Filter:
+     *  plan_id
+     */
     if (dbAdminSnapshot.plans) {
         var dbPlans = dbAdminSnapshot.plans,
             dbPlansKey = Object.keys(dbPlans)
@@ -124,6 +128,15 @@ planAPI.get(['/', '/get'], (req, res) => {
                     days: tempPlan.days,
                     createdOn: tempPlan.createdOn,
                     lastModifiedOn: tempPlan.lastModifiedOn,
+                }
+
+                if (req.query.plan_id) {
+                    if (req.query.plan_id == tempObj.plan_id) {
+                        return response(res, 200, 'success', undefined, tempObj, 'A-3.4.3')
+                    }
+                    if (i == dbPlansKey.length - 1) {
+                        return response(res, 404, 'notFound', 'Incorrect Plan ID.', 'A-3.4.4')
+                    }
                 }
 
                 postPlans.push(tempObj);
