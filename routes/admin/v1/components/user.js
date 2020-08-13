@@ -103,4 +103,11 @@ userAPI.post('/login', (req, res) => {
     });
 });
 
+// 1.3 LOGOUT
+userAPI.get('/logout', (req, res) => {
+    req.session.adminAuthToken = undefined
+    res.clearCookie('adminAuthToken')
+    return response(res, 200, 'success', 'Logout Successfully', undefined, 'A-1.3.1')
+})
+
 module.exports = userAPI;

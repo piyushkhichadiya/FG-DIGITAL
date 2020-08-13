@@ -1,3 +1,5 @@
+const { route } = require('./checkAuth')
+
 const express = require('express'),
     adminView = express.Router(),
     checkAuth = require('./checkAuth')
@@ -15,11 +17,14 @@ routes.push.apply(routes, ['/plan/', '/plan/add'])
 
 // Client & Projects
 routes.push.apply(routes, ['/client/', '/client/add',
-    '/client/project/', '/client/project/dashboard/', '/client/project-add/'
+    '/client/project/', '/client/project/dashboard/', '/client/project-add/', '/client/project-info/'
 ])
 
 // Employee
 routes.push.apply(routes, ['/employee/', '/employee/add/', '/employee/view/'])
+
+// Service
+routes.push.apply(routes, ['/services/', '/service/create/', '/service/view/'])
 
 adminView.use(routes, express.static('public/adminLTE'))
 
@@ -31,8 +36,11 @@ adminView.use(/^(?!\/login).*/, checkAuth);
 // Login
 adminView.get('/login', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/login.html') });
 
+// Dashboard
+adminView.get('/', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/dashboard.html') });
+
 // Profile
-adminView.get(['/', '/profile'], (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/profile.html') });
+adminView.get('/profile', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/profile.html') });
 
 // Plan
 adminView.get('/plan', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/plan.html') });
@@ -41,7 +49,6 @@ adminView.get('/plan/add', (req, res) => { res.sendFile(process.cwd() + '/views/
 // Clients
 adminView.get('/client', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client.html') });
 adminView.get('/client/add', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-add.html') });
-adminView.get('/client-add', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-add.html') });
 
 // Client > Project
 adminView.get('/client/project/', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-projects.html') });
@@ -53,7 +60,8 @@ adminView.get('/client/project-info', (req, res) => { res.sendFile(process.cwd()
 adminView.get('/employee', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/employee.html') });
 adminView.get(['/employee/add', '/employee/view'], (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/employee-add.html') });
 
-// NOT FOUND
-adminView.get('*', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/login.html') });
+// Services
+adminView.get('/services', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/services.html') });
+adminView.get(['/service/create', '/service/view'], (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/service-detail.html') });
 
 module.exports = adminView;

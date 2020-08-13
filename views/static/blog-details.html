@@ -43,7 +43,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
         <div class="container">
-            <a class="navbar-brand" href="index.html"><img src="images/logo1.png"></a>
+            <a class="navbar-brand" href="/"><img src="images/logo1.png"></a>
             <!-- <h2 style=" margin-left: 2%;">FG Digital</h2> -->
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="oi oi-menu"></span> Menu
@@ -51,12 +51,11 @@
 
             <div class="collapse navbar-collapse" id="ftco-nav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item "><a href="index.html" class="nav-link">Home</a></li>
-                    <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
-                    <li class="nav-item "><a href="work.html" class="nav-link">Work</a></li>
-                    <!-- <li class="nav-item"><a href="pricing.html" class="nav-link">Pricing</a></li> -->
-                    <li class="nav-item active"><a href="blog.html" class="nav-link">Blog</a></li>
-                    <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+                    <li class="nav-item "><a href="/" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a href="/about" class="nav-link">About</a></li>
+                    <li class="nav-item "><a href="/work" class="nav-link">Work</a></li>
+                    <li class="nav-item active"><a href="/blog" class="nav-link">Blog</a></li>
+                    <li class="nav-item"><a href="/contact" class="nav-link">Contact</a></li>
                 </ul>
             </div>
         </div>
@@ -82,7 +81,7 @@
                 <div class="col-md">
                     <div class="ftco-footer-widget mb-4">
                         <h2 class="ftco-heading-2" style="margin-bottom: 0px;">
-                            <a class="navbar-brand" href="index.html"><img src="images/logo1.png"></a>
+                            <a class="navbar-brand" href="/"><img src="images/logo1.png"></a>
                         </h2>
                         <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-3">
                             <li class="ftco-animate"><a href="https://www.youtube.com/channel/UCufVWMduso5WAjcC8QkckJw?view_as=subscriber"><span class="icon-youtube"></span></a></li>
@@ -107,11 +106,11 @@
                     <div class="ftco-footer-widget mb-4">
                         <h2 class="ftco-heading-2">Quick Links</h2>
                         <ul class="list-unstyled">
-                            <li><a href="index.html">Home</a></li>
-                            <li><a href="about.html">About Us</a></li>
-                            <li><a href="work.html">Work</a></li>
-                            <li><a href="contact.html">Contact</a></li>
-                            <li><a href="privacy.html">Terms &amp; Conditions</a></li>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/about">About Us</a></li>
+                            <li><a href="/work">Work</a></li>
+                            <li><a href="/contact">Contact</a></li>
+                            <li><a href="/privacy">Terms &amp; Conditions</a></li>
                         </ul>
                     </div>
                 </div>
@@ -171,7 +170,7 @@
     $(document).ready(() => {
         let searchParams = new URLSearchParams(window.location.search)
         if (!searchParams.has('id')) {
-            window.location.href = '/blog.html'
+            window.location.href = '//blog'
         }
         var blogNum = searchParams.get('id'),
             data = getAll(),

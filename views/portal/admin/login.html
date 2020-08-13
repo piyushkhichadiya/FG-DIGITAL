@@ -17,9 +17,9 @@
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-  <style>
-  
-  </style>
+  <!-- Toastr -->
+  <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
+
 </head>
 <body class="hold-transition login-page" style="background-image: url(images/bg.jpg); background-size: cover; background-position: center;">
 <div class="login-box">
@@ -31,9 +31,9 @@
   	<img src="images/logo-small.png" class="Logo"><br>
     <a href="javascript:void(0);"><b>Admin Panel</b></a>
   	</div>
-      <form action="#!" method="post">
+      <form id="form_login">
         <div class="input-group mb-3">
-          <input type="email" class="form-control" placeholder="Email">
+          <input type="email" id="txt_email" class="form-control" value='' placeholder="Email" autocomplete="off">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -41,7 +41,7 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="Password">
+          <input type="password" id="txt_password" class="form-control" value='' placeholder="Password" autocomplete="off">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
@@ -51,7 +51,7 @@
         <div class="row">
           <div class="col-8">
             <div class="icheck-primary">
-              <input type="checkbox" id="remember">
+              <input type="checkbox" id="chk_remember" checked="checked">
               <label for="remember">
                 Remember Me
               </label>
@@ -59,7 +59,7 @@
           </div>
           <!-- /.col -->
           <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            <button type="button" id="btn_submit" class="btn btn-primary btn-block">Sign In</button>
           </div>
           <!-- /.col -->
         </div>
@@ -74,6 +74,75 @@
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
+<!-- sweet alert -->
+<script src="plugins/toastr/toastr.min.js"></script>
 
 </body>
+<script>
+
+  const urlParams = new URLSearchParams(window.location.search);
+  var redirect='/admin'
+  if(urlParams.has('redirect') && urlParams.get('redirect')!=''){
+    redirect=urlParams.get('redirect')
+  }
+
+  $('#txt_email').focus();
+
+  $('#btn_submit').click(()=>{  
+    var email= $('#txt_email').val(),
+        password= $('#txt_password').val()
+        if(!email){
+          return $(document).Toasts('create', {
+                    title: 'Email not Found!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter Your Email id',
+                    class: 'bg-danger',
+                    });
+           $(document).on('removed.lte.toasts')
+        }else{
+          email=String(email).trim()
+        }
+
+        if(!password){
+          return $(document).Toasts('create', {
+                    title: 'Password not Found!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter Your Password',
+                    class: 'bg-danger',
+                  });
+        }else{
+          password=String(password)
+        }
+
+        $.post({
+            url:'/admin/v1/user/login',
+            data:{
+              "email": email,
+              "password": password,
+              "remember":$('#chk_remember').prop('checked')
+            },
+            success:result=>{
+              window.location.href=redirect;
+            },error:error=>{
+              error=error.responseJSON
+              $(document).Toasts('create', {
+                title: 'Error #'+error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+              });
+            }
+          });
+  });
+
+  $("#form_login").keydown(function (e) {
+    if (e.keyCode == 13) {
+      $('#btn_submit').click();
+      }
+  });
+
+</script>
 </html>

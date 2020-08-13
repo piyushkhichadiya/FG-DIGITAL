@@ -1,5 +1,5 @@
 const checkAuth = require('express').Router(),
-    { jwtDecode } = require('./v1/functions/functions');
+    { jwtDecode } = require('../../functions/functions');
 
 //Route
 checkAuth.all('*', (req, res, next) => {

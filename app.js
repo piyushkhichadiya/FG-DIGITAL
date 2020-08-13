@@ -6,15 +6,20 @@ var express = require('express'),
     cookieParser = require('cookie-parser'),
     swaggerUI = require('swagger-ui-express'),
     packageInfo = require('./package.json'),
-    { ConvertKeysToLowerCase } = require('./functions/functions')
+    { ConvertKeysToLowerCase } = require('./functions/functions'),
+    favicon = require('serve-favicon'),
+    path = require('path')
 
 //--------------------------- CONFIGURATION ---------------------------
 
 // Set Static Assets
 app.use(express.static('public'))
 
+// Set Fav Icon for APIs & UI
+app.use(favicon(path.join(__dirname, 'public/static/images/logo-small.png')))
+
 // Syntax Error Handling [ex. JSON]
-app.use(bodyParser.json(), (error, req, res, next) => {
+app.use(bodyParser.json(), bodyParser.urlencoded({ extended: false }), (error, req, res, next) => {
     if (error instanceof SyntaxError) {
         return res.status(400).json({ status: 400, response: 'badContent', message: 'SyntaxError: Incorrect Body' })
     }
@@ -34,14 +39,14 @@ app.use((req, res, next) => {
     }
 })
 
+// Multipart Body Parsing [JSON BODY, FILE(s)]
+app.use(multipartParser())
+
 // Convert All JSON Body keys to lowercase & Remove Empty strings
 app.use((req, res, next) => {
     req.body = ConvertKeysToLowerCase(req.body);
     next();
 })
-
-// Multipart Body Parsing [JSON BODY, FILE(s)]
-app.use(multipartParser())
 
 // Basic Directory Generate
 const directory_gen = require('./config/directory');
@@ -52,15 +57,16 @@ directory_gen('employee')
 console.clear();
 console.log(`npm start: ${packageInfo.scripts.start}
 
-Port:${process.env.PORT || 80}
-App Version: ${packageInfo.version}`)
+Port: \x1b[36m\x1b[1m${process.env.PORT || 80}\x1b[0m
+Environment: \x1b[36m\x1b[1m${process.env.NODE_ENV||''}\x1b[0m
+App Version: \x1b[33m\x1b[1m${packageInfo.version}\x1b[0m`)
 
 //----------------------------- DATABASE ------------------------------
 var firebase = require('./config/database')
 var obj_firebase = new firebase()
 obj_firebase.initialization()
 
-console.log(`Database: ${obj_firebase.status().status}`);
+console.log(`Database: \x1b[35m\x1b[1m${obj_firebase.status().status}\x1b[0m`);
 
 //------------------------- SESSION & COOKIE ---------------------------
 
@@ -71,16 +77,6 @@ app.use(cookieParser())
 app.use(session({ secret: 'MY-SECRET', resave: true, saveUninitialized: true, cookie: { secure: false, sameSite: true } }))
 
 //-------------------- API DOCUMENTATION [SWAGGER] ---------------------
-
-let SwaggerOptions = {
-    explorer: false,
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: "APIs - FG Digital",
-    customfavIcon: "/adminLTE/images/favicon.ico",
-    swaggerOptions: {
-        docExpansion: "none",
-    }
-}
 
 // v1
 if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && (process.env.PORT == 80 || !process.env.PORT)) {
@@ -119,9 +115,9 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
         }
     }));
 
-    console.log(`Swagger Ui: Success`);
+    console.log('Swagger Ui: \x1b[32m\x1b[1mSuccess\x1b[0m');
 } else {
-    console.log(`Swagger Ui: FAILED => Environment: ${process.env.NODE_ENV||''} > Port: ${process.env.PORT||80}`)
+    console.log('Swagger Ui: \x1b[31m\x1b[1mFailed: Development Environment is required \x1b[0m');
 }
 
 console.log(`------------------------------- ${packageInfo.name} -------------------------------`);
@@ -140,7 +136,6 @@ app.use('/', require('./routes/static.view'))
 app.use('/admin', require('./routes/admin/view.route'))
 app.use('/employee', require('./routes/employee/view.route.js'))
 app.use('/client', require('./routes/client/view.route.js'))
-
-app.use('*', (req, res) => { return res.redirect('/') })
+app.use('*', (req, res) => { res.sendFile(process.cwd() + '/views/404.html') }) //  404 Not Found
 
 module.exports = app;
