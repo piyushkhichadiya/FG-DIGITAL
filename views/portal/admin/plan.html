@@ -62,7 +62,7 @@
                         <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div>
                 </li> -->
-                <li><i class="fa fa-sign-out-alt mt-1 mr-2" onclick="logout()" style="cursor: pointer"></i></li>
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
                 
             </ul>
         </nav>
@@ -140,7 +140,7 @@
         <div class="card-body card">
         <div class="row">
           <div class="col-md-12">
-              <button class="btn btn-outline-primary float-right mb-3">Add Plan</button>
+              <button class="btn btn-outline-primary float-right mb-3" id="btn_addplan">Add Plan</button>
             </div>
               <!-- /.card-header -->
               <div class="col-md-12">
@@ -151,7 +151,6 @@
                     <th>Plan Name</th>
                     <th>Price</th>
                     <th>Day</th>
-                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                   </thead>
@@ -164,7 +163,6 @@
                     <th>Plan Name</th>
                     <th>Price</th>
                     <th>Day</th>
-                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                   </tfoot>
@@ -196,36 +194,6 @@
 </div>
 <!-- ./wrapper -->
 
-
-<!-- Modal -->
-  <div class="modal fade" id="Model_plan" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">User Data</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <div class="col-md-12" >
-              <p>Sr. No.: <span id="lbl_srno"></span></p>
-              <p>Plan Name: <span id="lbl_planname"></span></p>
-              <p>Price: <span id="lbl_price"></span></p>
-              <p>Day: <span id="lbl_day"></span></p>
-              <p>Status: <span id="lbl_status"></span></p>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
 <!-- jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
@@ -251,29 +219,29 @@
       "responsive": true,
     });
 
+  $('#btn_addplan').click(()=>{
+    document.location = '/admin/plan/add'
+  });
+
   $(document).ready(()=>{
-    $.getJSON('http://localhost/admin/v1/plan/get',(data)=>{
-      globaldata= data.data;
+    $.getJSON('/admin/v1/plan/get',(data)=>{
+      dbPlan = data.data;
       index =0;
+      j = 1;
       
-      for(var i = 0; i < globaldata.length; i++){
-        var value = globaldata[i]
+      for(var i = 0; i < dbPlan.length; i++){
+        var value = dbPlan[i]
         tblplan.row.add([
-          value.plan_id, value.plan_name, value.price, value.days, value.createdOn,
-          `<button class ="btn btn-secondary w-100" onclick="model(${index++})">Get Data</button>`
+          `${j++}`, value.plan_name, value.price, value.days, 
+          `<button class ="btn btn-secondary w-100" onclick="model(${index++})">Open</button>`
           ]).draw();
       }
     });
   });
-  
+
   function model(index){
-    var temp = globaldata[index]
-    $('#lbl_srno').html(temp.plan_id)
-    $('#lbl_planname').html(temp.plan_name)
-    $('#lbl_price').html(temp.price)
-    $('#lbl_days').html(temp.days)
-    $('#lbl_status').html(temp.createdOn)
-    $('#Model_plan').modal('show');
+    var temp = dbPlan[index]
+    window.location = `/admin/plan/add?plan_id=${temp.plan_id}`
   }
 </script>
 </html>

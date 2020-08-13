@@ -126,6 +126,9 @@
               window.location.href=redirect;
             },error:error=>{
               error=error.responseJSON
+              if(error.status == 401){
+                logout(true)
+              }
               $(document).Toasts('create', {
                 title: 'Error #'+error.code,
                 autohide: true,

@@ -35,34 +35,7 @@
             
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <!-- Notifications Dropdown Menu -->
-                <!-- <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="javascript:void(0);">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">15 Notifications</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new messages
-                            <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
-                    </div>
-                </li> -->
-                <li><i class="fa fa-sign-out-alt mt-1 mr-2" onclick="logout()" style="cursor: pointer"></i></li>
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -211,31 +184,154 @@
     plan= $('#txt_pname').val()
     amount= $('#txt_amount').val()
     days= $('#txt_days').val()
-    $.post({
-      url:'http://localhost/admin/v1/plan/add',
-      data:{
-        "plan_name": plan,
-        "price": amount,
-        "days": days,
-      },success:result=>{
-        $(document).Toasts('create', {
-          title: 'Success',
+    if(!plan || !amount || !days){
+      $(document).Toasts('create', {
+          title: 'Data missing',
           autohide: true,
           delay: 5000,
-          body: 'Plan Details add Successfully',
-          class: 'bg-success',
-        });
-      },error:error=>{
-        $(document).Toasts('create', {
-          title: 'Error!',
-          autohide: true,
-          delay: 5000,
-          body: 'Something went wrong Please try again',
+          body: 'Please fill out all fields',
           class: 'bg-danger',
         });
+    }
+    else{
+        if(isNaN(amount) || isNaN(days)){
+          $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Valid Input',
+                class: 'bg-danger',
+              });
+          }
+          else{
+          $.post({
+            url:'/admin/v1/plan/add',
+            data:{
+              "plan_name": plan,
+              "price": amount,
+              "days": days,
+            },success:result=>{
+              $(document).Toasts('create', {
+                title: 'Success',
+                autohide: true,
+                delay: 5000,
+                body: 'Plan details add Successfully',
+                class: 'bg-success',
+              });
+              $('#txt_pname').val(null)
+              $('#txt_amount').val(null)
+              $('#txt_days').val(null)
+            },error:error=>{
+              error=error.responseJSON
+              $(document).Toasts('create', {
+                title: 'Error #'+error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+              });
+            }
+          });
+        }
       }
+  });
+  const urlParams = new URLSearchParams(window.location.search);
+
+  $(document).ready(()=>{
+    $('#btn_remove').hide()
+    $('#btn_update').hide()
+    
+    if(urlParams.has('plan_id')){
+      if(urlParams.get('plan_id')==''){
+        return window.history.go(-1)
+      }
+      $('#btn_add').hide();
+      $('#btn_update').show();
+      $('#btn_remove').show();
+      $.get('/admin/v1/plan/get?plan_id='+urlParams.get('plan_id'),data=>{
+        console.log(data.data)
+      })
+    }
+  });
+
+  $('#btn_update').click(()=>{
+    p_id = urlParams.get('plan_id')
+      plan= $('#txt_pname').val()
+      amount= $('#txt_amount').val()
+      days= $('#txt_days').val()
+      if(!plan || !amount || !days){
+        $(document).Toasts('create', {
+            title: 'Data missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please fill out all fields',
+            class: 'bg-danger',
+          });
+      }
+      else{
+          if(isNaN(amount) || isNaN(days)){
+            $(document).Toasts('create', {
+                  title: 'Error!',
+                  autohide: true,
+                  delay: 5000,
+                  body: 'Please Enter Valid Input',
+                  class: 'bg-danger',
+                });
+            }
+            else{
+            $.post({
+              url:'/admin/v1/plan/update',
+              data:{
+                "plan_id": p_id,
+                "plan_name": plan,
+                "price": amount,
+                "days": days,
+              },success:result=>{
+                $(document).Toasts('create', {
+                  title: 'Success',
+                  autohide: true,
+                  delay: 5000,
+                  body: 'Plan Details update Successfully',
+                  class: 'bg-success',
+                });
+              },error:error=>{
+                error=error.responseJSON
+                $(document).Toasts('create', {
+                  title: 'Error #'+error.code,
+                  autohide: true,
+                  delay: 5000,
+                  body: error.message,
+                  class: 'bg-danger',
+                });
+              }
+            });
+          }
+        }
     });
-  })
- 
+  
+  $('#btn_remove').click(()=>{
+    p_id = urlParams.get('plan_id')
+      $.get({
+        url:`/admin/v1/plan/remove?plan_id=${p_id}`,
+        success:result=>{
+          $(document).Toasts('create', {
+            title: 'Success',
+            autohide: true,
+            delay: 5000,
+            body: 'Plan removed successfully',
+            class: 'bg-success',
+          });
+        },error:error=>{
+          error=error.responseJSON
+          $(document).Toasts('create', {
+            title: 'Error #'+error.code,
+            autohide: true,
+            delay: 5000,
+            body: error.message,
+            class: 'bg-danger',
+          });
+        }
+      });
+    });
 </script>
 </html>

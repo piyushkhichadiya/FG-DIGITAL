@@ -64,7 +64,7 @@
                         <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
                     </div>
                 </li> -->
-                <li><i class="fa fa-sign-out-alt mt-1 mr-2" onclick="logout()" style="cursor: pointer"></i></li>
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
                 
             </ul>
         </nav>
@@ -145,7 +145,7 @@
                         <div class="col-md-3">
                                 <img src="images/logo-small.png" id="img_profile" style="width: 100px;height: 100px; border-radius:50%;"><br>
                                 <i class="fa fa-camera mt-2" id="icon_camera" style="margin-left: 41px;cursor: pointer;"></i>
-                                <input type="file" id="txt_file" accept=".png, .jpg, .jpeg" style="display: none">
+                                <input type="file" id="file_profile" accept=".png, .jpg, .jpeg" style="display: none">
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
@@ -217,34 +217,36 @@
 </body>
 <script>
     $('#icon_camera').click(()=>{
-        $('#txt_file').click();
+        $('#file_profile').click();
     });
 
-    function readURL(input) {
-        if (input.files[0]) {
-            reader = new FileReader();
-            reader.onload = function (e) {
-                $('#img_profile').attr('src', e.target.result);
-            }
-            reader.readAsDataURL(input.files[0]);
+    $("#file_profile").change(function(){
+        if (this.files[0]) {
+            var file = this.files[0]
+            const objectURL = URL.createObjectURL(file)
+            return $('#img_profile').attr('src', objectURL);
+        }else{
+            $('#img_profile').attr('src', 'images/logo-small.png' )
         }
-    }
-
-    $("#txt_file").change(function(){
-        readURL(this);
     });
 
     $('#btn_updateprofile').click(()=>{
         username= $('#txt_username').val()
-        alert(username)
+        image = $('#file_profile')[0].files[0]
     });
 
 
     $(document).ready(()=>{
-        $.getJSON("http://localhost/admin/v1/profile", (data)=>{
-            globaldata = data.data
-            email = globaldata.email
-            $('#txt_email').val(email)
+        $.get("/admin/v1/profile", (data)=>{
+            dbdata = data.data
+            $('#txt_username').val(dbdata.name)
+            $('#txt_email').val(dbdata.email)
+            $('#img_profile').attr('src','/admin/v1/profile/file/'+ dbdata.profile_image)
+        }).fail(error=>{
+            error=error.responseJSON
+            if(error.status == 401){
+                logout(true)
+              }
         });
     });
 
@@ -253,10 +255,10 @@
             conpassword= $('#txt_cpassword').val()
             if(!password || !conpassword){
                 return $(document).Toasts('create', {
-                    title: 'Both field Required!',
+                    title: 'Password and Confirm password required',
                     autohide: true,
                     delay: 5000,
-                    body: 'Please fill out both Field',
+                    body: 'Add Password and Confirm Password',
                     class: 'bg-danger',
 
                   });
@@ -265,9 +267,19 @@
               conpassword= String(conpassword)
             }
 
-            if(password == conpassword){
-                $.post({
-                    url:'http://localhost/admin/v1/profile/password',
+            if(password != conpassword){
+                return $(document).Toasts('create', {
+                        title: 'Error!',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Password and Confirm Password must be same',
+                        class: 'bg-danger',
+                    });
+                
+                }     
+
+            $.post({
+                    url:'/admin/v1/profile/password',
                     data:{
                       "password": password,
                     },
@@ -276,30 +288,23 @@
                         title: 'Password Changed',
                         autohide: true,
                         delay: 5000,
-                        body: 'Your Password has been chaged Successfully',
+                        body: 'Your Password has been changed Successfully',
                         class: 'bg-success',
                       });
-                    $('#txt_password').val(null)
-                    $('#txt_cpassword').val(null)
-                    }
+                        $('#txt_password').val(null)
+                        $('#txt_cpassword').val(null)
+                    },error:error=>{
+                      error=error.responseJSON
+                      $(document).Toasts('create', {
+                        title: 'Error #'+error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                      });
+                  }
                 });
-            }else{
-                $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Password and Confirm password must be same',
-                    class: 'bg-danger',
-                });
-                $('#txt_password').val(null)
-                $('#txt_cpassword').val(null)
-            }
             
     })
-
-
-
-
-
 </script>
 </html>
