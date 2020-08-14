@@ -223,6 +223,7 @@
     document.location = '/admin/plan/add'
   });
 
+  var dbPlan
   $(document).ready(()=>{
     $.getJSON('/admin/v1/plan/get',(data)=>{
       dbPlan = data.data;
@@ -240,8 +241,8 @@
   });
 
   function model(index){
-    var temp = dbPlan[index]
-    window.location = `/admin/plan/add?plan_id=${temp.plan_id}`
+    var tempPlan = dbPlan[index]
+    window.location = `/admin/plan/add?plan_id=${tempPlan.plan_id}`
   }
 </script>
 </html>
