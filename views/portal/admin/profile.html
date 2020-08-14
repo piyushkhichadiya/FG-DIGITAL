@@ -143,7 +143,8 @@
                 	<div class="card-body card">
                     <div class="row">
                         <div class="col-md-3">
-                                <img src="images/logo-small.png" id="img_profile" style="width: 100px;height: 100px; border-radius:50%;"><br>
+                                <img src="images/logo-small.png" id="img_profile" style="width: 100px;height: 100px; border-radius:50%;">
+                                <img src="" id="img_originalProfile" style="width: 100px;height: 100px; border-radius:50%; display: none"><br>
                                 <i class="fa fa-camera mt-2" id="icon_camera" style="margin-left: 41px;cursor: pointer;"></i>
                                 <input type="file" id="file_profile" accept=".png, .jpg, .jpeg" style="display: none">
                         </div>
@@ -160,7 +161,7 @@
                     </div>
                     <div class="row">
                     	<div class="col-md-12">
-                            <button class="btn btn-outline-primary float-right" id="btn_updateprofile">Update Profile</button>
+                            <button class="btn btn-outline-primary float-right" id="btn_updateProfile">Update Profile</button>
                     	</div>
                     </div>
                     <hr>
@@ -216,7 +217,7 @@
 
 </body>
 <script>
-    $('#icon_camera').click(()=>{
+    $('#icon_camera,#img_profile,#img_originalProfile').click(()=>{
         $('#file_profile').click();
     });
 
@@ -243,14 +244,21 @@
                     class: 'bg-danger',
                 });
             }
+            $('#img_originalProfile').hide()
             const objectURL = URL.createObjectURL(file)
-            return $('#img_profile').attr('src', objectURL);
+            return $('#img_profile').attr('src', objectURL).show();
             }else{
-                $('#img_profile').attr('src', 'images/logo-small.png' )
+                if($('#img_originalProfile').attr('src') == ''){
+                $('#img_profile').attr('src', 'images/logo-small.png' ).show() 
+                $('#img_originalProfile').hide()
+            }else{
+                $('#img_profile').hide()
+                $('#img_originalProfile').show()
         }
+            }
     });
 
-    $('#btn_updateprofile').click(()=>{
+    $('#btn_updateProfile').click(()=>{
         var username= $('#txt_username').val()
         var formData = new FormData();
         formData.append('name', username);
@@ -287,12 +295,17 @@
             var dbdata = data.data
             $('#txt_username').val(dbdata.name)
             $('#txt_email').val(dbdata.email)
-            $('#img_profile').attr('src','/admin/v1/profile/file/'+ dbdata.profile_image)
+            $('#img_originalProfile').attr('src','/admin/v1/profile/file/'+ dbdata.profile_image).show()
+            $('#img_profile').hide()
         }).fail(error=>{
             error=error.responseJSON
-            if(error.status == 401){
-                logout(true)
-              }
+            $(document).Toasts('create', {
+                title: 'Password and Confirm password required',
+                autohide: true,
+                delay: 5000,
+                body: 'Add Password and Confirm Password',
+                class: 'bg-danger',
+              });
         });
     });
 
@@ -306,7 +319,6 @@
                     delay: 5000,
                     body: 'Add Password and Confirm Password',
                     class: 'bg-danger',
-
                   });
             }else{
               password= String(password)
