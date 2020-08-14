@@ -33,7 +33,7 @@ module.exports = {
                         }
 
                     } else {
-                        response(res, 400, 'unauthorized', 'User is not authorized to make request', undefined, 'A-MW-4');
+                        response(res, 401, 'unauthorized', 'User is not authorized to make request', undefined, 'A-MW-4');
                         return false;
                     }
                 } else {
@@ -43,12 +43,12 @@ module.exports = {
                 }
             } else {
                 // Invalid Token, Failed in JWT Verify
-                response(res, 400, 'unauthorized', 'Invalid Token', undefined, 'A-MW-2');
+                response(res, 401, 'unauthorized', 'Invalid Token', undefined, 'A-MW-2');
                 return false;
             }
         } else {
             // Token not found
-            response(res, 400, 'unauthorized', 'User is not authorized to make request', undefined, 'A-MW-1');
+            response(res, 401, 'unauthorized', 'Access Token not found', undefined, 'A-MW-1');
             return false;
         }
     }
