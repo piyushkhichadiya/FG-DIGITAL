@@ -105,7 +105,10 @@ employeeAPI.get(['/', '/get'], (req, res) => {
                     name: tempEmployee.name,
                     email: tempEmployee.email,
                     createdOn: tempEmployee.createdOn,
-                    createdBy: tempEmployee.createdBy
+                    createdBy: tempEmployee.createdBy,
+                    profile_image: tempEmployee.profile_image,
+                    skills: tempEmployee.skills,
+                    position: tempEmployee.position
                 }
 
                 // Social Account
@@ -186,6 +189,7 @@ employeeAPI.post('/update/:id', (req, res) => {
                     if (!validPosition.includes(position)) {
                         return response(res, 403, 'forbidden', 'Invalid Position.', { valid_positions: validPosition }, 'A-5.3.1');
                     }
+                    tempEmployee.position = position
                 }
 
                 // Skill
