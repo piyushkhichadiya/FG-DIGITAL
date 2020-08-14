@@ -223,22 +223,68 @@
     $("#file_profile").change(function(){
         if (this.files[0]) {
             var file = this.files[0]
+            var type = file.type.split('/').pop().toLowerCase();
+            if(type != "jpeg" && type != "jpg" && type != "png"){
+                return $(document).Toasts('create', {
+                    title: 'File Formate not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Formate',
+                    class: 'bg-danger',
+                  });
+
+            }
+            if(file.size > 102400){
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 100 kb',
+                    class: 'bg-danger',
+                });
+            }
             const objectURL = URL.createObjectURL(file)
             return $('#img_profile').attr('src', objectURL);
-        }else{
-            $('#img_profile').attr('src', 'images/logo-small.png' )
+            }else{
+                $('#img_profile').attr('src', 'images/logo-small.png' )
         }
     });
 
     $('#btn_updateprofile').click(()=>{
-        username= $('#txt_username').val()
-        image = $('#file_profile')[0].files[0]
+        var username= $('#txt_username').val()
+        var formData = new FormData();
+        formData.append('name', username);
+        formData.append('profile_image', $('#file_profile')[0].files[0]);
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/profile/update',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success : result=>{
+              $(document).Toasts('create', {
+                title: 'Updated',
+                autohide: true,
+                delay: 5000,
+                body: 'Your Profile Has been Successfully Updated',
+                class: 'bg-success',
+              });
+            },error:error=>{
+                  error=error.responseJSON
+                  $(document).Toasts('create', {
+                    title: 'Error #'+error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                  });
+              }
+        })
     });
-
 
     $(document).ready(()=>{
         $.get("/admin/v1/profile", (data)=>{
-            dbdata = data.data
+            var dbdata = data.data
             $('#txt_username').val(dbdata.name)
             $('#txt_email').val(dbdata.email)
             $('#img_profile').attr('src','/admin/v1/profile/file/'+ dbdata.profile_image)

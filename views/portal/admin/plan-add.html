@@ -195,6 +195,20 @@
     }
     else{
         if(isNaN(amount) || isNaN(days)){
+          $( "#txt_amount" ).validate({
+              rules: {
+                field: {
+                  min: 0
+                }
+              }
+            });
+          $( "#txt_days" ).validate({
+              rules: {
+                field: {
+                  min: 0
+                }
+              }
+            });
           $(document).Toasts('create', {
                 title: 'Error!',
                 autohide: true,
@@ -235,6 +249,7 @@
         }
       }
   });
+
   const urlParams = new URLSearchParams(window.location.search);
 
   $(document).ready(()=>{
@@ -249,13 +264,16 @@
       $('#btn_update').show();
       $('#btn_remove').show();
       $.get('/admin/v1/plan/get?plan_id='+urlParams.get('plan_id'),data=>{
-        console.log(data.data)
+        var data = data.data
+        $('#txt_pname').val(data.plan_name)
+        $('#txt_amount').val(data.price)
+        $('#txt_days').val(data.days)
       })
     }
   });
 
   $('#btn_update').click(()=>{
-    p_id = urlParams.get('plan_id')
+    var p_id = urlParams.get('plan_id')
       plan= $('#txt_pname').val()
       amount= $('#txt_amount').val()
       days= $('#txt_days').val()
@@ -270,6 +288,22 @@
       }
       else{
           if(isNaN(amount) || isNaN(days)){
+            $( "#txt_amount" ).validate({
+              rules: {
+                field: {
+                  required: true,
+                  min: 0
+                }
+              }
+            });
+            $( "#txt_days" ).validate({
+              rules: {
+                field: {
+                  required: true,
+                  min: 0
+                }
+              }
+            });
             $(document).Toasts('create', {
                   title: 'Error!',
                   autohide: true,
@@ -278,7 +312,7 @@
                   class: 'bg-danger',
                 });
             }
-            else{
+          else{
             $.post({
               url:'/admin/v1/plan/update',
               data:{
@@ -310,7 +344,7 @@
     });
   
   $('#btn_remove').click(()=>{
-    p_id = urlParams.get('plan_id')
+    var p_id = urlParams.get('plan_id')
       $.get({
         url:`/admin/v1/plan/remove?plan_id=${p_id}`,
         success:result=>{
