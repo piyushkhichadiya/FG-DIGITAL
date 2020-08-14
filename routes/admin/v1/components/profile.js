@@ -130,7 +130,6 @@ profileAPI.get('/file/:filename', async(req, res) => {
     var path = storageDirectory() + '/',
         filename = String(req.params.filename)
 
-    console.log(filename);
     if (!fs.existsSync(path)) {
         fs.mkdirSync(path)
     }
