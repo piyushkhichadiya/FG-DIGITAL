@@ -35,33 +35,7 @@
             
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="javascript:void(0);">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">15 Notifications</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new messages
-                            <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
-                    </div>
-                </li>
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
                 
             </ul>
         </nav>
@@ -139,30 +113,22 @@
         <div class="card-body card">
         <div class="row">
           <div class="col-md-12">
-              <button class="btn btn-outline-primary float-right mb-3">Add Plan</button>
+              <button class="btn btn-outline-primary float-right mb-3" id="btn_addplan">Add Plan</button>
             </div>
               <!-- /.card-header -->
               <div class="col-md-12">
-                <table id="example1" class="table table-bordered table-striped w-100">
+                <table id="tbl_plan" class="table table-bordered table-striped w-100">
                   <thead>
                   <tr>
                     <th>Sr. No.</th>
                     <th>Plan Name</th>
                     <th>Price</th>
                     <th>Day</th>
-                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td>01</td>
-                    <td>regular</td>
-                    <td>9000</td>
-                    <td>90</td>
-                    <td>available</td>
-                    <td>ready</td>
-                  </tr>
+                  
                   </tbody>
                   <tfoot>
                   <tr>
@@ -170,7 +136,6 @@
                     <th>Plan Name</th>
                     <th>Price</th>
                     <th>Day</th>
-                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                   </tfoot>
@@ -215,11 +180,38 @@
 <script src="dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
-<!-- page script -->
+<!-- sweetalert -->
+<script src="dist/js/sweetalert2.js"></script>
+<!-- Logout -->
+<script src="dist/js/logout.js"></script>
+<!-- toaster -->
+<script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-  $("#example1").DataTable({
+  var tblplan = $("#tbl_plan").DataTable({
       "responsive": true,
     });
+
+  $('#btn_addplan').click(()=>{
+    document.location = '/admin/plan/add'
+  });
+
+  var dbPlan
+  $(document).ready(()=>{
+    $.getJSON('/admin/v1/plan/get',(data)=>{
+      dbPlan = data.data;
+      index =0;
+      j = 1;
+      
+      for(var i = 0; i < dbPlan.length; i++){
+        var tempPlan = dbPlan[i]
+        tblplan.row.add([
+          `${j++}`, tempPlan.plan_name, tempPlan.price, tempPlan.days, 
+          `<button class ="btn btn-secondary w-100" onclick="window.location.hre ='/admin/plan/add?plan_id=${tempPlan.plan_id}'">Open</button>`
+          ]).draw();
+      }
+    });
+  });
+
 </script>
 </html>
