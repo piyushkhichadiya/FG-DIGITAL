@@ -35,34 +35,7 @@
             
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="javascript:void(0);">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">15 Notifications</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new messages
-                            <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
-                    </div>
-                </li>
-                
+               <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -125,7 +98,7 @@
           </div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+              <li class="breadcrumb-item"><a href="/admin">Home</a></li>
               <li class="breadcrumb-item active">Team Members</li>
             </ol>
           </div>
@@ -145,7 +118,7 @@
 	          </div>
               <!-- /.card-header -->
               <div class="col-md-12">
-                <table id="example1" class="table table-bordered table-striped w-100">
+                <table id="tbl_emp" class="table table-bordered table-striped w-100">
                   <thead>
                   <tr>
                     <th>Sr. No.</th>
@@ -153,20 +126,11 @@
                     <th>Profile Image</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td>01</td>
-                    <td>001</td>
-                    <td><img src="https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png" style="width: 70px; border-radius:50%;"></td>
-                    <td>Viren Oberoi</td>
-                    <td>viren@123</td>
-                    <td>99</td>
-                    <td>ready</td>
-                  </tr>
+                  
                   </tbody>
                   <tfoot>
                   <tr>
@@ -175,7 +139,6 @@
                     <th>Profile Image</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                   </tfoot>
@@ -220,11 +183,33 @@
 <script src="dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
-<!-- page script -->
+<!-- sweetalert -->
+<script src="dist/js/sweetalert2.js"></script>
+<!-- Logout -->
+<script src="dist/js/logout.js"></script>
+<!-- toaster -->
+<script src="plugins/toastr/toastr.min.js"></script>
+
 </body>
 <script>
-  $("#example1").DataTable({
+  var tblEmp = $("#tbl_emp").DataTable({
       "responsive": true,
     });
+  var empData
+  $(document).ready(()=>{
+    $.getJSON('/admin/v1/employee/get',(data)=>{
+      empData = data.data
+      index =0;
+      for(var i=0; i< empData.length; i++){
+        var tempEmp = empData[i]
+        var button = `<button class='btn btn-secondary w-100' onclick="window.location.href ='/admin/employee/add?emp_id=${tempEmp.employee_id}'">open</button>`
+        var image= `<img src="'/admin/v1/profile/file/'+${tempEmp.profile_image}">`
+        j = 1;
+        tblEmp.row.add([
+          `${j++}`,tempEmp.employee_id,image,tempEmp.name,tempEmp.email,button
+          ]).draw();
+      }
+    });
+  })
 </script>
 </html>

@@ -37,34 +37,7 @@
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <!-- Notifications Dropdown Menu -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="javascript:void(0);">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">15 Notifications</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new messages
-                            <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
-                    </div>
-                </li>
-
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -145,83 +118,90 @@
                             <div class="col-md-5">
                                 <div class="form-group row">
                                     <label class="col-md-3 col-form-label">Member ID:</label>
-                                    <input type="text" class="col-md-5 form-control" id="inputEmail3" placeholder="Member ID" disabled>
+                                    <input type="text" class="col-md-7 form-control" id="id_memberId" placeholder="Auto Generated" disabled>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-md-3 col-form-label">Name:</label>
-                                    <input type="text" class="col-md-5 form-control" id="inputEmail3" placeholder="Name">
+                                    <input type="text" class="col-md-7 form-control" id="txt_name" placeholder="Name">
                                 </div>
-                                <div class="form-group row">
+                                <div class="form-group row" id="div_position">
                                     <label class="col-md-3 col-form-label">Position:</label>
-                                    <select class="col-md-5 form-control">
-                                        <option>Position 1</option>
-                                        <option>Position 2</option>
-                                        <option>Position 3</option>
-                                        <option>Position 4</option>
-                                        <option>Position 5</option>
+                                    <select class="col-md-7 form-control" id="txt_position">
+                                        <option value="Website Developer">Website Developer</option>
+                                        <option value="Marketing Specialist">Marketing Specialist</option>
+                                        <option value="Application Developer">Application Developer</option>
+                                        <option value="Content Writer">Content Writer</option>
+                                        <option value="SEO Specialist">SEO Specialist</option>
+                                        <option value="Social Media Manager">Social Media Manager</option>
+                                        <option value="Graphics Designer">Graphics Designer</option>
+                                        <option value="Videographer">Videographer</option>
+                                        <option value="Video Editor">Video Editor</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="form-group row">
                                     <label class="col-md-3 col-form-label">Email:</label>
-                                    <input type="text" class="col-md-8 form-control" id="inputEmail3" placeholder="Email">
+                                    <input type="text" class="col-md-7 form-control" id="txt_email" placeholder="Email">
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-md-3 col-form-label">Password:</label>
-                                    <input type="password" class="col-md-4 form-control mr-1 mt-1" placeholder="New Password">
-                                    <input type="password" class="col-md-4 form-control mr-1 mt-1" placeholder="Confirm Password">
+                                    <input type="password" class="col-md-7 form-control mr-1 mt-1" id="txt_password" placeholder="Password">
                                 </div>
 
                             </div>
-                            <div class="col-md-2" align="center">
-                                <img src="https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-4.png" class="ml-2" style="width: 100px; border-radius:50%;"><br>
-                                <p><i class="fas fa-camera ml-2"></i></p>
+                            <div class="col-md-2" align="center" id="div_image">
+                                <img src="images/logo-small.png" class="ml-2" style="width: 100px;height: 100px; border-radius:50%;"><br>
+                                <input type="file" name="" accept=".png,.jpg,.jpeg" id="file_profile" style="display: none">
+                                <p><i class="fas fa-camera ml-2" style="cursor: pointer" id="icon_camera"></i></p>
                             </div>
                         </div>
 
                         <div class="col-md-12">
-                            <button class="btn btn-outline-primary float-right">Add Member</button>
+                            <button class="btn btn-outline-primary float-right" id="btn_addEmp">Add Member</button>
                         </div>
+                        <div id="div_other_details">
                         <hr>
-                        <h4 class="header-title">Other Details</h4>
-                        <div class="row">
-                            <label for="inputEmail3" class="col-md-12 col-form-label">Skills:</label>
-                            <div class="col-md-4">
-                                <textarea class="form-control" rows="2" placeholder="Skills...."></textarea>
+                            <h4 class="header-title">Other Details</h4>
+                            <div class="row">
+                                <label for="inputEmail3" class="col-md-12 col-form-label">Skills:</label>
+                                <div class="col-md-4">
+                                    <textarea class="form-control" rows="2" placeholder="Skills...."></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label for="inputEmail3" class="col-md-12 col-form-label">Social Accounts:</label>
+                                <div class="col-md-2 mt-2">
+                                    <select class="form-control">
+                                        <option value="Stack Overflow">Stack Overflow</option>
+                                        <option value="Github">Github</option>
+                                        <option value="Hacker Rank">Hacker Rank</option>
+                                        <option value="LinkedIn">LinkedIn</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control mt-2" id="txt_link" placeholder="U_id or Link">
+                                </div>
+                                <div class="col-md-3 mt-2">
+                                    <button class="btn btn-outline-primary">Add Account</button>
+                                    <button class="btn btn-outline-danger">Remove</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="txt_contact" placeholder="Contact Details">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-12">
+                                    <button class="btn btn-outline-primary mt-1 ml-2 float-right">Update</button>
+                                    <button class="btn btn-outline-primary mt-1 float-right">Remove</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <label for="inputEmail3" class="col-md-12 col-form-label">Social Accounts:</label>
-                            <div class="col-md-2 mt-2">
-                                <select class="form-control">
-                                    <option value="Stack Overflow">Stack Overflow</option>
-                                    <option value="Github">Github</option>
-                                    <option value="Hacker Rank">Hacker Rank</option>
-                                    <option value="LinkedIn">LinkedIn</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <input type="text" class="form-control mt-2" id="inputEmail3" placeholder="U_id or Link">
-                            </div>
-                            <div class="col-md-3 mt-2">
-                                <button class="btn btn-outline-primary">Add Account</button>
-                                <button class="btn btn-outline-danger">Remove</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
-                            <div class="col-md-4">
-                                <input type="text" class="form-control" id="inputEmail3" placeholder="Contact Details">
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-md-12">
-                                <button class="btn btn-outline-primary mt-1 ml-2 float-right">Update</button>
-                                <button class="btn btn-outline-primary mt-1 float-right">Remove</button>
-                            </div>
-                        </div>
-                        <hr>
+                        <div id="div_Update_Password">
+                        <hr>   
                         <h4 class="header-title">Update Password</h4>
                         <div class="row">
                             <div class="col-md-3 mt-2">
@@ -258,25 +238,93 @@
     </div>
     <!-- ./wrapper -->
 
-    <!-- jQuery -->
-    <script src="plugins/jquery/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables -->
-    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="dist/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="dist/js/demo.js"></script>
-    <!-- page script -->
+<!-- jQuery -->
+<script src="plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables -->
+<script src="plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="dist/js/demo.js"></script>
+<!-- sweetalert -->
+<script src="dist/js/sweetalert2.js"></script>
+<!-- Logout -->
+<script src="dist/js/logout.js"></script>
+<!-- toaster -->
+<script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-    $("#example1").DataTable({
-        "responsive": true,
-    });
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.has('emp_id')){
+        $('#btn_addEmp').hide();
+    }else{
+        $('#div_position').hide();
+        $('#div_other_details').hide();
+        $('#div_Update_Password').hide();
+        $('#div_image').hide();
+    }
+    
+    $('#btn_addEmp').click(()=>{
+        var name = $('#txt_name').val(),
+        email = $('#txt_email').val(),
+        password = $('#txt_password').val()
+        if(!name){
+            return $(document).Toasts('create', {
+              title: 'Name missing',
+              autohide: true,
+              delay: 5000,
+              body: 'Please fill out all fields',
+              class: 'bg-danger',
+            });
+        }
+        if(!email){
+            return $(document).Toasts('create', {
+              title: 'Email missing',
+              autohide: true,
+              delay: 5000,
+              body: 'Please fill out all fields',
+              class: 'bg-danger',
+            });
+        }else{
+            email=String(email).trim()
+        }
+        if(!name){
+            return $(document).Toasts('create', {
+              title: 'Password missing',
+              autohide: true,
+              delay: 5000,
+              body: 'Please fill out all fields',
+              class: 'bg-danger',
+            });
+        }else{
+            password=String(password)
+        }
+        $.post({
+        url:'/admin/v1/employee/add',
+        data:{
+          "email": email,
+          "password": password,
+          "name": name,
+        },
+        success:result=>{
+          window.location.href= '/admin/employee/add?emp_id=123';
+        },error:error=>{
+          error=error.responseJSON
+          $(document).Toasts('create', {
+            title: 'Error #'+error.code,
+            autohide: true,
+            delay: 5000,
+            body: error.message,
+            class: 'bg-danger',
+          });
+        }
+      });
+        });
 </script>
 
 </html>
