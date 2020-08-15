@@ -98,8 +98,7 @@
                     delay: 5000,
                     body: 'Please Enter Your Email id',
                     class: 'bg-danger',
-                    });
-           $(document).on('removed.lte.toasts')
+                  });
         }else{
           email=String(email).trim()
         }
@@ -127,6 +126,9 @@
               window.location.href=redirect;
             },error:error=>{
               error=error.responseJSON
+              if(error.status == 401){
+                logout(true)
+              }
               $(document).Toasts('create', {
                 title: 'Error #'+error.code,
                 autohide: true,
