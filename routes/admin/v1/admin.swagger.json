@@ -904,14 +904,33 @@
                 "summary": "Add Post Detail",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
-                        "name": "name",
+                        "name": "description",
                         "in": "formData",
-                        "description": "description",
+                        "description": "Description",
                         "required": false,
                         "type": "string",
-                        "example": "Enter description",
                         "schema": {
-                            "example": "Test description"
+                            "example": "Test Description"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "project_id",
+                        "description": "Project id",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "review_id",
+                        "description": "Review id",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MEBjUo5rkwH5OnwS8Hn"
                         }
                     },
                     {
@@ -938,7 +957,7 @@
                             "project_id": "1376735095048"
                         },
                         "schema": {
-                            "project_id": "1376735095048"
+                            "example": "1376735095048"
 
                         }
                     },
@@ -947,11 +966,8 @@
                         "name": "review_id",
                         "required": true,
                         "type": "string",
-                        "example": {
-                            "review_id": "-MEBjUo5rkwH5OnwS8Hn"
-                        },
                         "schema": {
-                            "review_id": "-MEBjUo5rkwH5OnwS8Hn"
+                            "example": "-MEBjUo5rkwH5OnwS8Hn"
 
                         }
                     },
@@ -960,17 +976,85 @@
                         "name": "post_id",
                         "required": true,
                         "type": "string",
-                        "example": {
-                            "post_id": "-MECMEfkwU2d3ghacnt-"
-                        },
                         "schema": {
-                            "post_id": "-MECMEfkwU2d3ghacnt-"
+                            "example": "-MECMEfkwU2d3ghacnt-"
 
                         }
                     }
                 ],
                 "responses": {}
 
+            }
+        },
+        "/project/review/close": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Close Review",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                        }
+
+                    },
+                    {
+                        "in": "query",
+                        "name": "action",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "close"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/remove-file": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Close Review",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "filename",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "Post-251469.png"
+                        }
+                    }
+                ],
+                "responses": {}
             }
         }
     }
