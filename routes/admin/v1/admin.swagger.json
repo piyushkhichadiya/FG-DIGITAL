@@ -1036,6 +1036,150 @@
                 ],
                 "responses": {}
             }
+        },
+        "/service/create": {
+            "post": {
+                "tags": ["7. Services"],
+                "summary": "Create New Service",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["title"],
+                        "properties": {
+                            "title": { "type": "string" }
+                        },
+                        "example": {
+                            "title": "Email Marketing"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/get": {
+            "get": {
+                "tags": ["7. Services"],
+                "summary": "Get existing services",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "integer",
+                    "description": "To get particular service"
+                }],
+                "responses": {}
+            }
+        },
+        "/service/update": {
+            "post": {
+                "tags": ["7. Services"],
+                "summary": "Update existing services",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["service_id", "title"],
+                        "properties": {
+                            "service_id": { "type": "integer" },
+                            "title": { "type": "string" }
+                        },
+                        "example": {
+                            "service_id": 371889110187,
+                            "title": "Social Media Marketing"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/remove": {
+            "get": {
+                "tags": ["7. Services"],
+                "summary": "Remove existing services",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "integer",
+                    "required": true,
+                    "description": "To remove particular service",
+                    "schema": {
+                        "example": "371889110187"
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/criteria/add": {
+            "post": {
+                "tags": ["7. Services"],
+                "summary": "Add criteria to service",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["service_id", "criteria"],
+                        "properties": {
+                            "service_id": { "type": "integer" },
+                            "criteria": { "type": "string" }
+                        },
+                        "example": {
+                            "service_id": 371889110187,
+                            "criteria": "Instagram Follower"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/criteria/update": {
+            "post": {
+                "tags": ["7. Services"],
+                "summary": "Update criteria to service",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["service_id", "criteria_id", "criteria"],
+                        "properties": {
+                            "service_id": { "type": "integer" },
+                            "criteria_id": { "type": "integer" },
+                            "criteria": { "type": "string" }
+                        },
+                        "example": {
+                            "service_id": 371889110187,
+                            "criteria_id": 390441675983,
+                            "criteria": "Facebook Follower"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/criteria/remove": {
+            "get": {
+                "tags": ["7. Services"],
+                "summary": "Remove existing service criteria",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "integer",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "criteria_id",
+                    "description": "Criteria ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 390441675983
+                    }
+                }],
+                "responses": {}
+            }
         }
     }
 }
