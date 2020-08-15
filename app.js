@@ -50,8 +50,8 @@ app.use((req, res, next) => {
 
 // Basic Directory Generate
 const directory_gen = require('./config/directory');
-directory_gen('admin')
-directory_gen('employee')
+directory_gen('/admin')
+directory_gen('/employee')
 
 // Console Clear
 console.clear();
