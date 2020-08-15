@@ -120,7 +120,7 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
     console.log('Swagger Ui: \x1b[31m\x1b[1mFailed: Development Environment is required \x1b[0m');
 }
 
-console.log(`------------------------------- FG Digital [${packageInfo.name}] -------------------------------`);
+console.log(`------------------------------- ${packageInfo.name} -------------------------------`);
 
 //------------------------- API & VIEW ROUTES --------------------------
 

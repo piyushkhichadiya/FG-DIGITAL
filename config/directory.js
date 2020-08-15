@@ -1,11 +1,11 @@
-const fs = require('fs');
+const fs = require('fs'),
+    { storageDirectory } = require('../functions/functions');
 module.exports = (directory) => {
     try {
-        if (!fs.exists(process.cwd() + '/public/storage/' + directory)) {
-            fs.mkdirSync(process.cwd() + '/public/storage/' + directory, { recursive: true });
+        if (!fs.exists(storageDirectory() + directory)) {
+            fs.mkdirSync(storageDirectory() + directory, { recursive: true });
         }
     } catch {
-        fs.mkdirSync(process.cwd() + '/public/storage/' + directory, { recursive: true });
+        fs.mkdirSync(storageDirectory() + directory, { recursive: true });
     }
-
 }
