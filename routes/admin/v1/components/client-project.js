@@ -1,7 +1,7 @@
 const projectAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     fs = require('fs'),
-    directoryMake = require('../../../../config/directory'),
+    directoryCreate = require('../../../../config/directory'),
     { response, storageDirectory, randomIntDigit } = require('../../../../functions/functions')
 
 //----------------------------- CONFIGURATION ------------------------------
@@ -479,12 +479,12 @@ projectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.13.1')
     }
-    if (!req.body.review_id) {
+    if (!req.body.review_key) {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.13.2')
     }
     var projectID = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectID),
-        reviewID = String(req.body.review_id).trim(),
+        reviewID = String(req.body.review_key).trim(),
         pushData = {
             createdOn: String(new Date()),
             createdBy: "ADMIN"
@@ -493,7 +493,7 @@ projectAPI.post('/review/add-post', (req, res) => {
     if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.13.3') }
 
     // Create Directory if does not exist
-    directoryMake(`/clients/${getKeyDB.client_key}/reviews`)
+    directoryCreate(`/clients/${getKeyDB.client_key}/reviews`)
 
     if (req.body.description) {
         var description = String(req.body.description).trim()
@@ -669,15 +669,12 @@ projectAPI.get('/review/close', (req, res) => {
     if (!req.query.review_id) {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.15.2')
     }
-    if (!req.query.action || req.query.action != "close") {
-        return response(res, 400, 'required', 'Action Required', undefined, 'A-6.15.3')
-    }
     var projectID = String(req.query.project_id).trim(),
         reviewID = String(req.query.review_id).trim(),
         getKeyDB = getKeys(projectID)
-    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.15.4') }
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.15.3') }
     if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
-        return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.15.5')
+        return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.15.4')
     }
     var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
         reviewDBKey = Object.keys(reviewDB)
@@ -685,25 +682,22 @@ projectAPI.get('/review/close', (req, res) => {
         if (reviewID == reviewDBKey[i]) {
             var tempReview = reviewDB[reviewDBKey[i]]
             if (tempReview.closed) {
-                return response(res, 403, 'Forbidden', 'Review is already closed', undefined, 'A-6.15.6')
+                return response(res, 403, 'Forbidden', 'Review is already closed', undefined, 'A-6.15.5')
 
             }
             tempReview.closed = true,
                 tempReview.lastModifiedBy = "ADMIN",
                 tempReview.lastModifiedOn = String(new Date())
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewID}/`).update(tempReview).then(() => {
-                return response(res, 200, 'success', 'Review has been closed successfully', undefined, 'A-6.15.7')
+                return response(res, 200, 'success', 'Review has been closed successfully', undefined, 'A-6.15.6')
 
             })
 
         } else if (i == reviewDBKey.length - 1) {
-            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.15.8')
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.15.7')
 
         }
     }
-
-
-
 })
 
 // 6.16 REMOVE FILE
@@ -742,7 +736,7 @@ projectAPI.get('/review/remove-file', (req, res) => {
                 var postDB = tempReview.post,
                     postDBKey = Object.keys(postDB)
                 for (var i = 0; i < postDBKey.length; i++) {
-                    //removing Images
+                    // removing Images
                     var tempReviewPost = postDB[postDBKey[i]]
                     if (tempReviewPost.deleted) {
                         return response(res, 403, 'Forbidden', 'Post is already removed', undefined, 'A-6.16.8')

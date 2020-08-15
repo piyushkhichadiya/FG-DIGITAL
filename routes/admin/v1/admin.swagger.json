@@ -825,12 +825,8 @@
                         "name": "project_id",
                         "required": true,
                         "type": "string",
-                        "example": {
-                            "project_id": "1376735095048"
-                        },
                         "schema": {
-                            "project_id": "1376735095048"
-
+                            "example": "1376735095048"
                         }
                     },
                     {
@@ -838,12 +834,8 @@
                         "name": "account_key",
                         "required": true,
                         "type": "string",
-                        "example": {
-                            "account_key": "-MDx3AwtJCYTVn6Kjk8l"
-                        },
                         "schema": {
-                            "account_key": "-MDx3AwtJCYTVn6Kjk8l"
-
+                            "example": "-MDx3AwtJCYTVn6Kjk8l"
                         }
                     }
                 ],
@@ -916,7 +908,7 @@
                     {
                         "in": "formData",
                         "name": "project_id",
-                        "description": "Project id",
+                        "description": "Project ID",
                         "required": false,
                         "type": "string",
                         "schema": {
@@ -925,8 +917,8 @@
                     },
                     {
                         "in": "formData",
-                        "name": "review_id",
-                        "description": "Review id",
+                        "name": "review_key",
+                        "description": "Review Key",
                         "required": false,
                         "type": "string",
                         "schema": {
@@ -936,7 +928,7 @@
                     {
                         "name": "file",
                         "in": "formData",
-                        "description": "file to upload",
+                        "description": "SUPPORT MULTIPLE FILES",
                         "required": false,
                         "type": "file"
                     }
@@ -953,9 +945,6 @@
                         "name": "project_id",
                         "required": true,
                         "type": "string",
-                        "example": {
-                            "project_id": "1376735095048"
-                        },
                         "schema": {
                             "example": "1376735095048"
 
@@ -1008,15 +997,6 @@
                             "example": "-MEBjUo5rkwH5OnwS8Hn"
                         }
 
-                    },
-                    {
-                        "in": "query",
-                        "name": "action",
-                        "required": true,
-                        "type": "string",
-                        "schema": {
-                            "example": "close"
-                        }
                     }
                 ],
                 "responses": {}
