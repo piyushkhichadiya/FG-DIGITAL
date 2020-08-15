@@ -118,7 +118,7 @@
                             <div class="col-md-5">
                                 <div class="form-group row">
                                     <label class="col-md-3 col-form-label">Member ID:</label>
-                                    <input type="text" class="col-md-7 form-control" id="id_memberId" placeholder="Auto Generated" disabled>
+                                    <input type="text" class="col-md-7 form-control" id="txt_memberId" placeholder="Auto Generated" disabled>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-md-3 col-form-label">Name:</label>
@@ -151,7 +151,8 @@
 
                             </div>
                             <div class="col-md-2" align="center" id="div_image">
-                                <img src="images/logo-small.png" class="ml-2" style="width: 100px;height: 100px; border-radius:50%;"><br>
+                                <img src="images/logo-small.png" id="img_profile" class="ml-2" style="width: 100px;height: 100px; border-radius:50%;">
+                                <img src="" id="img_originalProfile" style="width: 100px;height: 100px; border-radius:50%; display: none"><br>
                                 <input type="file" name="" accept=".png,.jpg,.jpeg" id="file_profile" style="display: none">
                                 <p><i class="fas fa-camera ml-2" style="cursor: pointer" id="icon_camera"></i></p>
                             </div>
@@ -166,7 +167,7 @@
                             <div class="row">
                                 <label for="inputEmail3" class="col-md-12 col-form-label">Skills:</label>
                                 <div class="col-md-4">
-                                    <textarea class="form-control" rows="2" placeholder="Skills...."></textarea>
+                                    <textarea class="form-control" id="txt_skill" rows="2" placeholder="Skills...."></textarea>
                                 </div>
                             </div>
                             <div class="row">
@@ -205,13 +206,13 @@
                         <h4 class="header-title">Update Password</h4>
                         <div class="row">
                             <div class="col-md-3 mt-2">
-                                <input type="password" class="form-control" placeholder="Enter New Password">
+                                <input type="password" id="txt_newPassword" class="form-control" placeholder="Enter New Password">
                             </div>
                             <div class="col-md-3 mt-2">
-                                <input type="password" class="form-control" placeholder="Confirm Password">
+                                <input type="password" id="txt_cPassword" class="form-control" placeholder="Confirm Password">
                             </div>
                             <div class="col-md-2 mt-2">
-                                <button class="btn btn-outline-primary">Update Password</button>
+                                <button class="btn btn-outline-primary" id="btn_updatePassword">Update Password</button>
                             </div>
                         </div>
 
@@ -260,14 +261,30 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    if(urlParams.has('emp_id')){
-        $('#btn_addEmp').hide();
-    }else{
-        $('#div_position').hide();
-        $('#div_other_details').hide();
-        $('#div_Update_Password').hide();
-        $('#div_image').hide();
-    }
+
+    $(document).ready(()=>{
+        if(urlParams.has('emp_id')){
+            if(urlParams.get('emp_id')==''){
+                return window.history.go(-1)
+            }
+            $('#btn_addEmp').hide();
+            $.get('/admin/v1/employee/get?employee_id='+urlParams.get('emp_id'),data=>{
+            var data = data.data
+            $('#txt_memberId').val(data.employee_id)
+            $('#txt_name').val(data.name)
+            $('#txt_email').prop('disabled', true)
+            $('#txt_email').val(data.email)
+            $('#txt_skill').val(data.skills)
+            $('#img_originalProfile').attr('src','/admin/v1/profile/file/'+ data.profile_image).show()
+            $('#img_profile').hide()
+        });
+        }else{
+            $('#div_position').hide();
+            $('#div_other_details').hide();
+            $('#div_Update_Password').hide();
+            $('#div_image').hide();
+        }
+    });
     
     $('#btn_addEmp').click(()=>{
         var name = $('#txt_name').val(),
@@ -323,8 +340,107 @@
             class: 'bg-danger',
           });
         }
-      });
         });
+    });
+
+    $('#icon_camera,#img_profile').click(()=>{
+        $('#file_profile').click();
+    })
+
+    $("#file_profile").change(function(){
+        if (this.files[0]) {
+            var file = this.files[0]
+            var type = file.type.split('/').pop().toLowerCase();
+            if(type != "jpeg" && type != "jpg" && type != "png"){
+                return $(document).Toasts('create', {
+                    title: 'File Formate not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Formate',
+                    class: 'bg-danger',
+                  });
+
+            }
+            if(file.size > 102400){
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 100 kb',
+                    class: 'bg-danger',
+                });
+            }
+            $('#img_originalProfile').hide()
+            const objectURL = URL.createObjectURL(file)
+            return $('#img_profile').attr('src', objectURL).show();
+            }else{
+                if($('#img_originalProfile').attr('src') == ''){
+                    $('#img_profile').attr('src', 'images/logo-small.png' ).show() 
+                    $('#img_originalProfile').hide()
+                }else{
+                    $('#img_profile').hide()
+                    $('#img_originalProfile').show()
+                }
+            }
+    });
+
+    $('#btn_updatePassword').click(()=>{
+        var password= $('#txt_newPassword').val(),
+            conPassword= $('#txt_cPassword').val()
+            console.log(password,conPassword)
+            if(!password || !conPassword){
+                return $(document).Toasts('create', {
+                    title: 'Password and Confirm password required',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Add Password and Confirm Password',
+                    class: 'bg-danger',
+                  });
+            }else{
+              password= String(password)
+              conPassword= String(conPassword)
+            }
+
+            if(password != conPassword){
+                return $(document).Toasts('create', {
+                        title: 'Error!',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Password and Confirm Password must be same',
+                        class: 'bg-danger',
+                    });
+                
+                }     
+
+            $.post({
+                    url:'/admin/v1/profile/password',
+                    data:{
+                      "password": password,
+                    },
+                    success:result=>{
+                      $(document).Toasts('create', {
+                        title: 'Password Changed',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Your Password has been changed Successfully',
+                        class: 'bg-success',
+                      });
+                        $('#txt_password').val(null)
+                        $('#txt_cpassword').val(null)
+                    },error:error=>{
+                      error=error.responseJSON
+                      $(document).Toasts('create', {
+                        title: 'Error #'+error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                      });
+                  }
+                });
+            
+    })
+
 </script>
 
 </html>
