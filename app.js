@@ -50,8 +50,8 @@ app.use((req, res, next) => {
 
 // Basic Directory Generate
 const directory_gen = require('./config/directory');
-directory_gen('admin')
-directory_gen('employee')
+directory_gen('/admin')
+directory_gen('/employee')
 
 // Console Clear
 console.clear();
@@ -120,7 +120,7 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
     console.log('Swagger Ui: \x1b[31m\x1b[1mFailed: Development Environment is required \x1b[0m');
 }
 
-console.log(`------------------------------- FG Digital [${packageInfo.name}] -------------------------------`);
+console.log(`------------------------------- ${packageInfo.name} -------------------------------`);
 
 //------------------------- API & VIEW ROUTES --------------------------
 
