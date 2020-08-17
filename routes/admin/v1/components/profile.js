@@ -131,14 +131,13 @@ profileAPI.get('/file/:filename', async(req, res) => {
         filename = String(req.params.filename)
 
     if (!fs.existsSync(path)) {
-        fs.mkdirSync(path)
+        fs.mkdirSync(path, { recursive: true })
     }
     try {
         var finder = finder = require('findit')(path),
             finder_flag = false;
         finder.on('directory', function(dir, stat, stop) {
             var newPath = dir + '/'
-            console.log(dir);
             if (fs.existsSync(newPath + filename)) {
                 finder_flag = true;
                 return res.sendFile(newPath + filename)
