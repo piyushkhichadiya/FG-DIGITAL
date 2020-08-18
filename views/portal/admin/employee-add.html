@@ -104,7 +104,7 @@
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Member</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/employee">Member</a></li>
                                 <li class="breadcrumb-item active">Add Member</li>
                             </ol>
                         </div>
@@ -127,7 +127,7 @@
                                     <label class="col-md-3 col-form-label">Name:</label>
                                     <input type="text" class="col-md-7 form-control" id="txt_name" placeholder="Name">
                                 </div>
-                                <div class="form-group row" id="div_position">
+                                <div class="form-group row" id="div_position" style="display: none;">
                                     <label class="col-md-3 col-form-label">Position:</label>
                                     <select class="col-md-7 form-control" id="list_position">
                                         <option value="Website Developer">Website Developer</option>
@@ -152,9 +152,9 @@
                                     <input type="password" class="col-md-7 form-control mr-1 mt-1" id="txt_password" placeholder="Password">
                                 </div>
                             </div>
-                            <div class="col-md-2" align="center" id="div_image">
+                            <div class="col-md-2" align="center" id="div_image" style="display: none;">
                                 <img src="images/logo-small.png" id="img_profile" class="ml-2" style="width: 100px;height: 100px; border-radius:50%;">
-                                <img src="" id="img_originalProfile" style="width: 100px;height: 100px; border-radius:50%; display: none"><br>
+                                <img src="" id="img_originalProfile" onerror="this.src='images/logo-small.png'" style="width: 100px;height: 100px; border-radius:50%; display: none"><br>
                                 <input type="file" name="" accept=".png,.jpg,.jpeg" id="file_profile" style="display: none">
                                 <p><i class="fas fa-camera ml-2 mr-2" style="cursor: pointer" id="icon_camera"></i></p>
                             </div>
@@ -162,13 +162,13 @@
                         <div class="col-md-12">
                             <button class="btn btn-outline-primary float-right" id="btn_addEmp">Add Member</button>
                         </div>
-                        <div id="div_other_details">
+                        <div id="div_other_details" style="display: none;">
                             <hr>
                             <h4 class="header-title">Other Details</h4>
                             <div class="row form-group">
                                 <label for="inputEmail3" class="col-md-12 col-form-label">Skills:</label>
                                 <div class="col-md-4">
-                                    <textarea class="form-control" id="txt_skill" rows="2" placeholder="Skills...."></textarea>
+                                    <textarea class="form-control" id="txt_skill" rows="2" placeholder="Employee Skils"></textarea>
                                 </div>
                             </div>
                             <div id="">
@@ -190,7 +190,7 @@
                                             <input type="text" class="form-control" id="txt_link" placeholder="Link or Username">
                                         </div>
                                         <div class="col-md-4 form-group">
-                                            <button class="btn btn-outline-primary col-md-6 m-1" onclick="addSocialAccount()">Add Account</button>
+                                            <button class="btn btn-outline-primary col-md-6 m-1" onclick="addSocialAccount()"><i class="fas fa-plus"></i> Add Account</button>
                                         </div>
                                     </div>
                                 </div>
@@ -218,8 +218,8 @@
                                 <div class="col-md-3 mt-2">
                                     <input type="password" id="txt_cPassword" class="form-control" placeholder="Confirm Password">
                                 </div>
-                                <div class="col-md-2 mt-2">
-                                    <button class="btn btn-outline-primary" id="btn_updatePassword">Update Password</button>
+                                <div class="col-md-3 mt-2">
+                                    <button class="btn btn-outline-primary" id="btn_updatePassword"><i class="fas fa-pencil-alt"></i> Update Password</button>
                                 </div>
                             </div>
                         </div>
@@ -274,19 +274,16 @@ $(document).ready(() => {
         }
         getEmployee(urlParams.get('emp_id'))
         $('#btn_addEmp').hide();
-
-    } else {
-        $('#div_position').hide();
-        $('#div_other_details').hide();
-        $('#div_Update_Password').hide();
-        $('#div_image').hide();
+        $('#div_position').show();
+        $('#div_other_details').show();
+        $('#div_Update_Password').show();
+        $('#div_image').show();
     }
 });
 
 function getEmployee(emp_id) {
     $.get('/admin/v1/employee/get?employee_id=' + emp_id, data => {
-        var data = data.data,
-            social_Data = data.social_accounts
+        var data = data.data
         $('#txt_memberId').val(data.employee_id)
         $('#txt_name').val(data.name)
         $('#txt_email').val(data.email)
@@ -295,30 +292,34 @@ function getEmployee(emp_id) {
         $('#img_originalProfile').attr('src', '/admin/v1/profile/file/' + data.profile_image).show()
         $('#img_profile').hide()
 
-        for (var i = 0; i < social_Data.length; i++) {
-            var temp_social = social_Data[i]
-            var socialHTML = `<div class="row">
-                                <div class="col-md-3 form-group">
-                                    <select class="form-control" id='list_social_${i}'>
-    <option value="Stack Overflow">Stack Overflow</option>
-    <option value="Github">Github</option>
-    <option value="Hacker Rank">Hacker Rank</option>
-    <option value="LinkedIn">LinkedIn</option>
-    <option value="Instagram">Instagram</option>
-    <option value="Facebook">Facebook</option>
-</select>
-</div>
-<div class="col-md-5 form-group">
-    <input type="text" class="form-control" id="txt_link_${i}" value="${temp_social.reference}" placeholder="Link or Username">
-</div>
-<div class="col-md-4 form-group">
-    <button class="btn btn-outline-info col-md-6 m-1" onclick=updateSocial(${i},'${temp_social.account_id}')>Update Account</button>
-    <button class="btn btn-outline-danger col-md-4 m-1" onclick=removeSocial('${temp_social.account_id}')>Remove</button>
-</div>
-</div>`;
-            $('#div_social').append(socialHTML);
-            $(`#list_social_${i}`).val(temp_social.account_name)
+        if (data.social_accounts) {
+            var social_Data = data.social_accounts
+            for (var i = 0; i < social_Data.length; i++) {
+                var temp_social = social_Data[i]
+                var socialHTML = `<div class="row">
+                <div class="col-md-3 form-group">
+                    <select class="form-control" id='list_social_${i}'>
+                        <option value="Stack Overflow">Stack Overflow</option>
+                        <option value="Github">Github</option>
+                        <option value="Hacker Rank">Hacker Rank</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Facebook">Facebook</option>
+                    </select>
+                    </div>
+                    <div class="col-md-5 form-group">
+                        <input type="text" class="form-control" id="txt_link_${i}" value="${temp_social.reference}" placeholder="Link or Username">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <button class="btn btn-outline-info col-md-6 m-1" onclick=updateSocial(${i},'${temp_social.account_id}')><i class="fas fa-pencil-alt"></i> Update Account</button>
+                        <button class="btn btn-outline-danger col-md-4 m-1" onclick=removeSocial('${temp_social.account_id}')><i class='fas fa-trash-alt'></i> Remove</button>
+                    </div>
+                    </div>`;
+                $('#div_social').append(socialHTML);
+                $(`#list_social_${i}`).val(temp_social.account_name)
+            }
         }
+
     });
 }
 $('#btn_addEmp').click(() => {
@@ -369,8 +370,8 @@ $('#btn_addEmp').click(() => {
                 body: 'Member add Successfully',
                 class: 'bg-success',
             });
-            console.log(result)
-            // window.location.href= '/admin/employee/add?emp_id=123';
+            var memberId = result.data
+            window.location.href = `/admin/employee/add?emp_id=${memberId.member_id}`;
         },
         error: error => {
             error = error.responseJSON
@@ -408,7 +409,7 @@ $("#file_profile").change(function() {
                 title: 'File is too Large',
                 autohide: true,
                 delay: 5000,
-                body: 'please select file size below 100 kb',
+                body: 'please select file size below 100 KB',
                 class: 'bg-danger',
             });
         }
@@ -437,10 +438,19 @@ $('#btn_update').click(() => {
     if (name) {
         formData.append('name', name);
     }
-    formData.append('position', position);
-    formData.append('skills', skills);
-    formData.append('email', email);
-    formData.append('profile_image', $('#file_profile')[0].files[0]);
+    if (position) {
+        formData.append('position', position);
+    }
+    if (skills) {
+        formData.append('skills', skills);
+    }
+    if (email) {
+        formData.append('email', email);
+    }
+    if ($('#file_profile')[0].files[0]) {
+
+        formData.append('profile_image', $('#file_profile')[0].files[0]);
+    }
     $.post({
         type: 'POST',
         url: `/admin/v1/employee/update/${emp_id}`,
@@ -498,7 +508,6 @@ $('#btn_remove').click(() => {
 $('#btn_updatePassword').click(() => {
     var password = $('#txt_newPassword').val(),
         conPassword = $('#txt_cPassword').val()
-
     if (!password || !conPassword) {
         return $(document).Toasts('create', {
             title: 'Password and Confirm password required',
@@ -511,7 +520,6 @@ $('#btn_updatePassword').click(() => {
         password = String(password)
         conPassword = String(conPassword)
     }
-
     if (password != conPassword) {
         return $(document).Toasts('create', {
             title: 'Error!',
@@ -520,9 +528,7 @@ $('#btn_updatePassword').click(() => {
             body: 'Password and Confirm Password must be same',
             class: 'bg-danger',
         });
-
     }
-
     $.post({
         url: '/admin/v1/profile/password',
         data: {
@@ -554,12 +560,124 @@ $('#btn_updatePassword').click(() => {
 })
 
 function addSocialAccount() {
-
+    emp_id = $('#txt_memberId').val()
+    accountName = $('#list_social').val()
+    reference = $('#txt_link').val();
+    if (!accountName) {
+        return $(document).Toasts('create', {
+            title: 'Error!',
+            autohide: true,
+            delay: 5000,
+            body: 'Account Name not found',
+            class: 'bg-danger',
+        });
+    }
+    if (!reference) {
+        return $(document).Toasts('create', {
+            title: 'Error!',
+            autohide: true,
+            delay: 5000,
+            body: 'Link or Username not found',
+            class: 'bg-danger',
+        });
+    }
+    $.post({
+        url: '/admin/v1/employee/social-account/add',
+        data: {
+            "employee_id": emp_id,
+            "account_name": accountName,
+            "reference": reference,
+        },
+        success: result => {
+            $(document).Toasts('create', {
+                title: 'Account added',
+                autohide: true,
+                delay: 5000,
+                body: 'Social Account added Successfully',
+                class: 'bg-success',
+            });
+            window.location.reload()
+        },
+        error: error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        }
+    });
 }
 
 function updateSocial(index, account_id) {
-    console.log(index, account_id)
-    getEmployee(urlParams.get('emp_id'))
+    // getEmployee(urlParams.get('emp_id'))
+    accountName = $(`#list_social_${index}`).val()
+    reference = $(`#txt_link_${index}`).val();
+    emp_id = $('#txt_memberId').val()
+    formData = new FormData();
+    formData.append('employee_id', emp_id)
+    formData.append('account_id', account_id)
+    if (accountName) {
+        formData.append('account_name', accountName)
+    }
+    if (reference) {
+        formData.append('reference', reference)
+    }
+    $.post({
+        type: 'POST',
+        url: '/admin/v1/employee/social-account/update',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: result => {
+            $(document).Toasts('create', {
+                title: 'Updated',
+                autohide: true,
+                delay: 5000,
+                body: 'Social account details has been Successfully Updated',
+                class: 'bg-success',
+            });
+        },
+        error: error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        }
+    });
+}
+
+function removeSocial(account_id) {
+    emp_id = $('#txt_memberId').val()
+    $.get({
+        url: `/admin/v1/employee/social-account/remove?employee_id=${emp_id}&account_id=${account_id}`,
+        success: result => {
+            $(document).Toasts('create', {
+                title: 'Success',
+                autohide: true,
+                delay: 5000,
+                body: 'Social account removed successfully',
+                class: 'bg-success',
+            });
+            window.location.reload();
+        },
+        error: error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        }
+    });
 }
 </script>
 
