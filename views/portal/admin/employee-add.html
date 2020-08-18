@@ -147,7 +147,7 @@
                                     <label class="col-md-3 col-form-label">Email:</label>
                                     <input type="text" class="col-md-7 form-control" id="txt_email" placeholder="Email">
                                 </div>
-                                <div class="form-group row">
+                                <div class="form-group row" id="div_password">
                                     <label class="col-md-3 col-form-label">Password:</label>
                                     <input type="password" class="col-md-7 form-control mr-1 mt-1" id="txt_password" placeholder="Password">
                                 </div>
@@ -171,34 +171,32 @@
                                     <textarea class="form-control" id="txt_skill" rows="2" placeholder="Employee Skils"></textarea>
                                 </div>
                             </div>
-                            <div id="">
-                                <div class="form-group">
-                                    <label for="inputEmail3" class="col-md-12 col-form-label">Social Accounts:</label>
-                                    <div id="div_social"></div>
-                                    <div class="row">
-                                        <div class="col-md-3 form-group">
-                                            <select class="form-control" id='list_social'>
-                                                <option value="Stack Overflow">Stack Overflow</option>
-                                                <option value="Github">Github</option>
-                                                <option value="Hacker Rank">Hacker Rank</option>
-                                                <option value="LinkedIn">LinkedIn</option>
-                                                <option value="Instagram">Instagram</option>
-                                                <option value="Facebook">Facebook</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-5 form-group">
-                                            <input type="text" class="form-control" id="txt_link" placeholder="Link or Username">
-                                        </div>
-                                        <div class="col-md-4 form-group">
-                                            <button class="btn btn-outline-primary col-md-6 m-1" onclick="addSocialAccount()"><i class="fas fa-plus"></i> Add Account</button>
-                                        </div>
+                            <div class="form-group">
+                                <label for="inputEmail3" class="col-md-12 col-form-label">Social Accounts:</label>
+                                <div id="div_social"></div>
+                                <div class="row">
+                                    <div class="col-md-3 form-group">
+                                        <select class="form-control" id='list_social'>
+                                            <option value="Stack Overflow">Stack Overflow</option>
+                                            <option value="Github">Github</option>
+                                            <option value="Hacker Rank">Hacker Rank</option>
+                                            <option value="LinkedIn">LinkedIn</option>
+                                            <option value="Instagram">Instagram</option>
+                                            <option value="Facebook">Facebook</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5 form-group">
+                                        <input type="text" class="form-control" id="txt_link" placeholder="Link or Username">
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <button class="btn btn-outline-primary col-md-6 m-1" onclick="addSocialAccount()"><i class="fas fa-plus"></i> Add Account</button>
                                     </div>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control" id="txt_contact" placeholder="Contact Details">
+                                    <input type="text" class="form-control" id="txt_contact" placeholder="Contact Number">
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -278,6 +276,7 @@ $(document).ready(() => {
         $('#div_other_details').show();
         $('#div_Update_Password').show();
         $('#div_image').show();
+        $('#div_password').remove()
     }
 });
 
@@ -289,6 +288,7 @@ function getEmployee(emp_id) {
         $('#txt_email').val(data.email)
         $('#txt_skill').val(data.skills)
         $('#list_position').val(data.position)
+        $('#txt_contact').val(data.number)
         $('#img_originalProfile').attr('src', '/admin/v1/profile/file/' + data.profile_image).show()
         $('#img_profile').hide()
 
@@ -370,6 +370,7 @@ $('#btn_addEmp').click(() => {
                 body: 'Member add Successfully',
                 class: 'bg-success',
             });
+            $('#div_password').remove()
             var memberId = result.data
             window.location.href = `/admin/employee/add?emp_id=${memberId.member_id}`;
         },
@@ -428,12 +429,13 @@ $("#file_profile").change(function() {
 });
 
 $('#btn_update').click(() => {
-    var emp_id = $('#txt_memberId').val(),
+    var emp_id = urlParams.get('emp_id'),
         email = $('#txt_email').val(),
         name = $('#txt_name').val(),
         position = $('#list_position').val(),
         skills = $('#txt_skill').val(),
-        formData = new FormData();
+        contact = $('#txt_contact').val()
+    formData = new FormData();
 
     if (name) {
         formData.append('name', name);
@@ -446,6 +448,9 @@ $('#btn_update').click(() => {
     }
     if (email) {
         formData.append('email', email);
+    }
+    if (contact) {
+        formData.append('mobile', contact);
     }
     if ($('#file_profile')[0].files[0]) {
 
@@ -480,29 +485,39 @@ $('#btn_update').click(() => {
 });
 
 $('#btn_remove').click(() => {
-    var emp_id = $('#txt_memberId').val()
-    $.get({
-        url: `/admin/v1/employee/remove?employee_id=${emp_id}`,
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Success',
-                autohide: true,
-                delay: 5000,
-                body: 'Member removed successfully',
-                class: 'bg-success',
-            });
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
+    var emp_id = urlParams.get('emp_id')
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to remove this Member Account",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Remove'
+    }).then((result) => {
+        if (result.value) {
+            $.get({
+                url: `/admin/v1/employee/remove?employee_id=${emp_id}`,
+                success: result => {
+                    $(document).Toasts('create', {
+                        title: 'Success',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Member removed successfully',
+                        class: 'bg-success',
+                    });
+                },
+                error: error => {
+                    error = error.responseJSON
+                    $(document).Toasts('create', {
+                        title: 'Error #' + error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                    });
+                }
             });
         }
-    });
+    })
 });
 
 $('#btn_updatePassword').click(() => {
@@ -560,7 +575,7 @@ $('#btn_updatePassword').click(() => {
 })
 
 function addSocialAccount() {
-    emp_id = $('#txt_memberId').val()
+    emp_id = urlParams.get('emp_id')
     accountName = $('#list_social').val()
     reference = $('#txt_link').val();
     if (!accountName) {
@@ -596,7 +611,8 @@ function addSocialAccount() {
                 body: 'Social Account added Successfully',
                 class: 'bg-success',
             });
-            window.location.reload()
+            $('#div_social').empty();
+            getEmployee(emp_id);
         },
         error: error => {
             error = error.responseJSON
@@ -615,7 +631,7 @@ function updateSocial(index, account_id) {
     // getEmployee(urlParams.get('emp_id'))
     accountName = $(`#list_social_${index}`).val()
     reference = $(`#txt_link_${index}`).val();
-    emp_id = $('#txt_memberId').val()
+    emp_id = urlParams.get('emp_id')
     formData = new FormData();
     formData.append('employee_id', emp_id)
     formData.append('account_id', account_id)
@@ -654,30 +670,42 @@ function updateSocial(index, account_id) {
 }
 
 function removeSocial(account_id) {
-    emp_id = $('#txt_memberId').val()
-    $.get({
-        url: `/admin/v1/employee/social-account/remove?employee_id=${emp_id}&account_id=${account_id}`,
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Success',
-                autohide: true,
-                delay: 5000,
-                body: 'Social account removed successfully',
-                class: 'bg-success',
-            });
-            window.location.reload();
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
+    emp_id = urlParams.get('emp_id')
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to remove this Social account",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Remove'
+    }).then((result) => {
+        if (result.value) {
+            $.get({
+                url: `/admin/v1/employee/social-account/remove?employee_id=${emp_id}&account_id=${account_id}`,
+                success: result => {
+                    $(document).Toasts('create', {
+                        title: 'Success',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Social account removed successfully',
+                        class: 'bg-success',
+                    });
+                    $('#div_social').empty();
+                    getEmployee(emp_id)
+                },
+                error: error => {
+                    error = error.responseJSON
+                    $(document).Toasts('create', {
+                        title: 'Error #' + error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                    });
+                }
             });
         }
-    });
+    })
+
 }
 </script>
 
