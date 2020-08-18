@@ -431,6 +431,15 @@
                     "schema": {
                         "example": "John123@gmail.com"
                     }
+                }, {
+                    "in": "formData",
+                    "name": "mobile",
+                    "description": "Employee Contact number",
+                    "required": false,
+                    "type": "string",
+                    "schema": {
+                        "example": "9911223344"
+                    }
                 }],
                 "responses": {}
             }
@@ -620,7 +629,7 @@
                     "in": "query",
                     "name": "client_id",
                     "description": "get project",
-                    "required": false,
+                    "required": true,
                     "items": { "type": "string" }
                 }],
                 "responses": {}
@@ -638,7 +647,9 @@
                         "required": ["project_id", "client_id"],
                         "properties": {
                             "employee_id": { "type": "string" },
-                            "project_id": { "type": "string" }
+                            "project_id": { "type": "string" },
+                            "review": { "type": "boolean" },
+                            "activity": { "type": "boolean" }
                         },
                         "example": {
                             "employee_id": "20201",
@@ -669,10 +680,369 @@
                         "example": {
                             "employee_id": "20201",
                             "project_id": "1376735095048",
-                            "active": "true"
+                            "active": true
                         }
                     }
                 }],
+                "responses": {}
+            }
+        },
+        "/project/team/remove": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "project_id": "1376735095048"
+                    },
+                    "schema": {
+                        "project_id": "1376735095048"
+                    }
+                }, {
+                    "in": "query",
+                    "name": "employee_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "employee_id": "20201"
+                    },
+                    "schema": {
+                        "employee_id": "20201"
+                    }
+                }],
+                "responses": {}
+
+            }
+        },
+        "/project/team/deactivate": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "project_id": "1376735095048"
+                    },
+                    "schema": {
+                        "project_id": "1376735095048"
+                    }
+                }, {
+                    "in": "query",
+                    "name": "employee_id",
+                    "required": true,
+                    "type": "string",
+                    "example": {
+                        "employee_id": "20201"
+                    },
+                    "schema": {
+                        "employee_id": "20201"
+                    }
+                }],
+                "responses": {}
+
+            }
+        },
+        "/project/team/activate": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "string",
+                    "example": 1376735095048,
+                    "schema": {
+                        "example": "1376735095048"
+                    }
+                }, {
+                    "in": "query",
+                    "name": "employee_id",
+                    "required": true,
+                    "type": "string",
+                    "example": "20201",
+                    "schema": {
+                        "example": "20201"
+                    }
+                }],
+                "responses": {}
+
+            }
+        },
+        "/project/social-account/add": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Add Social Account",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["account_name", "reference", "project_id"],
+                        "properties": {
+                            "project_id": { "type": "string" },
+                            "account_name": { "type": "string" },
+                            "reference": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": "1376735095048",
+                            "account_name": "Facebook",
+                            "reference": "www.facebook.com"
+                        }
+                    }
+                }],
+                "responses": {}
+
+            }
+        },
+        "/project/social-account/update": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Update Social Account",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["account_key", "project_id"],
+                        "properties": {
+                            "project_id": { "type": "string" },
+                            "account_key": { "type": "string" },
+                            "reference": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": "1376735095048",
+                            "account_key": "-MDx3AwtJCYTVn6Kjk8l",
+                            "reference": "www.instagram.com"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/social-account/remove": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Social Account",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "account_key",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MDx3AwtJCYTVn6Kjk8l"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/update": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Update Account Info",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_name", "project_description", "project_id"],
+                        "properties": {
+                            "project_name": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "project_description": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": "1376735095048",
+                            "project_name": "Social Media",
+                            "project_description": "Test description for project"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/review/create": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Create Review",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "review_description", "review_title"],
+                        "properties": {
+                            "title": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "description": { "type": "string" }
+                        },
+                        "example": {
+                            "title": "Test Review",
+                            "project_id": "1376735095048",
+                            "description": "Test description for project"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/review/add-post": {
+            "post": {
+                "tags": ["6. Client-project"],
+                "summary": "Add Post Detail",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "description",
+                        "in": "formData",
+                        "description": "Description",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "Test Description"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "project_id",
+                        "description": "Project ID",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "review_key",
+                        "description": "Review Key",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "SUPPORT MULTIPLE FILES",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/remove-post": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Post",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "1376735095048"
+
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "post_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MECMEfkwU2d3ghacnt-"
+
+                        }
+                    }
+                ],
+                "responses": {}
+
+            }
+        },
+        "/project/review/close": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Close Review",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                        }
+
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/remove-file": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Close Review",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "1376735095048"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "filename",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "Post-251469.png"
+                        }
+                    }
+                ],
                 "responses": {}
             }
         },
