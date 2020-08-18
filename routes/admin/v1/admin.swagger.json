@@ -431,6 +431,15 @@
                     "schema": {
                         "example": "John123@gmail.com"
                     }
+                }, {
+                    "in": "formData",
+                    "name": "mobile",
+                    "description": "Employee Contact number",
+                    "required": false,
+                    "type": "string",
+                    "schema": {
+                        "example": "9911223344"
+                    }
                 }],
                 "responses": {}
             }
