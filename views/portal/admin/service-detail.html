@@ -266,8 +266,8 @@ $('#btn_create').click(() => {
 });
 
 $('#btn_update').click(() => {
-    service_id = urlParams.get('service_id')
-    name = $('#txt_Sevice').val()
+    var service_id = urlParams.get('service_id'),
+        name = $('#txt_Sevice').val()
     formData = new FormData()
     if (name) {
         formData.append('title', name)
@@ -302,7 +302,7 @@ $('#btn_update').click(() => {
 });
 
 $('#btn_remove').click(() => {
-    service_id = urlParams.get('service_id')
+    var service_id = urlParams.get('service_id')
     Swal.fire({
         title: 'Are you sure?',
         text: "You want to remove this service",
@@ -314,7 +314,14 @@ $('#btn_remove').click(() => {
             $.get({
                 url: `/admin/v1/service/remove?service_id=${service_id}`,
                 success: function() {
-                    window.location.reload()
+                    $(document).Toasts('create', {
+                        title: 'Success',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Member removed successfully',
+                        class: 'bg-success',
+                    });
+                    window.location.href = '/admin/services'
                 },
                 error: function() {
                     error = error.responseJSON
@@ -331,9 +338,126 @@ $('#btn_remove').click(() => {
     })
 });
 
-function updateCriteria(index, criteria_id) {}
+$('#btn_add').click(() => {
+    var service_id = urlParams.get('service_id'),
+        criteria = $('#txt_Criteria').val()
+    if (!criteria) {
+        return $(document).Toasts('create', {
+            title: 'Criteria missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Criteria',
+            class: 'bg-danger',
+        });
+    }
+    $.post({
+        url: '/admin/v1/service/criteria/add',
+        data: {
+            "service_id": service_id,
+            "criteria": criteria
+        },
+        success: result => {
+            $(document).Toasts('create', {
+                title: 'Added',
+                autohide: true,
+                delay: 5000,
+                body: 'Criteria added Successfully',
+                class: 'bg-success',
+            });
+            $('#div_criteriaAdd').empty();
+            getService(service_id);
+        },
+        error: error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        }
+    });
+})
 
-function removeCriteria(criteria_id) {}
+function updateCriteria(index, criteria_id) {
+    var service_id = urlParams.get('service_id'),
+        criteria = $(`#txt_Criteria_${index}`).val()
+    if (!criteria) {
+        return $(document).Toasts('create', {
+            title: 'Criteria missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Enter Criteria for Update',
+            class: 'bg-danger',
+        });
+    }
+    $.post({
+        url: '/admin/v1/service/criteria/update',
+        data: {
+            "service_id": service_id,
+            "criteria_id": criteria_id,
+            "criteria": criteria
+        },
+        success: result => {
+            $(document).Toasts('create', {
+                title: 'Updated',
+                autohide: true,
+                delay: 5000,
+                body: 'Criteria Updated Successfully',
+                class: 'bg-success',
+            });
+        },
+        error: error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        }
+    });
+}
+
+function removeCriteria(criteria_id) {
+    var service_id = urlParams.get('service_id')
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You have want to remove this Crieteria",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Remove'
+    }).then((result) => {
+        if (result.value) {
+            $.get({
+                url: `/admin/v1/service/criteria/remove?service_id=${service_id}&criteria_id=${criteria_id}`,
+                success: result => {
+                    $(document).Toasts('create', {
+                        title: 'Success',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Criteria removed successfully',
+                        class: 'bg-success',
+                    });
+                    $('#div_criteriaAdd').empty();
+                    getService(service_id);
+                },
+                error: error => {
+                    error = error.responseJSON
+                    $(document).Toasts('create', {
+                        title: 'Error #' + error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                    });
+                }
+            });
+        }
+    })
+}
 </script>
 
 </html>
