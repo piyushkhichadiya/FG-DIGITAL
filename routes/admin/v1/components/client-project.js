@@ -770,6 +770,171 @@ projectAPI.get('/review/remove-file', (req, res) => {
     }
 })
 
+// 6.17 Add Service
+projectAPI.get('/service/add', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.17.1')
+    }
+    if (!req.query.service_id) {
+        return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.17.2')
+    }
+    var projectID = String(req.query.project_id).trim(),
+        serviceID = String(req.query.service_id).trim(),
+        getKeyDB = getKeys(projectID)
+    console.log(getKeyDB);
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.17.3') }
+
+    if (dbAdminSnapshot && dbAdminSnapshot.services) {
+        var serviceDB = dbAdminSnapshot.services,
+            serviceDBKeys = Object.keys(serviceDB)
+        for (var i = 0; i < serviceDBKeys.length; i++) {
+            var tempService = serviceDB[serviceDBKeys[i]]
+            if (tempService.service_id == serviceID) {
+                if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
+                    var serviceDBClient = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+                        serviceDBClientKey = Object.keys(serviceDBClient)
+                    for (var j = 0; i < serviceDBClientKey.length; j++) {
+                        var tempServiceClient = serviceDBClient[serviceDBClientKey[j]]
+                        if (tempServiceClient.service_id == serviceID) {
+                            return response(res, 403, 'forbidden', 'Service already added', undefined, 'A-6.17.4')
+                        } else if (j == serviceDBClientKey.length - 1) {
+                            var pushData = {
+                                service_id: serviceID,
+                                active: true,
+                                createdOn: String(new Date()),
+                                createdBy: "ADMIN"
+                            }
+                            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/service/`).push(pushData).then(() => {
+                                return response(res, 200, 'success', 'Service has been added successfully', undefined, 'A-6.17.5')
+                            })
+                        }
+                    }
+                } else {
+                    var pushData = {
+                        service_id: serviceID,
+                        active: true,
+                        createdOn: String(new Date()),
+                        createdBy: "ADMIN"
+                    }
+                    return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/service/`).push(pushData).then(() => {
+                        return response(res, 200, 'success', 'Service has been added successfully', undefined, 'A-6.17.6')
+                    })
+                }
+
+            } else if (i == serviceDBKeys.length - 1) {
+                return response(res, 404, 'notfound', 'Incorrect Service ID', undefined, 'A-6.17.7')
+            }
+        }
+    } else {
+        return response(res, 404, 'notfound', 'Incorrect Service ID', undefined, 'A-6.17.8')
+    }
+})
+
+// 6.18 Deactivate Service
+projectAPI.get('/service/deactivate', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.18.1')
+    }
+    if (!req.query.service_id) {
+        return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.18.2')
+    }
+    var projectID = String(req.query.project_id).trim(),
+        serviceID = String(req.query.service_id).trim(),
+        getKeyDB = getKeys(projectID)
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.18.3') }
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
+        return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.18.4')
+    }
+    var serviceDBClient = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+        serviceDBClientKey = Object.keys(serviceDBClient)
+    for (var i = 0; i < serviceDBClientKey.length; i++) {
+        var tempService = serviceDBClient[serviceDBClientKey[i]]
+            // Aiya hu pacho service ma check nthi kravto because gme tyare plamathi delete kre to ama locho pde so ( delete after read)
+        if (tempService.active && tempService.service_id == serviceID && !tempService.deleted) {
+            tempService.active = false
+            tempService.lastModifiedBy = "ADMIN"
+            tempService.lastModifiedOn = String(new Date())
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/service/${serviceDBClientKey[i]}/`).update(tempService).then(() => {
+                return response(res, 200, 'success', 'Service has been deactivated successfully', undefined, 'A-6.18.5')
+            })
+        } else if (i == serviceDBClientKey.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Service ID', undefined, 'A-6.18.6')
+        }
+    }
+
+})
+
+// 6.19 Activate Service
+projectAPI.get('/service/activate', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.19.1')
+    }
+    if (!req.query.service_id) {
+        return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.19.2')
+    }
+    var projectID = String(req.query.project_id).trim(),
+        serviceID = String(req.query.service_id).trim(),
+        getKeyDB = getKeys(projectID)
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.19.3') }
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
+        return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.19.4')
+    }
+    var serviceDBClient = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+        serviceDBClientKey = Object.keys(serviceDBClient)
+    for (var i = 0; i < serviceDBClientKey.length; i++) {
+        var tempService = serviceDBClient[serviceDBClientKey[i]]
+        if (tempService.service_id == serviceID && !tempService.deleted) {
+            if (tempService.active) {
+                return response(res, 403, 'forbidden', 'This service is already active', undefined, 'A-6.19.5')
+            }
+            tempService.active = true
+            tempService.lastModifiedBy = "ADMIN"
+            tempService.lastModifiedOn = String(new Date())
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/service/${serviceDBClientKey[i]}/`).update(tempService).then(() => {
+                return response(res, 200, 'success', 'Service has been deactivated successfully', undefined, 'A-6.19.6')
+            })
+        } else if (i == serviceDBClientKey.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Service ID', undefined, 'A-6.19.7')
+        }
+    }
+})
+
+// 6.20 Remove Service
+projectAPI.get('/service/remove', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.20.1')
+    }
+    if (!req.query.service_id) {
+        return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.20.2')
+    }
+    var projectID = String(req.query.project_id).trim(),
+        serviceID = String(req.query.service_id).trim(),
+        getKeyDB = getKeys(projectID)
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.20.3') }
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
+        return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.20.4')
+    }
+    var serviceDBClient = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+        serviceDBClientKey = Object.keys(serviceDBClient)
+    for (var i = 0; i < serviceDBClientKey.length; i++) {
+        var tempService = serviceDBClient[serviceDBClientKey[i]]
+        if (tempService.service_id == serviceID) {
+            if (tempService.deleted) {
+                return response(res, 403, 'forbidden', 'This service is already deleted', undefined, 'A-6.20.5')
+            }
+            tempService.active = false
+            tempService.deleted = true
+            tempService.lastModifiedBy = "ADMIN"
+            tempService.lastModifiedOn = String(new Date())
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/service/${serviceDBClientKey[i]}/`).update(tempService).then(() => {
+                return response(res, 200, 'success', 'Service has been updated successfully', undefined, 'A-6.20.6')
+            })
+        } else if (i == serviceDBClientKey.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Service ID', undefined, 'A-6.20.7')
+        }
+    }
+})
+
 function getKeys(project_id) {
     if (!dbAdminSnapshot.clients) {
         return false
