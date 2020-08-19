@@ -250,9 +250,7 @@
                     "name": "plan_id",
                     "description": "Get Plan ID using /plan/get",
                     "required": true,
-                    "items": {
-                        "type": "string"
-                    }
+                    "type": "string"
                 }],
                 "responses": {}
             }
@@ -302,9 +300,9 @@
                     "in": "body",
                     "name": "body",
                     "schema": {
-                        "required": ["clientID"],
+                        "required": ["client_id"],
                         "properties": {
-                            "clientID": {
+                            "client_id": {
                                 "type": "string"
                             },
                             "email": {
@@ -315,7 +313,7 @@
                             }
                         },
                         "example": {
-                            "clientID": "-as65v16161as89ve",
+                            "client_id": "-as65v16161as89ve",
                             "email": "test-new@gmail.com",
                             "name": "Client ABC"
                         }
@@ -329,12 +327,12 @@
                 "tags": ["4. Client"],
                 "summary": "Remove existing client and all plans/projects",
                 "parameters": [{
-                    "in": "body",
-                    "name": "clientID",
+                    "in": "query",
+                    "name": "client_id",
                     "description": "Get Client ID using /client/get/",
-                    "required": true,
-                    "items": { "type": "string" }
-                }]
+                    "required": true
+                }],
+                "responses": {}
             }
         },
         "/employee/add": {
@@ -370,7 +368,7 @@
                     "name": "employee_id",
                     "description": "Employee ID",
                     "required": false,
-                    "items": { "type": "string" }
+                    "type": "string"
                 }],
                 "responses": {}
             }
@@ -592,7 +590,7 @@
                     "name": "client_id",
                     "description": "Client ID",
                     "required": false,
-                    "items": { "type": "string" }
+                    "type": "string"
                 }],
                 "responses": {}
             }
@@ -630,7 +628,7 @@
                     "name": "client_id",
                     "description": "get project",
                     "required": true,
-                    "items": { "type": "string" }
+                    "type": "string"
                 }],
                 "responses": {}
             }
