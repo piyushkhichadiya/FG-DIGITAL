@@ -940,11 +940,7 @@ projectAPI.get('/service/remove', (req, res) => {
     for (var i = 0; i < serviceDBClientKey.length; i++) {
         var tempService = serviceDBClient[serviceDBClientKey[i]]
 
-        if (tempService.service_id == serviceID) {
-
-            if (tempService.deleted) {
-                return response(res, 403, 'forbidden', 'This service is already deleted', undefined, 'A-6.20.5')
-            }
+        if (!tempService.deleted && tempService.service_id == serviceID) {
 
             tempService.active = false
             tempService.deleted = true
