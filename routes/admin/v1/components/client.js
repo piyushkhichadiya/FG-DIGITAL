@@ -62,68 +62,65 @@ clientAPI.post('/create', async(req, res) => {
 
 // 4.2 Profile Update
 clientAPI.post('/update', (req, res) => {
-    var pushData = {}
-    if (dbAdminSnapshot.clients) {
-        var clientDB = dbAdminSnapshot.clients,
-            clientKey = Object.keys(clientDB)
-        if (!req.body.clientID) {
-            return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.2.1')
-        }
-        var clientID = String(req.body.clientID).trim()
-        if (!clientKey.includes(clientID)) {
-            return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.2.2')
-        }
+
+    if (req.body.client_id) {
+        var clientID = String(req.body.client_id)
+    } else {
+        return response(res, 400, 'required', 'Client ID is required', undefined, 'A-4.2.1')
+    }
+
+    if (dbAdminSnapshot.clients && dbAdminSnapshot.clients[clientID] && !dbAdminSnapshot.clients[clientID].deleted) {
+        var clientDB = dbAdminSnapshot.clients[clientID]
+
         if (req.body.name) {
             var name = String(req.body.name).trim()
-            pushData.name = name
+            clientDB.name = name
         }
+
         if (req.body.email) {
-            var email = String(req.body.email).trim().toLowerCase()
+            var email = String(req.body.email).trim().toLowerCase(),
+                clientKey = Object.keys(dbAdminSnapshot.clients)
             for (var i = 0; i < clientKey.length; i++) {
-                if (clientDB[clientKey[i]].email == email && !clientDB[clientKey[i]].deleted) {
-                    return response(res, 403, 'forbidden', 'Client With This Email Is Already Exist', undefined, 'A-4.2.3')
+                if (dbAdminSnapshot.clients[clientKey[i]].email == email && clientKey[i] != clientID) {
+                    return response(res, 409, 'duplicate', 'Client With This Email Is Already Exist', undefined, 'A-4.2.2')
                 } else if (i == clientKey.length - 1) {
-                    pushData.email = email
+                    clientDB.email = email
                 }
             }
         }
-        if (pushData && !clientDB[clientID].deleted) {
-            pushData.lastModifiedOn = String(new Date())
-            pushData.lastModifiedBy = "ADMIN"
-            firebase.database().ref(`/admin/clients/${clientID}/`).update(pushData).then(() => {
-                return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.2.4')
-            })
-        } else {
-            return response(res, 404, 'forbidden', undefined, undefined, 'A-4.2.5')
 
-        }
+        clientDB.lastModifiedOn = String(new Date())
+        clientDB.lastModifiedBy = "ADMIN"
+        firebase.database().ref(`/admin/clients/${clientID}`).update(clientDB).then(() => {
+            return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.2.3')
+        })
     } else {
-        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.2.6')
-
+        return response(res, 404, 'notFound', 'Incorrect Client ID', undefined, 'A-4.2.4')
     }
 
 });
 
 // 4.3 DELETE CLIENT
-clientAPI.post('/delete', (req, res) => {
-    if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.3.1')
-    }
-    var clientDB = dbAdminSnapshot.clients,
-        clientKey = Object.keys(clientDB),
-        clientID = String(req.body.clientID).trim()
-    if (!req.body.clientID || !clientKey.includes(clientID)) {
-        return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.3.2')
+clientAPI.get('/remove', (req, res) => {
+    if (req.query.client_id) {
+        var clientID = String(req.query.client_id)
+    } else {
+        return response(res, 400, 'required', 'Client ID is required', undefined, 'A-4.3.1')
     }
 
-    if (!clientDB[clientID].deleted) {
-        firebase.database().ref(`/admin/clients/${clientID}/`).update({ "deleted": true, "lastModifiedOn": String(new Date()), "lastModifiedBy": "ADMIN" }).then(() => {
-            return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.3.3')
+    if (dbAdminSnapshot.clients && dbAdminSnapshot.clients[clientID] && !dbAdminSnapshot.clients[clientID].deleted) {
+        var tempClient = dbAdminSnapshot.clients[clientID]
+
+        tempClient.deleted = true
+        tempClient.lastModifiedOn = String(new Date())
+        tempClient.lastModifiedBy = "ADMIN"
+
+        firebase.database().ref(`/admin/clients/${clientID}/`).update(tempClient).then(() => {
+            return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.3.2')
         })
     } else {
-        return response(res, 403, 'forbidden', 'Client Account is already deleted', undefined, 'A-4.3.4')
+        return response(res, 404, 'notFound', 'Incorrect Client ID. Client not found', undefined)
     }
-
 });
 
 // 4.4 ADD PLAN
@@ -176,7 +173,7 @@ clientAPI.post('/plan/add', (req, res) => {
 // 4.5 UPDATE PLAN
 clientAPI.post('/plan/update', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.5.1')
+        return response(res, 404, 'notFound', 'Not Found Client', undefined, 'A-4.5.1')
     }
     var clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB),
@@ -231,7 +228,7 @@ clientAPI.post('/plan/update', (req, res) => {
 // 4.6 DELETE PLAN
 clientAPI.post('/plan/remove', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.6.1')
+        return response(res, 404, 'notFound', 'Not Found Client', undefined, 'A-4.6.1')
     }
     var clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB),
@@ -259,83 +256,75 @@ clientAPI.post('/plan/remove', (req, res) => {
 // 4.7 GET ALL CLIENT / SINGLE CLIENT DETAIL
 clientAPI.get('/get', (req, res) => {
     if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'forbidden', 'Not Found Client', undefined, 'A-4.7.1')
+        return response(res, 404, 'notFound', 'Not Found Client', undefined, 'A-4.7.1')
     }
+
     var clientDB = dbAdminSnapshot.clients,
         clientKey = Object.keys(clientDB),
         pushData = []
-    if (req.query.client_id) {
-        var clientID = String(req.query.client_id)
-    }
 
     for (var i = 0; i < clientKey.length; i++) {
-        var tempClient = clientDB[clientKey[i]],
-            plan = []
-            //Single Client
-        if (tempClient.plans) {
-            var plansDB = tempClient.plans,
-                planKeys = Object.keys(plansDB)
-            for (var j = 0; j < planKeys.length; j++) {
-                var tempPlan = plansDB[planKeys[j]],
-                    status = "expired",
-                    startDate = new Date(tempPlan.startDate),
-                    endDate = new Date(tempPlan.startDate)
-                endDate.setDate(startDate.getDate() + parseInt(tempPlan.duration))
 
-                if (startDate > new Date()) {
-                    status = "Scheduled"
-                } else if (new Date() >= startDate && new Date() <= endDate) {
-                    status = "Running"
-                }
-                plan.push({
-                    project_id: tempPlan.project_id,
-                    plan_name: tempPlan.plan,
-                    status: status
-                })
-            }
-        }
-        // SINGLE CLIENT DETAIL
-        if (req.query.client_id) {
+        var tempClient = clientDB[clientKey[i]]
 
-            if (clientID == clientKey[i]) {
-                var clientSingle = {
-                    client_id: clientKey[i],
-                    email: tempClient.email,
-                    name: tempClient.name,
-                    created_on: tempClient.createdOn,
-                    created_by: tempClient.createdBy,
-                    lastModified_on: tempClient.createdOn,
-                    lastModified_by: tempClient.createdBy,
-                    plans: plan
+        if (!tempClient.deleted) {
+
+            if (tempClient.plans) {
+                var plansDB = tempClient.plans,
+                    planKeys = Object.keys(plansDB),
+                    postPlan = []
+                for (var j = 0; j < planKeys.length; j++) {
+                    var tempPlan = plansDB[planKeys[j]],
+                        status = "expired",
+                        startDate = new Date(tempPlan.startDate),
+                        endDate = new Date(tempPlan.startDate)
+                    endDate.setDate(startDate.getDate() + parseInt(tempPlan.duration))
+
+                    if (startDate > new Date()) {
+                        status = "scheduled"
+                    } else if (new Date() >= startDate && new Date() <= endDate) {
+                        status = "running"
+                    }
+                    postPlan.push({
+                        project_id: tempPlan.project_id,
+                        plan_name: tempPlan.plan,
+                        status: status
+                    })
                 }
-                if (plan.length == 0) {
-                    delete clientSingle.plans
-                }
-                return response(res, 200, 'success', undefined, clientSingle, 'A-4.7.2')
             }
 
-        } else {
-            pushData.push({
+            var tempObj = {
                 client_id: clientKey[i],
                 email: tempClient.email,
                 name: tempClient.name,
-                created_on: tempClient.createdOn,
-                created_by: tempClient.createdBy,
-                lastModified_on: tempClient.createdOn,
-                lastModified_by: tempClient.createdBy,
-                plans: plan
-            })
-            if (plan.length == 0) {
-                delete pushData[pushData.length - 1].plans
+                createdOn: tempClient.createdOn,
+                createdBy: tempClient.createdBy,
+                lastModifiedOn: tempClient.createdOn,
+                lastModifiedBy: tempClient.createdBy
+            }
+
+            if (postPlan.length > 0) {
+                tempObj.plans = postPlan;
+            }
+
+            // SINGLE CLIENT DETAIL
+            if (req.query.client_id) {
+                if (String(req.query.client_id) == clientKey[i]) {
+                    return response(res, 200, 'success', undefined, tempObj, 'A-4.7.2')
+                }
+            } else {
+                pushData.push(tempObj)
             }
         }
 
+        if (i == clientKey.length - 1) {
+            if (req.query.client_id) {
+                return response(res, 404, 'notfound', 'Incorrect Client ID', undefined, 'A-4.7.4')
+            } else {
+                return response(res, 200, 'success', 'Client Details', pushData, 'A-4.7.3')
+            }
+        }
     }
-    if (pushData.length > 0) {
-        return response(res, 200, 'success', 'Client Details', pushData, 'A-4.7.3')
-    }
-    return response(res, 404, 'notfound', 'Incorrect Client ID or No Clients Found', undefined, 'A-4.7.4')
-
 })
 
 // 4.8 CHANGE PASSWORD
@@ -351,6 +340,7 @@ clientAPI.post('/change-password', (req, res) => {
     } else {
         return response(res, 400, 'required', 'Password is required', undefined, 'A-4.8.2')
     }
+
     //Check Client
     if (dbAdminSnapshot.clients) {
         var clientDB = dbAdminSnapshot.clients,
@@ -372,8 +362,9 @@ clientAPI.post('/change-password', (req, res) => {
                 return response(res, 404, 'notFound', 'Incorrect Client ID', undefined, 'A-4.8.4')
             }
         }
+    } else {
+        return response(res, 404, 'notFound', 'Incorrect Client ID', undefined)
     }
-
 })
 
 module.exports = clientAPI;
