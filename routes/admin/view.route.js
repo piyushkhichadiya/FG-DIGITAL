@@ -1,5 +1,3 @@
-const { route } = require('./checkAuth')
-
 const express = require('express'),
     adminView = express.Router(),
     checkAuth = require('./checkAuth')
