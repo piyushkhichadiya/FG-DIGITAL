@@ -2,7 +2,7 @@ const projectAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     fs = require('fs'),
     directoryCreate = require('../../../../config/directory'),
-    { response, storageDirectory, randomIntDigit } = require('../../../../functions/functions')
+    { response, storageDirectory } = require('../../../../functions/functions')
 
 //----------------------------- CONFIGURATION ------------------------------
 
@@ -787,14 +787,20 @@ projectAPI.get('/service/add', (req, res) => {
     if (dbAdminSnapshot && dbAdminSnapshot.services) {
         var serviceDB = dbAdminSnapshot.services,
             serviceDBKeys = Object.keys(serviceDB)
+
         for (var i = 0; i < serviceDBKeys.length; i++) {
             var tempService = serviceDB[serviceDBKeys[i]]
+
             if (tempService.service_id == serviceID) {
+
                 if (dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
+
                     var serviceDBClient = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
                         serviceDBClientKey = Object.keys(serviceDBClient)
-                    for (var j = 0; i < serviceDBClientKey.length; j++) {
+
+                    for (var j = 0; j < serviceDBClientKey.length; j++) {
                         var tempServiceClient = serviceDBClient[serviceDBClientKey[j]]
+
                         if (tempServiceClient.service_id == serviceID) {
                             return response(res, 409, 'duplicate', 'Service already added', undefined, 'A-6.17.4')
                         } else if (j == serviceDBClientKey.length - 1) {
