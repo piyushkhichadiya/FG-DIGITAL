@@ -105,7 +105,7 @@
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin/employee">Member</a></li>
-                                <li class="breadcrumb-item active">Add Member</li>
+                                <li class="breadcrumb-item active">Member Information</li>
                             </ol>
                         </div>
                     </div>
@@ -268,7 +268,7 @@ const urlParams = new URLSearchParams(window.location.search);
 $(document).ready(() => {
     if (urlParams.has('emp_id')) {
         if (urlParams.get('emp_id') == '') {
-            return window.history.go(-1)
+            return window.location.href = '/admin/employee'
         }
         getEmployee(urlParams.get('emp_id'))
         $('#btn_addEmp').hide();
@@ -288,7 +288,7 @@ function getEmployee(emp_id) {
         $('#txt_email').val(data.email)
         $('#txt_skill').val(data.skills)
         $('#list_position').val(data.position)
-        $('#txt_contact').val(data.number)
+        $('#txt_contact').val(data.mobile)
         $('#img_originalProfile').attr('src', '/admin/v1/profile/file/' + data.profile_image).show()
         $('#img_profile').hide()
 
@@ -320,6 +320,19 @@ function getEmployee(emp_id) {
             }
         }
 
+    }).fail(error => {
+        error = error.responseJSON
+        if (error.status == 404) {
+            window.location.href = '/admin/employee'
+        } else {
+            $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Employee not Found',
+                class: 'bg-danger',
+            });
+        }
     });
 }
 $('#btn_addEmp').click(() => {
@@ -504,6 +517,7 @@ $('#btn_remove').click(() => {
                         body: 'Member removed successfully',
                         class: 'bg-success',
                     });
+                    window.location.href = '/admin/employee'
                 },
                 error: error => {
                     error = error.responseJSON
@@ -613,6 +627,8 @@ function addSocialAccount() {
             });
             $('#div_social').empty();
             getEmployee(emp_id);
+            $('#list_social').val('');
+            $('#txt_link').val('');
         },
         error: error => {
             error = error.responseJSON
