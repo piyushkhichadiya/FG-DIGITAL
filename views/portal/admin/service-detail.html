@@ -190,13 +190,6 @@ const urlParams = new URLSearchParams(window.location.search);
 $(document).ready(() => {
     if (urlParams.has('service_id')) {
         if (urlParams.get('service_id') == '') {
-            $(document).Toasts('create', {
-                title: 'Error!',
-                autohide: true,
-                delay: 5000,
-                body: 'Service not Found',
-                class: 'bg-danger',
-            });
             return window.location.href = '/admin/services'
         }
         getService(urlParams.get('service_id'))
@@ -228,6 +221,19 @@ function getService(service_id) {
                 $('#div_criteriaAdd').append(serviceHTML);
                 $(`#txt_Criteria_${i}`).val(temp_criteria.criteria)
             }
+        }
+    }).fail(error => {
+        error = error.responseJSON
+        if (error.status == 404) {
+            window.location.href = '/admin/services'
+        } else {
+            $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Service Not Found',
+                class: 'bg-danger',
+            });
         }
     });
 }
