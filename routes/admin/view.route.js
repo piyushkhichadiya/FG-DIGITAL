@@ -15,7 +15,7 @@ routes.push.apply(routes, ['/plan/', '/plan/add'])
 
 // Client & Projects
 routes.push.apply(routes, ['/client/', '/client/add',
-    '/client/project/', '/client/project/dashboard/', '/client/project-add/', '/client/project-info/'
+    '/client/project/', '/client/project-dashboard/', '/client/project-add/', '/client/project-info/'
 ])
 
 // Employee
@@ -50,7 +50,7 @@ adminView.get('/client/add', (req, res) => { res.sendFile(process.cwd() + '/view
 
 // Client > Project
 adminView.get('/client/project/', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-projects.html') });
-adminView.get('/client/project/dashboard', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project-dashboard.html') });
+adminView.get('/client/project-dashboard', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project-dashboard.html') });
 adminView.get('/client/project-add', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project-add.html') });
 adminView.get('/client/project-info', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project-info.html') });
 
