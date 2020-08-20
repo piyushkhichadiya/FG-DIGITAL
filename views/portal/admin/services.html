@@ -20,6 +20,7 @@
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
+
     </style>
 </head>
 
@@ -109,7 +110,8 @@
                             </ol>
                         </div>
                     </div>
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- Main content -->
             <section class="content">
@@ -118,7 +120,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right mb-3" onclick="create()" id="btn_create">Create Service</button>
+                                    <button class="btn btn-outline-primary float-right mb-3" onclick="window.location.href = '/admin/service/create'" id="btn_create">Create Service</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -191,26 +193,26 @@
     <script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-tbl_Service = $("#tbl_Service").DataTable({
-    "responsive": true,
-});
-
-function create() {
-    window.location.href = '/admin/service/create'
-};
-
-$(document).ready(() => {
-    $.getJSON('/admin/v1/service/get', (data) => {
-        var dataService = data.data
-        for (var i = 0; i < dataService.length; i++) {
-            var tempService = dataService[i];
-            button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/service/create?service_id=${tempService.service_id}'">open</button>`
-            tbl_Service.row.add([
-                `${i+1}`, tempService.title, tempService.service_id, button
-            ]).draw();
-        }
+    tbl_Service = $("#tbl_Service").DataTable({
+        "responsive": true,
     });
-});
+
+    function create() {
+        window.location.href = '/admin/service/create'
+    };
+
+    $(document).ready(() => {
+        $.getJSON('/admin/v1/service/get', (data) => {
+            var dataService = data.data
+            for (var i = 0; i < dataService.length; i++) {
+                var tempService = dataService[i];
+                button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/service/create?service_id=${tempService.service_id}'">open</button>`
+                tbl_Service.row.add([
+                    `${i+1}`, tempService.title, tempService.service_id, button
+                ]).draw();
+            }
+        });
+    });
 </script>
 
 </html>
