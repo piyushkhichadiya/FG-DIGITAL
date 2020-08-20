@@ -125,132 +125,189 @@ clientAPI.get('/remove', (req, res) => {
 
 // 4.4 ADD PLAN
 clientAPI.post('/plan/add', (req, res) => {
-    if (!dbAdminSnapshot.clients) {
+
+    if (req.body.client_id) {
+        var clientID = String(req.body.client_id).trim()
+    } else {
+        return response(res, 400, 'required', 'Client ID is required', undefined)
+    }
+
+    if (req.body.plan) {
+        var plan = String(req.body.plan)
+    } else {
+        return response(res, 400, 'required', 'Plan Name is required', undefined)
+    }
+
+    if (req.body.start_date) {
+        var start_date = new Date(req.body.start_date)
+        if (start_date == 'Invalid Date') {
+            return response(res, 400, 'invalid', 'Start Date is invalid. Format: YYYY/MM/DD', undefined)
+        }
+        start_date.setHours(0, 0, 0, 0);
+    } else {
+        return response(res, 400, 'required', 'Start Date is required', undefined)
+    }
+
+    if (req.body.duration) {
+        var duration = parseInt(req.body.duration)
+        if (isNaN(duration) || duration < 1) {
+            return response(res, 400, 'invalid', 'Duration must be greater than 0', undefined)
+        }
+    } else {
+        return response(res, 400, 'required', 'Duration of Project/Plan is required', undefined)
+    }
+
+    if (req.body.price) {
+        var price = parseInt(req.body.price)
+        if (isNaN(price) || parseInt(price) < 1) {
+            return response(res, 400, 'invalid', 'Price must be greater than 0', undefined, 'A-4.4.5')
+        }
+    } else {
+        return response(res, 400, 'required', 'Price is required', undefined)
+    }
+
+    if (dbAdminSnapshot.clients && dbAdminSnapshot.clients[clientID] && !dbAdminSnapshot.clients[clientID].deleted) {
+        var pushData = {
+            project_id: Math.floor(new Date().valueOf() * Math.random()),
+            plan: String(plan),
+            start_date: String(start_date),
+            duration: String(duration),
+            price: String(price),
+            createdBy: "ADMIN",
+            createdOn: String(new Date())
+        }
+
+        return firebase.database().ref(`/admin/clients/${clientID}/plans/`).push(pushData).then(() => {
+            return response(res, 200, 'success', 'Profile Updated Successfully', { project_id: pushData.project_id }, 'A-4.4.7')
+        })
+    } else {
         return response(res, 404, 'notFound', 'Incorrect Client ID', undefined, 'A-4.4.1')
     }
-    var pushData = {},
-        clientDB = dbAdminSnapshot.clients,
-        clientKey = Object.keys(clientDB),
-        plan_id = Math.floor(new Date().valueOf() * Math.random())
-    if (!req.body.plan || !req.body.start_date || !req.body.duration || !req.body.clientID) {
-        return response(res, 400, 'invalid', 'Input Data properly', undefined, 'A-4.4.2')
-    }
-    var clientID = String(req.body.clientID).trim()
-    if (!clientKey.includes(clientID)) {
-        return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.4.3')
-    }
-    var plan = String(req.body.plan),
-        startDate = String(req.body.start_date),
-        duration = String(req.body.duration)
-    if (String(new Date(startDate)) == "Invalid Date") {
-        return response(res, 400, 'invalid', 'Invalid Date', undefined, 'A-4.4.4')
-    }
-    if (req.body.price) {
-        var price = String(req.body.price)
-        if (isNaN(price)) {
-            return response(res, 400, 'invalid', 'Price Value invalid', undefined, 'A-4.4.5')
-        }
-        pushData = {
-            price: price
-        }
-    }
-    if (isNaN(duration)) {
-        return response(res, 400, 'invalid', 'Duration Value invalid', undefined, 'A-4.4.6')
-    }
-    pushData = {
-        start_date: startDate,
-        plan: plan,
-        duration: duration,
-        createdBy: "ADMIN",
-        createdOn: String(new Date()),
-        project_id: plan_id
-    }
-    firebase.database().ref(`/admin/clients/${clientID}/plans/`).push(pushData).then(() => {
-        return response(res, 200, 'success', 'Profile Updated Successfully', undefined, 'A-4.4.7')
-    })
+
 });
 
 // 4.5 UPDATE PLAN
 clientAPI.post('/plan/update', (req, res) => {
-    if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'notFound', 'Not Found Client', undefined, 'A-4.5.1')
-    }
-    var clientDB = dbAdminSnapshot.clients,
-        clientKey = Object.keys(clientDB),
-        clientID = String(req.body.clientID),
-        pushData = {}
-    if (!req.body.clientID || !clientKey.includes(clientID)) {
-        return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.5.2')
-    }
-    var planDB = clientDB[clientID].plans,
-        planKey = Object.keys(planDB),
-        planID = String(req.body.planID)
-    if (!req.body.planID || !planKey.includes(planID)) {
-        return response(res, 400, 'invalid', 'invalid Plan Key', undefined, 'A-4.5.3')
-    }
-    if (req.body.plan) {
-        var plan = String(req.body.plan)
-        pushData.plan = plan
-    }
-    if (req.body.start_date) {
-        if (String(new Date(req.body.start_date)) == "Invalid Date") {
-            return response(res, 400, 'invalid', 'Invalid Date', undefined, 'A-4.5.5')
-        }
-        var startDate = String(req.body.start_date)
-        pushData.start_date = startDate
-    }
-    if (req.body.duration) {
-        var duration = String(req.body.duration)
-        if (isNaN(duration)) {
-            return response(res, 400, 'invalid', 'Duration Value invalid', undefined, 'A-4.5.4')
-        }
-        pushData.duration = duration
-    }
-    if (req.body.price) {
-        var price = String(req.body.price)
-        if (isNaN(price)) {
-            return response(res, 400, 'invalid', 'Price Value invalid', undefined, 'A-4.5.6')
-        }
-        pushData.price = price
+    if (req.body.client_id) {
+        var client_id = String(req.body.client_id).trim()
+    } else {
+        return response(res, 400, 'required', 'Client ID is required', undefined)
     }
 
-    if (!clientDB[clientID].plans[planID].deleted) {
-        pushData.lastModifiedOn = String(new Date())
-        pushData.lastModifiedBy = "ADMIN"
-        firebase.database().ref(`/admin/clients/${clientID}/plans/${planID}/`).update(pushData).then(() => {
-            return response(res, 200, 'success', 'Plan Successfully Updated', undefined, 'A-4.5.7')
-        })
+    if (req.body.project_id) {
+        var project_id = String(req.body.project_id).trim()
     } else {
-        return response(res, 403, 'forbidden', 'Plan Is Deleted Or Not Available', undefined, 'A-4.5.8')
+        return response(res, 400, 'required', 'Project ID is required', undefined)
     }
+
+    if (dbAdminSnapshot.clients && dbAdminSnapshot.clients[client_id] && !dbAdminSnapshot.clients[client_id].deleted) {
+        var clientDB = dbAdminSnapshot.clients[client_id]
+
+        if (clientDB.plans) {
+
+            var planDB = clientDB.plans,
+                planDBKeys = Object.keys(planDB)
+
+            for (var i = 0; i < planDBKeys.length; i++) {
+                var tempPlan = planDB[planDBKeys[i]];
+
+                if (!tempPlan.deleted && tempPlan.project_id == project_id) {
+
+                    if (req.body.plan) {
+                        tempPlan.plan = String(req.body.plan).trim()
+                    }
+
+                    if (req.body.start_date) {
+                        var start_date = new Date(req.body.start_date)
+                        if (start_date == 'Invalid Date') {
+                            return response(res, 400, 'invalid', 'Start Date is invalid. Format: YYYY/MM/DD', undefined)
+                        }
+                        start_date.setHours(0, 0, 0, 0);
+                        tempPlan.start_date = String(start_date)
+                    }
+
+                    if (req.body.duration) {
+                        var duration = parseInt(req.body.duration)
+                        if (isNaN(duration) || duration < 1) {
+                            return response(res, 400, 'invalid', 'Duration must be greater than 0', undefined)
+                        }
+                        tempPlan.duration = String(duration)
+                    }
+
+                    if (req.body.price) {
+                        var price = parseInt(req.body.price)
+                        if (isNaN(price) || parseInt(price) < 1) {
+                            return response(res, 400, 'invalid', 'Price must be greater than 0', undefined, 'A-4.4.5')
+                        }
+                        tempPlan.price = String(price)
+                    }
+
+                    tempPlan.lastModifiedOn = String(new Date())
+                    tempPlan.lastModifiedBy = "ADMIN"
+
+                    firebase.database().ref(`/admin/clients/${client_id}/plans/${planDBKeys[i]}`).update(tempPlan).then(() => {
+                        return response(res, 200, 'success', 'Plan Successfully Updated', undefined, 'A-4.5.7')
+                    })
+                } else if (i == planDBKeys.length - 1) {
+                    return response(res, 404, 'notFound', 'Incorrect Project ID', undefined)
+                }
+            }
+        } else {
+            return response(res, 404, 'notFound', 'Incorrect Project ID', undefined)
+        }
+    } else {
+        return response(res, 404, 'notFOund', 'Incorrect Client ID', undefined)
+    }
+
 });
 
 // 4.6 DELETE PLAN
 clientAPI.post('/plan/remove', (req, res) => {
-    if (!dbAdminSnapshot.clients) {
-        return response(res, 404, 'notFound', 'Not Found Client', undefined, 'A-4.6.1')
-    }
-    var clientDB = dbAdminSnapshot.clients,
-        clientKey = Object.keys(clientDB),
-        clientID = String(req.body.clientID),
-        pushData = {
-            deleted: true,
-            lastModifiedOn: String(new Date()),
-            lastModifiedBy: "ADMIN"
-        }
-    if (!req.body.clientID || !clientKey.includes(clientID)) {
-        return response(res, 400, 'invalid', 'invalid Client Key', undefined, 'A-4.6.2')
-    }
-    var planDB = clientDB[clientID].plans,
-        planKey = Object.keys(planDB),
-        planID = String(req.body.planID)
-    if (!req.body.planID || !planKey.includes(planID)) {
-        return response(res, 400, 'invalid', 'invalid Plan Key', undefined, 'A-4.6.3')
-    }
-    firebase.database().ref(`/admin/clients/${clientID}/plans/${planID}/`).update(pushData).then(() => {
-        return response(res, 200, 'success', 'Plan Successfully Removed', undefined, 'A-4.6.4')
-    })
 
+    if (req.body.client_id) {
+        var client_id = String(req.body.client_id).trim()
+    } else {
+        return response(res, 400, 'required', 'Client ID is required', undefined)
+    }
+
+    if (req.body.project_id) {
+        var project_id = String(req.body.project_id).trim()
+    } else {
+        return response(res, 400, 'required', 'Project ID is required', undefined)
+    }
+
+    if (dbAdminSnapshot.clients && dbAdminSnapshot.clients[client_id] && !dbAdminSnapshot.clients[client_id].deleted) {
+
+        var clientDB = dbAdminSnapshot.clients[client_id]
+
+        if (clientDB.plans) {
+
+            var planDB = clientDB.plans,
+                planDBKeys = Object.keys(planDB)
+
+            for (var i = 0; i < planDBKeys.length; i++) {
+                var tempPlan = planDB[planDBKeys[i]];
+
+                if (!tempPlan.deleted && tempPlan.project_id == project_id) {
+
+                    tempPlan.deleted = true
+                    tempPlan.lastModifiedOn = String(new Date())
+                    tempPlan.lastModifiedBy = "ADMIN"
+
+                    firebase.database().ref(`/admin/clients/${client_id}/plans/${planDBKeys[i]}`).update(tempPlan).then(() => {
+                        return response(res, 200, 'success', 'Plan Successfully Updated', undefined, 'A-4.5.7')
+                    })
+                } else if (i == planDBKeys.length - 1) {
+                    return response(res, 404, 'notFound', 'Incorrect Project ID', undefined)
+                }
+            }
+        } else {
+            return response(res, 404, 'notFound', 'Incorrect Project ID', undefined)
+        }
+    } else {
+        return response(res, 404, 'notFound', 'Incorrect Client ID', undefined, 'A-4.6.1')
+
+    }
 });
 
 // 4.7 GET ALL CLIENT / SINGLE CLIENT DETAIL
@@ -287,7 +344,9 @@ clientAPI.get('/get', (req, res) => {
                     }
                     postPlan.push({
                         project_id: tempPlan.project_id,
-                        plan_name: tempPlan.plan,
+                        plan: tempPlan.plan,
+                        duration: tempPlan.duration,
+                        price: tempPlan.price,
                         status: status
                     })
                 }

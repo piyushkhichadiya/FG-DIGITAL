@@ -563,18 +563,72 @@
                     "in": "body",
                     "name": "body",
                     "schema": {
-                        "required": ["clientID", "plan", "start_date", "duration"],
+                        "required": ["client_id", "plan", "start_date", "duration", "price"],
                         "properties": {
-                            "clientID": { "type": "string" },
+                            "client_id": { "type": "string" },
                             "plan": { "type": "string", "description": "Get Plan Name using /plan/get" },
                             "start_date": { "type": "string", "format": "date" },
-                            "duration": { "type": "integer" }
+                            "duration": { "type": "integer" },
+                            "price": { "type": "integer" }
                         },
                         "example": {
-                            "clientID": "-MCKMpR3RGE-EmVBF-JQ",
+                            "client_id": "-MDa5rMi4PeMnbevEOyV",
                             "plan": "Customized Plan",
                             "start_date": "2020/05/30",
-                            "duration": 30
+                            "duration": 30,
+                            "price": 50000
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/client/plan/update": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "Update existing plan details",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["client_id", "project_id"],
+                        "properties": {
+                            "client_id": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "plan": { "type": "string", "description": "Get Plan Name using /plan/get" },
+                            "start_date": { "type": "string", "format": "date" },
+                            "duration": { "type": "integer" },
+                            "price": { "type": "integer" }
+                        },
+                        "example": {
+                            "client_id": "-MDa5rMi4PeMnbevEOyV",
+                            "project_id": 123465789,
+                            "plan": "Customized Plan",
+                            "start_date": "2020/05/30",
+                            "duration": 30,
+                            "price": 50000
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/client/plan/remove": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "Remove existing plan/project from client",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["client_id", "project_id"],
+                        "properties": {
+                            "client_id": { "type": "string" },
+                            "project_id": { "type": "string" }
+                        },
+                        "example": {
+                            "client_id": "-MDa5rMi4PeMnbevEOyV",
+                            "project_id": 474905198593
                         }
                     }
                 }],
