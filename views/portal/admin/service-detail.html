@@ -109,7 +109,8 @@
                             </ol>
                         </div>
                     </div>
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- Main content -->
             <section class="content">
@@ -117,7 +118,7 @@
                     <div class="card-body card">
                         <div class="row form-group">
                             <div class="col-md-6">
-                                <input type="text" class="col-md-8 form-control" id="txt_Sevice" placeholder="Service Name">
+                                <input type="text" class="col-md-8 form-control" id="txt_service" placeholder="Service Name">
                             </div>
                             <div class="col-md-6">
                                 <button class="btn btn-outline-primary float-right ml-1" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
@@ -189,7 +190,7 @@ const urlParams = new URLSearchParams(window.location.search);
 $(document).ready(() => {
     if (urlParams.has('service_id')) {
         if (urlParams.get('service_id') == '') {
-            return window.history.go(-1)
+            return window.location.href = '/admin/services'
         }
         getService(urlParams.get('service_id'))
         $('#btn_create').hide();
@@ -202,7 +203,7 @@ $(document).ready(() => {
 function getService(service_id) {
     $.get(`/admin/v1/service/get?service_id=${service_id}`, (data) => {
         var dataService = data.data
-        $('#txt_Sevice').val(dataService.title)
+        $('#txt_service').val(dataService.title)
 
         if (dataService.criteria) {
             var criteriaData = dataService.criteria
@@ -221,11 +222,24 @@ function getService(service_id) {
                 $(`#txt_Criteria_${i}`).val(temp_criteria.criteria)
             }
         }
+    }).fail(error => {
+        error = error.responseJSON
+        if (error.status == 404) {
+            window.location.href = '/admin/services'
+        } else {
+            $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Service Not Found',
+                class: 'bg-danger',
+            });
+        }
     });
 }
 
 $('#btn_create').click(() => {
-    var name = $('#txt_Sevice').val()
+    var name = $('#txt_service').val()
     if (!name) {
         return $(document).Toasts('create', {
             title: 'Service Name missing',
@@ -267,18 +281,23 @@ $('#btn_create').click(() => {
 
 $('#btn_update').click(() => {
     var service_id = urlParams.get('service_id'),
-        name = $('#txt_Sevice').val()
-    formData = new FormData()
-    if (name) {
-        formData.append('title', name)
-    }
-    formData.append('service_id', service_id)
+        name = $('#txt_service').val();
+    if (!name) {
+        return $(document).Toasts('create', {
+            title: 'Service Name missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Service name',
+            class: 'bg-danger',
+        });
+    };
     $.post({
         type: 'POST',
         url: '/admin/v1/service/update',
-        data: formData,
-        processData: false,
-        contentType: false,
+        data: {
+            "service_id": service_id,
+            "title": name,
+        },
         success: result => {
             $(document).Toasts('create', {
                 title: 'Updated',
