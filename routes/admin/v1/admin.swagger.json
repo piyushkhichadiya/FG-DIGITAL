@@ -1187,6 +1187,111 @@
                 }],
                 "responses": {}
             }
+        },
+        "/project/service/add": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Add Service to client",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "integer",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 1376735095048
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/service/deactivate": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Deactivate Service to client",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "string",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 1376735095048
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/service/activate": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Activate Service to client",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "string",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 1376735095048
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/service/remove": {
+            "get": {
+                "tags": ["6. Client-project"],
+                "summary": "Remove Service from client",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "string",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 1376735095048
+                    }
+                }],
+                "responses": {}
+            }
         }
+
     }
 }
