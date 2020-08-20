@@ -207,7 +207,7 @@
         var tempPlan = dbPlan[i]
         tblplan.row.add([
           `${j++}`, tempPlan.plan_name, tempPlan.price, tempPlan.days, 
-          `<button class ="btn btn-secondary w-100" onclick="window.location.hre ='/admin/plan/add?plan_id=${tempPlan.plan_id}'">Open</button>`
+          `<button class ="btn btn-secondary w-100" onclick="window.location.href ='/admin/plan/add?plan_id=${tempPlan.plan_id}'">Open</button>`
           ]).draw();
       }
     });

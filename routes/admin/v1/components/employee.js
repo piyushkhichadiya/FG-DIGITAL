@@ -108,7 +108,8 @@ employeeAPI.get(['/', '/get'], (req, res) => {
                     createdBy: tempEmployee.createdBy,
                     profile_image: tempEmployee.profile_image,
                     skills: tempEmployee.skills,
-                    position: tempEmployee.position
+                    position: tempEmployee.position,
+                    mobile: tempEmployee.mobile
                 }
 
                 // Social Account
