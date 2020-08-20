@@ -118,7 +118,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right mb-3" id="btn_create">Create Service</button>
+                                    <button class="btn btn-outline-primary float-right mb-3" onclick="create()" id="btn_create">Create Service</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -195,9 +195,9 @@ tbl_Service = $("#tbl_Service").DataTable({
     "responsive": true,
 });
 
-$('#btn_create').click(() => {
+function create() {
     window.location.href = '/admin/service/create'
-});
+};
 
 $(document).ready(() => {
     $.getJSON('/admin/v1/service/get', (data) => {
