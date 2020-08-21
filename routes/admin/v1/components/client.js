@@ -295,7 +295,7 @@ clientAPI.post('/plan/remove', (req, res) => {
                     tempPlan.lastModifiedBy = "ADMIN"
 
                     firebase.database().ref(`/admin/clients/${client_id}/plans/${planDBKeys[i]}`).update(tempPlan).then(() => {
-                        return response(res, 200, 'success', 'Plan Successfully Updated', undefined, 'A-4.6.3')
+                        return response(res, 200, 'success', 'Plan successfully removed', undefined, 'A-4.6.3')
                     })
                 } else if (i == planDBKeys.length - 1) {
                     return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'A-4.6.4')
@@ -342,25 +342,27 @@ clientAPI.get('/get', (req, res) => {
                     planKeys = Object.keys(plansDB),
                     postPlan = []
                 for (var j = 0; j < planKeys.length; j++) {
-                    var tempPlan = plansDB[planKeys[j]],
-                        status = "expired",
-                        startDate = new Date(tempPlan.startDate),
-                        endDate = new Date(tempPlan.startDate)
-                    endDate.setDate(startDate.getDate() + parseInt(tempPlan.duration))
+                    if (!plansDB[planKeys[j]].deleted) {
+                        var tempPlan = plansDB[planKeys[j]],
+                            status = "expired",
+                            startDate = new Date(tempPlan.startDate),
+                            endDate = new Date(tempPlan.startDate)
+                        endDate.setDate(startDate.getDate() + parseInt(tempPlan.duration))
 
-                    if (startDate > new Date()) {
-                        status = "scheduled"
-                    } else if (new Date() >= startDate && new Date() <= endDate) {
-                        status = "running"
+                        if (startDate > new Date()) {
+                            status = "scheduled"
+                        } else if (new Date() >= startDate && new Date() <= endDate) {
+                            status = "running"
+                        }
+                        postPlan.push({
+                            project_id: tempPlan.project_id,
+                            plan: tempPlan.plan,
+                            duration: tempPlan.duration,
+                            price: tempPlan.price,
+                            start_date: tempPlan.start_date,
+                            status: status
+                        })
                     }
-                    postPlan.push({
-                        project_id: tempPlan.project_id,
-                        plan: tempPlan.plan,
-                        duration: tempPlan.duration,
-                        price: tempPlan.price,
-                        start_date: tempPlan.start_date,
-                        status: status
-                    })
                 }
 
                 if (postPlan.length > 0) {
