@@ -28,7 +28,7 @@
             "description": "Employee Account and related operations"
         },
         {
-            "name": "6. Client-project",
+            "name": "6. Client Project",
             "description": "Activity Related to project of client"
         },
         {
@@ -675,7 +675,7 @@
         },
         "/project/get": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Get All Project Details",
                 "parameters": [{
                     "in": "query",
@@ -688,9 +688,37 @@
             }
 
         },
+        "/project/fetch/{project_id}": {
+            "get": {
+                "tags": ["6. Client Project"],
+                "summary": "Get Project using defined scope",
+                "parameters": [{
+                    "in": "path",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "string",
+                    "example": "93492065515",
+                    "schema": {
+                        "example": "93492065515"
+                    }
+                }, {
+                    "in": "query",
+                    "name": "scope",
+                    "description": "Separate using space. \n Available Scopes: \n 1. info \n 2. service \n 3. team \n 4. accounts \n 5. review \n 6. activity",
+                    "type": "string",
+                    "example": "info service team",
+                    "schema": {
+                        "example": "info service team accounts review activity"
+                    }
+                }],
+                "responses": {}
+            }
+
+        },
         "/project/team/add": {
             "post": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Assign Team member to project",
                 "parameters": [{
                     "in": "body",
@@ -705,7 +733,7 @@
                         },
                         "example": {
                             "employee_id": "20201",
-                            "project_id": "1376735095048"
+                            "project_id": "93492065515"
                         }
                     }
                 }],
@@ -714,7 +742,7 @@
         },
         "/project/team/update": {
             "post": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Update Permission to team member",
                 "parameters": [{
                     "in": "body",
@@ -731,7 +759,7 @@
                         },
                         "example": {
                             "employee_id": "20201",
-                            "project_id": "1376735095048",
+                            "project_id": "93492065515",
                             "active": true
                         }
                     }
@@ -741,7 +769,7 @@
         },
         "/project/team/remove": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Remove Project",
                 "parameters": [{
                     "in": "query",
@@ -749,10 +777,10 @@
                     "required": true,
                     "type": "string",
                     "example": {
-                        "project_id": "1376735095048"
+                        "project_id": "93492065515"
                     },
                     "schema": {
-                        "project_id": "1376735095048"
+                        "project_id": "93492065515"
                     }
                 }, {
                     "in": "query",
@@ -772,7 +800,7 @@
         },
         "/project/team/deactivate": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Remove Project",
                 "parameters": [{
                     "in": "query",
@@ -780,10 +808,10 @@
                     "required": true,
                     "type": "string",
                     "example": {
-                        "project_id": "1376735095048"
+                        "project_id": "93492065515"
                     },
                     "schema": {
-                        "project_id": "1376735095048"
+                        "project_id": "93492065515"
                     }
                 }, {
                     "in": "query",
@@ -803,16 +831,16 @@
         },
         "/project/team/activate": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Remove Project",
                 "parameters": [{
                     "in": "query",
                     "name": "project_id",
                     "required": true,
                     "type": "string",
-                    "example": 1376735095048,
+                    "example": 93492065515,
                     "schema": {
-                        "example": "1376735095048"
+                        "example": "93492065515"
                     }
                 }, {
                     "in": "query",
@@ -830,7 +858,7 @@
         },
         "/project/social-account/add": {
             "post": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Add Social Account",
                 "parameters": [{
                     "in": "body",
@@ -843,7 +871,7 @@
                             "reference": { "type": "string" }
                         },
                         "example": {
-                            "project_id": "1376735095048",
+                            "project_id": "93492065515",
                             "account_name": "Facebook",
                             "reference": "www.facebook.com"
                         }
@@ -855,7 +883,7 @@
         },
         "/project/social-account/update": {
             "post": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Update Social Account",
                 "parameters": [{
                     "in": "body",
@@ -868,7 +896,7 @@
                             "reference": { "type": "string" }
                         },
                         "example": {
-                            "project_id": "1376735095048",
+                            "project_id": "93492065515",
                             "account_key": "-MDx3AwtJCYTVn6Kjk8l",
                             "reference": "www.instagram.com"
                         }
@@ -879,7 +907,7 @@
         },
         "/project/social-account/remove": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Remove Social Account",
                 "parameters": [{
                         "in": "query",
@@ -887,7 +915,7 @@
                         "required": true,
                         "type": "string",
                         "schema": {
-                            "example": "1376735095048"
+                            "example": "93492065515"
                         }
                     },
                     {
@@ -905,7 +933,7 @@
         },
         "/project/update": {
             "post": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Update Account Info",
                 "parameters": [{
                     "in": "body",
@@ -918,7 +946,7 @@
                             "project_description": { "type": "string" }
                         },
                         "example": {
-                            "project_id": "1376735095048",
+                            "project_id": "93492065515",
                             "project_name": "Social Media",
                             "project_description": "Test description for project"
                         }
@@ -929,7 +957,7 @@
         },
         "/project/review/create": {
             "post": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Create Review",
                 "parameters": [{
                     "in": "body",
@@ -943,7 +971,7 @@
                         },
                         "example": {
                             "title": "Test Review",
-                            "project_id": "1376735095048",
+                            "project_id": "93492065515",
                             "description": "Test description for project"
                         }
                     }
@@ -953,7 +981,7 @@
         },
         "/project/review/add-post": {
             "post": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Add Post Detail",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
@@ -973,17 +1001,17 @@
                         "required": false,
                         "type": "string",
                         "schema": {
-                            "example": "1376735095048"
+                            "example": "93492065515"
                         }
                     },
                     {
                         "in": "formData",
-                        "name": "review_key",
-                        "description": "Review Key",
+                        "name": "review_id",
+                        "description": "Review ID",
                         "required": false,
                         "type": "string",
                         "schema": {
-                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                            "example": "688642606297"
                         }
                     },
                     {
@@ -999,7 +1027,7 @@
         },
         "/project/review/remove-post": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Remove Post",
                 "parameters": [{
                         "in": "query",
@@ -1007,7 +1035,7 @@
                         "required": true,
                         "type": "string",
                         "schema": {
-                            "example": "1376735095048"
+                            "example": "93492065515"
 
                         }
                     },
@@ -1017,7 +1045,7 @@
                         "required": true,
                         "type": "string",
                         "schema": {
-                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                            "example": "688642606297"
 
                         }
                     },
@@ -1038,7 +1066,7 @@
         },
         "/project/review/close": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Close Review",
                 "parameters": [{
                         "in": "query",
@@ -1046,7 +1074,7 @@
                         "required": true,
                         "type": "string",
                         "schema": {
-                            "example": "1376735095048"
+                            "example": "93492065515"
                         }
                     },
                     {
@@ -1055,7 +1083,7 @@
                         "required": true,
                         "type": "string",
                         "schema": {
-                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                            "example": "688642606297"
                         }
 
                     }
@@ -1065,7 +1093,7 @@
         },
         "/project/review/remove-file": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Close Review",
                 "parameters": [{
                         "in": "query",
@@ -1073,7 +1101,7 @@
                         "required": true,
                         "type": "string",
                         "schema": {
-                            "example": "1376735095048"
+                            "example": "93492065515"
                         }
                     },
                     {
@@ -1082,7 +1110,7 @@
                         "required": true,
                         "type": "string",
                         "schema": {
-                            "example": "-MEBjUo5rkwH5OnwS8Hn"
+                            "example": "688642606297"
                         }
                     },
                     {
@@ -1244,7 +1272,7 @@
         },
         "/project/service/add": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Add Service to client",
                 "parameters": [{
                     "in": "query",
@@ -1262,7 +1290,7 @@
                     "required": true,
                     "type": "integer",
                     "schema": {
-                        "example": 1376735095048
+                        "example": 93492065515
                     }
                 }],
                 "responses": {}
@@ -1270,7 +1298,7 @@
         },
         "/project/service/deactivate": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Deactivate Service to client",
                 "parameters": [{
                     "in": "query",
@@ -1288,7 +1316,7 @@
                     "required": true,
                     "type": "integer",
                     "schema": {
-                        "example": 1376735095048
+                        "example": 93492065515
                     }
                 }],
                 "responses": {}
@@ -1296,7 +1324,7 @@
         },
         "/project/service/activate": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Activate Service to client",
                 "parameters": [{
                     "in": "query",
@@ -1314,7 +1342,7 @@
                     "required": true,
                     "type": "integer",
                     "schema": {
-                        "example": 1376735095048
+                        "example": 93492065515
                     }
                 }],
                 "responses": {}
@@ -1322,7 +1350,7 @@
         },
         "/project/service/remove": {
             "get": {
-                "tags": ["6. Client-project"],
+                "tags": ["6. Client Project"],
                 "summary": "Remove Service from client",
                 "parameters": [{
                     "in": "query",
@@ -1340,7 +1368,7 @@
                     "required": true,
                     "type": "integer",
                     "schema": {
-                        "example": 1376735095048
+                        "example": 93492065515
                     }
                 }],
                 "responses": {}
