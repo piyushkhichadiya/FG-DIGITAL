@@ -203,7 +203,7 @@ $(document).ready(() => {
         var dataClient = data.data
         for (var i = 0; i < dataClient.length; i++) {
             var tempClient = dataClient[i];
-            button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'">open</button>`
+            button = `<button class='btn btn-secondary m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'">View</button><button class='btn btn-secondary m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'">Projects</button>`
             tblClient.row.add([
                 `${i+1}`, tempClient.name, tempClient.email, button
             ]).draw();
