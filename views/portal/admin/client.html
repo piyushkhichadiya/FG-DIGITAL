@@ -20,6 +20,7 @@
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
+
     </style>
 </head>
 
@@ -109,7 +110,8 @@
                             </ol>
                         </div>
                     </div>
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- Main content -->
             <section class="content">
@@ -191,25 +193,25 @@
     <script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-var tblClient = $("#tbl_Client").DataTable({
-    "responsive": true,
-});
-$('#btn_add').click(() => {
-    window.location.href = '/admin/client/add'
-});
-
-$(document).ready(() => {
-    $.getJSON('/admin/v1/client/get', (data) => {
-        var dataClient = data.data
-        for (var i = 0; i < dataClient.length; i++) {
-            var tempClient = dataClient[i];
-            button = `<button class='btn btn-secondary m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'">View</button><button class='btn btn-secondary m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'">Projects</button>`
-            tblClient.row.add([
-                `${i+1}`, tempClient.name, tempClient.email, button
-            ]).draw();
-        }
+    var tblClient = $("#tbl_Client").DataTable({
+        "responsive": true,
     });
-});
+    $('#btn_add').click(() => {
+        window.location.href = '/admin/client/add'
+    });
+
+    $(document).ready(() => {
+        $.getJSON('/admin/v1/client/get', (data) => {
+            var dataClient = data.data
+            for (var i = 0; i < dataClient.length; i++) {
+                var tempClient = dataClient[i];
+                button = `<button class='btn btn-secondary m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'">View</button><button class='btn btn-secondary m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'">Projects</button>`
+                tblClient.row.add([
+                    `${i+1}`, tempClient.name, tempClient.email, button
+                ]).draw();
+            }
+        });
+    });
 </script>
 
 </html>
