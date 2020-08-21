@@ -294,7 +294,7 @@ clientAPI.post('/plan/remove', (req, res) => {
                     tempPlan.lastModifiedOn = String(new Date())
                     tempPlan.lastModifiedBy = "ADMIN"
 
-                    firebase.database().ref(`/admin/clients/${client_id}/plans/${planDBKeys[i]}`).update(tempPlan).then(() => {
+                    return firebase.database().ref(`/admin/clients/${client_id}/plans/${planDBKeys[i]}`).update(tempPlan).then(() => {
                         return response(res, 200, 'success', 'Plan successfully removed', undefined, 'A-4.6.3')
                     })
                 } else if (i == planDBKeys.length - 1) {
