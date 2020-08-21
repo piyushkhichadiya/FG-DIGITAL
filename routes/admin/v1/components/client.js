@@ -407,7 +407,7 @@ clientAPI.post('/change-password', (req, res) => {
     //Check Client
     if (dbAdminSnapshot.clients && dbAdminSnapshot.clients[clientID] && !dbAdminSnapshot.clients[clientID].deleted) {
 
-        var tempClient = clientDB[clientID]
+        var tempClient = dbAdminSnapshot.clients[clientID]
 
         password = bcryptHash(password);
         tempClient.password = password
