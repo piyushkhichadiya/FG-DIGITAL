@@ -289,7 +289,11 @@ function getEmployee(emp_id) {
         $('#txt_skill').val(data.skills)
         $('#list_position').val(data.position)
         $('#txt_contact').val(data.mobile)
-        $('#img_originalProfile').attr('src', '/admin/v1/profile/file/' + data.profile_image).show()
+        if (data.profile_image) {
+            $('#img_originalProfile').attr('src', '/admin/v1/profile/file/' + data.profile_image).show()
+        } else {
+            $('#img_originalProfile').show()
+        }
         $('#img_profile').hide()
 
         if (data.social_accounts) {
