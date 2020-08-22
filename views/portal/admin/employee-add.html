@@ -20,6 +20,7 @@
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
+
     </style>
 </head>
 
@@ -104,8 +105,9 @@
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/admin/employee">Member</a></li>
-                                <li class="breadcrumb-item active">Member Information</li>
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/employee">Team Member</a></li>
+                                <li class="breadcrumb-item active">Information</li>
                             </ol>
                         </div>
                     </div>
@@ -226,81 +228,81 @@
                     <!-- /.container-fluid -->
             </section>
             <!-- /.content -->
-        </div>
-        <!-- /.content-wrapper -->
-        <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
-                <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script>
+            <!-- /.content-wrapper -->
+            <footer class="main-footer">
+                <div class="float-right d-none d-sm-block">
+                    <p id="lbl_ui_version"> VERSION INFO </p>
+                </div>
+                <strong>Copyright &copy <script>
                 document.write(new Date().getFullYear());
                 </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
-        </footer>
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-        </aside>
-        <!-- /.control-sidebar -->
-    </div>
-    <!-- ./wrapper -->
-    <!-- jQuery -->
-    <script src="plugins/jquery/jquery.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables -->
-    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="dist/js/adminlte.min.js"></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="dist/js/demo.js"></script>
-    <!-- sweetalert -->
-    <script src="dist/js/sweetalert2.js"></script>
-    <!-- Logout -->
-    <script src="dist/js/logout.js"></script>
-    <!-- toaster -->
-    <script src="plugins/toastr/toastr.min.js"></script>
+            </footer>
+            <!-- Control Sidebar -->
+            <aside class="control-sidebar control-sidebar-dark">
+                <!-- Control sidebar content goes here -->
+            </aside>
+            <!-- /.control-sidebar -->
+        </div>
+        <!-- ./wrapper -->
+        <!-- jQuery -->
+        <script src="plugins/jquery/jquery.min.js"></script>
+        <!-- Bootstrap 4 -->
+        <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- DataTables -->
+        <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+        <!-- AdminLTE App -->
+        <script src="dist/js/adminlte.min.js"></script>
+        <!-- AdminLTE for demo purposes -->
+        <script src="dist/js/demo.js"></script>
+        <!-- sweetalert -->
+        <script src="dist/js/sweetalert2.js"></script>
+        <!-- Logout -->
+        <script src="dist/js/logout.js"></script>
+        <!-- toaster -->
+        <script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-const urlParams = new URLSearchParams(window.location.search);
-$(document).ready(() => {
-    if (urlParams.has('emp_id')) {
-        if (urlParams.get('emp_id') == '') {
-            return window.location.href = '/admin/employee'
+    const urlParams = new URLSearchParams(window.location.search);
+    $(document).ready(() => {
+        if (urlParams.has('emp_id')) {
+            if (urlParams.get('emp_id') == '') {
+                return window.location.href = '/admin/employee'
+            }
+            getEmployee(urlParams.get('emp_id'))
+            $('#btn_addEmp').hide();
+            $('#div_position').show();
+            $('#div_other_details').show();
+            $('#div_Update_Password').show();
+            $('#div_image').show();
+            $('#div_password').remove()
         }
-        getEmployee(urlParams.get('emp_id'))
-        $('#btn_addEmp').hide();
-        $('#div_position').show();
-        $('#div_other_details').show();
-        $('#div_Update_Password').show();
-        $('#div_image').show();
-        $('#div_password').remove()
-    }
-});
+    });
 
-function getEmployee(emp_id) {
-    $.get('/admin/v1/employee/get?employee_id=' + emp_id, data => {
-        var data = data.data
-        $('#txt_memberId').val(data.employee_id)
-        $('#txt_name').val(data.name)
-        $('#txt_email').val(data.email)
-        $('#txt_skill').val(data.skills)
-        $('#list_position').val(data.position)
-        $('#txt_contact').val(data.mobile)
-        if (data.profile_image) {
-            $('#img_originalProfile').attr('src', '/admin/v1/profile/file/' + data.profile_image).show()
-        } else {
-            $('#img_originalProfile').show()
-        }
-        $('#img_profile').hide()
+    function getEmployee(emp_id) {
+        $.get('/admin/v1/employee/get?employee_id=' + emp_id, data => {
+            var data = data.data
+            $('#txt_memberId').val(data.employee_id)
+            $('#txt_name').val(data.name)
+            $('#txt_email').val(data.email)
+            $('#txt_skill').val(data.skills)
+            $('#list_position').val(data.position)
+            $('#txt_contact').val(data.mobile)
+            if (data.profile_image) {
+                $('#img_originalProfile').attr('src', '/admin/v1/profile/file/' + data.profile_image).show()
+            } else {
+                $('#img_originalProfile').show()
+            }
+            $('#img_profile').hide()
 
-        if (data.social_accounts) {
-            var social_Data = data.social_accounts
-            for (var i = 0; i < social_Data.length; i++) {
-                var temp_social = social_Data[i]
-                var socialHTML = `<div class="row">
+            if (data.social_accounts) {
+                var social_Data = data.social_accounts
+                for (var i = 0; i < social_Data.length; i++) {
+                    var temp_social = social_Data[i]
+                    var socialHTML = `<div class="row">
                 <div class="col-md-3 form-group">
                     <select class="form-control" id='list_social_${i}'>
                         <option value="Stack Overflow">Stack Overflow</option>
@@ -319,414 +321,416 @@ function getEmployee(emp_id) {
                         <button class="btn btn-outline-danger col-md-4 m-1" onclick=removeSocial('${temp_social.account_id}')><i class='fas fa-trash-alt'></i> Remove</button>
                     </div>
                     </div>`;
-                $('#div_social').append(socialHTML);
-                $(`#list_social_${i}`).val(temp_social.account_name)
+                    $('#div_social').append(socialHTML);
+                    $(`#list_social_${i}`).val(temp_social.account_name)
+                }
+            }
+
+        }).fail(error => {
+            error = error.responseJSON
+            if (error.status == 404) {
+                window.location.href = '/admin/employee'
+            } else {
+                $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Employee not Found',
+                    class: 'bg-danger',
+                });
+            }
+        });
+    }
+    $('#btn_addEmp').click(() => {
+        var name = $('#txt_name').val(),
+            email = $('#txt_email').val(),
+            password = $('#txt_password').val()
+        if (!name) {
+            return $(document).Toasts('create', {
+                title: 'Name missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please fill out allfields',
+                class: 'bg-danger',
+            });
+        }
+        if (!email) {
+            return $(document).Toasts('create', {
+                title: 'Email missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please fill out all fields',
+                class: 'bg-danger',
+            });
+        } else {
+            email = String(email).trim()
+        }
+        if (!password) {
+            return $(document).Toasts('create', {
+                title: 'Password missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please fill out all fields',
+                class: 'bg-danger',
+            });
+        } else {
+            password = String(password)
+        }
+        $.post({
+            url: '/admin/v1/employee/add',
+            data: {
+                "email": email,
+                "password": password,
+                "name": name,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Member is added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Member add Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_password').remove()
+                var memberId = result.data
+                window.location.href = `/admin/employee/add?emp_id=${memberId.member_id}`;
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
+    });
+
+    $('#icon_camera,#img_profile,#img_originalProfile').click(() => {
+        $('#file_profile').click();
+    })
+
+    $("#file_profile").change(function() {
+        if (this.files[0]) {
+            var file = this.files[0]
+            var type = file.type.split('/').pop().toLowerCase();
+            if (type != "jpeg" && type != "jpg" && type != "png") {
+                return $(document).Toasts('create', {
+                    title: 'File Formate not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Formate',
+                    class: 'bg-danger',
+                });
+
+            }
+            if (file.size / 1024 > 100) {
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 100 KB',
+                    class: 'bg-danger',
+                });
+            }
+            $('#img_originalProfile').hide()
+            const objectURL = URL.createObjectURL(file)
+            return $('#img_profile').attr('src', objectURL).show();
+        } else {
+            if ($('#img_originalProfile').attr('src') == '') {
+                $('#img_profile').attr('src', 'images/logo-small.png').show()
+                $('#img_originalProfile').hide()
+            } else {
+                $('#img_profile').hide()
+                $('#img_originalProfile').show()
             }
         }
+    });
 
-    }).fail(error => {
-        error = error.responseJSON
-        if (error.status == 404) {
-            window.location.href = '/admin/employee'
+    $('#btn_update').click(() => {
+        var emp_id = urlParams.get('emp_id'),
+            email = $('#txt_email').val(),
+            name = $('#txt_name').val(),
+            position = $('#list_position').val(),
+            skills = $('#txt_skill').val(),
+            contact = $('#txt_contact').val()
+        formData = new FormData();
+
+        if (name) {
+            formData.append('name', name);
+        }
+        if (position) {
+            formData.append('position', position);
+        }
+        if (skills) {
+            formData.append('skills', skills);
+        }
+        if (email) {
+            formData.append('email', email);
+        }
+        if (contact) {
+            formData.append('mobile', contact);
+        }
+        if ($('#file_profile')[0].files[0]) {
+
+            formData.append('profile_image', $('#file_profile')[0].files[0]);
+        }
+        $.post({
+            type: 'POST',
+            url: `/admin/v1/employee/update/${emp_id}`,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Member details has been Successfully Updated',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
+    });
+
+    $('#btn_remove').click(() => {
+        var emp_id = urlParams.get('emp_id')
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Member Account",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/employee/remove?employee_id=${emp_id}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Member removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.href = '/admin/employee'
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    }
+                });
+            }
+        })
+    });
+
+    $('#btn_updatePassword').click(() => {
+        var password = $('#txt_newPassword').val(),
+            conPassword = $('#txt_cPassword').val()
+        if (!password || !conPassword) {
+            return $(document).Toasts('create', {
+                title: 'Password and Confirm password required',
+                autohide: true,
+                delay: 5000,
+                body: 'Add Password and Confirm Password',
+                class: 'bg-danger',
+            });
         } else {
-            $(document).Toasts('create', {
+            password = String(password)
+            conPassword = String(conPassword)
+        }
+        if (password != conPassword) {
+            return $(document).Toasts('create', {
                 title: 'Error!',
                 autohide: true,
                 delay: 5000,
-                body: 'Employee not Found',
+                body: 'Password and Confirm Password must be same',
                 class: 'bg-danger',
             });
         }
-    });
-}
-$('#btn_addEmp').click(() => {
-    var name = $('#txt_name').val(),
-        email = $('#txt_email').val(),
-        password = $('#txt_password').val()
-    if (!name) {
-        return $(document).Toasts('create', {
-            title: 'Name missing',
-            autohide: true,
-            delay: 5000,
-            body: 'Please fill out allfields',
-            class: 'bg-danger',
+        $.post({
+            url: '/admin/v1/profile/password',
+            data: {
+                "password": password,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Password Changed',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Your Password has been changed Successfully',
+                    class: 'bg-success',
+                });
+                $('#txt_password').val(null)
+                $('#txt_cpassword').val(null)
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
         });
-    }
-    if (!email) {
-        return $(document).Toasts('create', {
-            title: 'Email missing',
-            autohide: true,
-            delay: 5000,
-            body: 'Please fill out all fields',
-            class: 'bg-danger',
-        });
-    } else { email = String(email).trim() }
-    if (!password) {
-        return $(document).Toasts('create', {
-            title: 'Password missing',
-            autohide: true,
-            delay: 5000,
-            body: 'Please fill out all fields',
-            class: 'bg-danger',
-        });
-    } else {
-        password = String(password)
-    }
-    $.post({
-        url: '/admin/v1/employee/add',
-        data: {
-            "email": email,
-            "password": password,
-            "name": name,
-        },
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Member is added',
-                autohide: true,
-                delay: 5000,
-                body: 'Member add Successfully',
-                class: 'bg-success',
-            });
-            $('#div_password').remove()
-            var memberId = result.data
-            window.location.href = `/admin/employee/add?emp_id=${memberId.member_id}`;
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        }
-    });
-});
 
-$('#icon_camera,#img_profile,#img_originalProfile').click(() => {
-    $('#file_profile').click();
-})
-
-$("#file_profile").change(function() {
-    if (this.files[0]) {
-        var file = this.files[0]
-        var type = file.type.split('/').pop().toLowerCase();
-        if (type != "jpeg" && type != "jpg" && type != "png") {
-            return $(document).Toasts('create', {
-                title: 'File Formate not Correct ',
-                autohide: true,
-                delay: 5000,
-                body: 'Select valid File Formate',
-                class: 'bg-danger',
-            });
-
-        }
-        if (file.size / 1024 > 100) {
-            return $(document).Toasts('create', {
-                title: 'File is too Large',
-                autohide: true,
-                delay: 5000,
-                body: 'please select file size below 100 KB',
-                class: 'bg-danger',
-            });
-        }
-        $('#img_originalProfile').hide()
-        const objectURL = URL.createObjectURL(file)
-        return $('#img_profile').attr('src', objectURL).show();
-    } else {
-        if ($('#img_originalProfile').attr('src') == '') {
-            $('#img_profile').attr('src', 'images/logo-small.png').show()
-            $('#img_originalProfile').hide()
-        } else {
-            $('#img_profile').hide()
-            $('#img_originalProfile').show()
-        }
-    }
-});
-
-$('#btn_update').click(() => {
-    var emp_id = urlParams.get('emp_id'),
-        email = $('#txt_email').val(),
-        name = $('#txt_name').val(),
-        position = $('#list_position').val(),
-        skills = $('#txt_skill').val(),
-        contact = $('#txt_contact').val()
-    formData = new FormData();
-
-    if (name) {
-        formData.append('name', name);
-    }
-    if (position) {
-        formData.append('position', position);
-    }
-    if (skills) {
-        formData.append('skills', skills);
-    }
-    if (email) {
-        formData.append('email', email);
-    }
-    if (contact) {
-        formData.append('mobile', contact);
-    }
-    if ($('#file_profile')[0].files[0]) {
-
-        formData.append('profile_image', $('#file_profile')[0].files[0]);
-    }
-    $.post({
-        type: 'POST',
-        url: `/admin/v1/employee/update/${emp_id}`,
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Updated',
-                autohide: true,
-                delay: 5000,
-                body: 'Member details has been Successfully Updated',
-                class: 'bg-success',
-            });
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        }
-    });
-});
-
-$('#btn_remove').click(() => {
-    var emp_id = urlParams.get('emp_id')
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to remove this Member Account",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Remove'
-    }).then((result) => {
-        if (result.value) {
-            $.get({
-                url: `/admin/v1/employee/remove?employee_id=${emp_id}`,
-                success: result => {
-                    $(document).Toasts('create', {
-                        title: 'Success',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Member removed successfully',
-                        class: 'bg-success',
-                    });
-                    window.location.href = '/admin/employee'
-                },
-                error: error => {
-                    error = error.responseJSON
-                    $(document).Toasts('create', {
-                        title: 'Error #' + error.code,
-                        autohide: true,
-                        delay: 5000,
-                        body: error.message,
-                        class: 'bg-danger',
-                    });
-                }
-            });
-        }
-    })
-});
-
-$('#btn_updatePassword').click(() => {
-    var password = $('#txt_newPassword').val(),
-        conPassword = $('#txt_cPassword').val()
-    if (!password || !conPassword) {
-        return $(document).Toasts('create', {
-            title: 'Password and Confirm password required',
-            autohide: true,
-            delay: 5000,
-            body: 'Add Password and Confirm Password',
-            class: 'bg-danger',
-        });
-    } else {
-        password = String(password)
-        conPassword = String(conPassword)
-    }
-    if (password != conPassword) {
-        return $(document).Toasts('create', {
-            title: 'Error!',
-            autohide: true,
-            delay: 5000,
-            body: 'Password and Confirm Password must be same',
-            class: 'bg-danger',
-        });
-    }
-    $.post({
-        url: '/admin/v1/profile/password',
-        data: {
-            "password": password,
-        },
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Password Changed',
-                autohide: true,
-                delay: 5000,
-                body: 'Your Password has been changed Successfully',
-                class: 'bg-success',
-            });
-            $('#txt_password').val(null)
-            $('#txt_cpassword').val(null)
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        }
-    });
-
-})
-
-function addSocialAccount() {
-    emp_id = urlParams.get('emp_id')
-    accountName = $('#list_social').val()
-    reference = $('#txt_link').val();
-    if (!accountName) {
-        return $(document).Toasts('create', {
-            title: 'Error!',
-            autohide: true,
-            delay: 5000,
-            body: 'Account Name not found',
-            class: 'bg-danger',
-        });
-    }
-    if (!reference) {
-        return $(document).Toasts('create', {
-            title: 'Error!',
-            autohide: true,
-            delay: 5000,
-            body: 'Link or Username not found',
-            class: 'bg-danger',
-        });
-    }
-    $.post({
-        url: '/admin/v1/employee/social-account/add',
-        data: {
-            "employee_id": emp_id,
-            "account_name": accountName,
-            "reference": reference,
-        },
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Account added',
-                autohide: true,
-                delay: 5000,
-                body: 'Social Account added Successfully',
-                class: 'bg-success',
-            });
-            $('#div_social').empty();
-            getEmployee(emp_id);
-            $('#list_social').val('');
-            $('#txt_link').val('');
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        }
-    });
-}
-
-function updateSocial(index, account_id) {
-    // getEmployee(urlParams.get('emp_id'))
-    accountName = $(`#list_social_${index}`).val()
-    reference = $(`#txt_link_${index}`).val();
-    emp_id = urlParams.get('emp_id')
-    formData = new FormData();
-    formData.append('employee_id', emp_id)
-    formData.append('account_id', account_id)
-    if (accountName) {
-        formData.append('account_name', accountName)
-    }
-    if (reference) {
-        formData.append('reference', reference)
-    }
-    $.post({
-        type: 'POST',
-        url: '/admin/v1/employee/social-account/update',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Updated',
-                autohide: true,
-                delay: 5000,
-                body: 'Social account details has been Successfully Updated',
-                class: 'bg-success',
-            });
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        }
-    });
-}
-
-function removeSocial(account_id) {
-    emp_id = urlParams.get('emp_id')
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to remove this Social account",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Remove'
-    }).then((result) => {
-        if (result.value) {
-            $.get({
-                url: `/admin/v1/employee/social-account/remove?employee_id=${emp_id}&account_id=${account_id}`,
-                success: result => {
-                    $(document).Toasts('create', {
-                        title: 'Success',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Social account removed successfully',
-                        class: 'bg-success',
-                    });
-                    $('#div_social').empty();
-                    getEmployee(emp_id)
-                },
-                error: error => {
-                    error = error.responseJSON
-                    $(document).Toasts('create', {
-                        title: 'Error #' + error.code,
-                        autohide: true,
-                        delay: 5000,
-                        body: error.message,
-                        class: 'bg-danger',
-                    });
-                }
-            });
-        }
     })
 
-}
+    function addSocialAccount() {
+        emp_id = urlParams.get('emp_id')
+        accountName = $('#list_social').val()
+        reference = $('#txt_link').val();
+        if (!accountName) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Account Name not found',
+                class: 'bg-danger',
+            });
+        }
+        if (!reference) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Link or Username not found',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            url: '/admin/v1/employee/social-account/add',
+            data: {
+                "employee_id": emp_id,
+                "account_name": accountName,
+                "reference": reference,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Account added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Social Account added Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_social').empty();
+                getEmployee(emp_id);
+                $('#list_social').val('');
+                $('#txt_link').val('');
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
+    }
+
+    function updateSocial(index, account_id) {
+        // getEmployee(urlParams.get('emp_id'))
+        accountName = $(`#list_social_${index}`).val()
+        reference = $(`#txt_link_${index}`).val();
+        emp_id = urlParams.get('emp_id')
+        formData = new FormData();
+        formData.append('employee_id', emp_id)
+        formData.append('account_id', account_id)
+        if (accountName) {
+            formData.append('account_name', accountName)
+        }
+        if (reference) {
+            formData.append('reference', reference)
+        }
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/employee/social-account/update',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Social account details has been Successfully Updated',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
+    }
+
+    function removeSocial(account_id) {
+        emp_id = urlParams.get('emp_id')
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Social account",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/employee/social-account/remove?employee_id=${emp_id}&account_id=${account_id}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Social account removed successfully',
+                            class: 'bg-success',
+                        });
+                        $('#div_social').empty();
+                        getEmployee(emp_id)
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    }
+                });
+            }
+        })
+
+    }
 </script>
 
 </html>
