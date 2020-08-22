@@ -336,7 +336,6 @@ clientAPI.get('/get', (req, res) => {
                 lastModifiedBy: tempClient.createdBy
             }
 
-
             if (tempClient.plans) {
                 var plansDB = tempClient.plans,
                     planKeys = Object.keys(plansDB),
