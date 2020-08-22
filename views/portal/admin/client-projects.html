@@ -20,6 +20,7 @@
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
+
     </style>
 </head>
 
@@ -195,31 +196,31 @@
     <script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-var tblproject = $("#tbl_project").DataTable({
-    "responsive": true,
-});
-
-const urlParams = new URLSearchParams(window.location.search);
-
-$(document).ready(() => {
-    $.getJSON(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
-        var dataClient = data.data;
-        if (dataClient.plans) {
-            var dataProject = dataClient.plans
-            for (var i = 0; i < dataProject.length; i++) {
-                var tempProject = dataProject[i];
-                button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/client/project-dashboard?project_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Go To Dashboard</button>`
-                var start_date = new Date(tempProject.start_date);
-                var d = start_date.getDate();
-                var m = start_date.getMonth() + 1;
-                var y = start_date.getFullYear();
-                tblproject.row.add([
-                    `${i+1}`, tempProject.plan, m + "/" + d + "/" + y, tempProject.status, button
-                ]).draw();
-            }
-        }
+    var tblProject = $("#tbl_project").DataTable({
+        "responsive": true,
     });
-});
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    $(document).ready(() => {
+        $.getJSON(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
+            var dataClient = data.data;
+            if (dataClient.plans) {
+                var dataProject = dataClient.plans
+                for (var i = 0; i < dataProject.length; i++) {
+                    var tempProject = dataProject[i];
+                    button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/client/project-dashboard?project_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Go To Dashboard</button>`
+                    var start_date = new Date(tempProject.start_date);
+                    var d = start_date.getDate();
+                    var m = start_date.getMonth() + 1;
+                    var y = start_date.getFullYear();
+                    tblProject.row.add([
+                        `${i+1}`, tempProject.plan, m + "/" + d + "/" + y, tempProject.status, button
+                    ]).draw();
+                }
+            }
+        });
+    });
 </script>
 
 </html>
