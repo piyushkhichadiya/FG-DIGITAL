@@ -22,7 +22,6 @@
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
-
     </style>
 </head>
 
@@ -124,11 +123,6 @@
                                 <div class="form-group">
                                     <label>Plan Name:</label>
                                     <select class="form-control" id="list_planName">
-                                        <option value="Plan_A">Plan_A</option>
-                                        <option value="Plan_B">Plan_B</option>
-                                        <option value="Plan_C">Plan_C</option>
-                                        <option value="Plan_D">Plan_D</option>
-                                        <option value="Plan_E">Plan_E</option>
                                     </select>
                                 </div>
                             </div>
@@ -148,7 +142,7 @@
                         <div class="row form-group">
                             <label>Start Date:</label>
                             <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                <input type="text" class="form-control datetimepicker-input col-md-3" id="txt_startDate" data-target="#reservationdate" placeholder="MM/DD/YYYY" />
+                                <input type="text" class="form-control datetimepicker-input col-md-3" id="txt_startDate" data-target="#reservationdate" placeholder="YYYY/MM/DD" />
                                 <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                 </div>
@@ -229,303 +223,329 @@
     <script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-    $('#reservationdate').datetimepicker({
-        format: 'L'
-    });
+$('#reservationdate').datetimepicker({
+    format: 'Y/MM/D'
+});
 
-    const urlParams = new URLSearchParams(window.location.search);
-    var planData
-    $(document).ready(() => {
-        var plan_id = urlParams.get('plan_id')
-        if (urlParams.has('plan_id')) {
-            if (urlParams.get('plan_id') == '') {
-                return window.location.href = `/admin/client/project-add?client_id=${urlParams.get('client_id')}`
-            }
-            $('#div_projectInfo').show();
-            $('#btn_add').hide();
+const urlParams = new URLSearchParams(window.location.search);
+var planData
+$(document).ready(() => {
+    var plan_id = urlParams.get('plan_id')
+    if (urlParams.has('plan_id')) {
+        if (urlParams.get('plan_id') == '') {
+            return window.location.href = `/admin/client/project-add?client_id=${urlParams.get('client_id')}`
         }
-        $('#list_planName').val('');
-        $.get(`/admin/v1/plan/get`, (data) => {
-            planData = data.data;
+        $('#div_projectInfo').show();
+        $('#btn_add').hide();
+    }
+
+    $('#list_planName').val('');
+    $.get(`/admin/v1/plan/get`, (data) => {
+        planData = data.data;
+        console.log(planData)
+        var options
+        $(planData).each(function(index,value){
+                                        options += '<option value="' + value.plan_name + '">' + value.plan_name + '</option>';
         });
-        $.get(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
-            var data = data.data;
-            if (data.plans) {
-                var planData = data.plans;
-                for (var i = 0; i < planData.length; i++) {
-                    tempPlan = planData[i]
-                    if (urlParams.get('plan_id') == tempPlan.project_id) {
-                        var plan = tempPlan.plan,
-                            price = tempPlan.price,
-                            start_date = tempPlan.start_date,
-                            days = tempPlan.duration;
-                    }
+        $('#list_planName').html(options);
+    }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            }); 
+        });
+
+    $.get(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
+        var data = data.data;
+        if (data.plans) {
+            var planData = data.plans;
+            for (var i = 0; i < planData.length; i++) {
+                var tempPlan = planData[i]
+                if (urlParams.get('plan_id') == tempPlan.project_id) {
+                    var plan = tempPlan.plan,
+                        price = tempPlan.price,
+                        start_date = tempPlan.start_date,
+                        days = tempPlan.duration;
                 }
-                var start_date = new Date(start_date),
-                    d = start_date.getDate(),
-                    m = start_date.getMonth(),
-                    y = start_date.getFullYear();
-                m += 1;
-                $('#list_planName').val(plan);
-                $('#txt_amount').val(price);
-                $('#txt_days').val(days);
-                $('#txt_startDate').val(m + "/" + d + "/" + y);
-            };
+            }
+            var start_date = new Date(start_date),
+                d = start_date.getDate(),
+                m = start_date.getMonth()+1,
+                y = start_date.getFullYear();
+            $('#list_planName').val(plan);
+            $('#txt_amount').val(price);
+            $('#txt_days').val(days);
+            if(isNaN(start_date)){
+                $('#txt_startDate').val('');
+            }else{
+                $('#txt_startDate').val(y + "/" + m + "/" + d);
+            }
 
+        };
+
+    }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            }); 
         });
-    });
+});
 
-    $("#list_planName").change(function() {
-        var planName = $(this).val();
-        var amount, days;
-        for (var i = 0; i < planData.length; i++) {
-            var tempPlan = planData[i];
-            if (tempPlan.plan_name == planName) {
-                amount = tempPlan.price;
-                days = tempPlan.days;
-            }
+$("#list_planName").change(function() {
+    var planName = $(this).val();
+    var amount, days;
+    for (var i = 0; i < planData.length; i++) {
+        var tempPlan = planData[i];
+        if (tempPlan.plan_name == planName) {
+            amount = tempPlan.price;
+            days = tempPlan.days;
         }
-        $('#txt_amount').val(amount);
-        $('#txt_days').val(days);
-    });
+    }
+    $('#txt_amount').val(amount);
+    $('#txt_days').val(days);
+});
 
-    $('#btn_add').click(() => {
-        var plan = $('#list_planName').val(),
-            clientId = urlParams.get('client_id'),
-            day = $('#txt_days').val(),
-            amount = $('#txt_amount').val(),
-            startDate = $('#txt_startDate').val();
-        if (!plan) {
-            return $(document).Toasts('create', {
-                title: 'Plan name missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Plan name',
-                class: 'bg-danger',
-            });
-        }
-        if (!amount || isNaN(amount)) {
-            return $(document).Toasts('create', {
-                title: 'Amount missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Valid Plan Amount',
-                class: 'bg-danger',
-            });
-        }
-        if (!isNaN(amount)) {
-            if (amount <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Amount must be positive numbers',
-                    class: 'bg-danger',
-                });
-            }
-        }
-        if (!day || isNaN(day)) {
-            return $(document).Toasts('create', {
-                title: 'Duration missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Valid days',
-                class: 'bg-danger',
-            });
-        }
-        if (!isNaN(day)) {
-            if (day <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'days must be positive numbers',
-                    class: 'bg-danger',
-                });
-            }
-        }
-        if (!startDate) {
-            return $(document).Toasts('create', {
-                title: 'Date missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project start date',
-                class: 'bg-danger',
-            });
-        }
-        $.post({
-            url: '/admin/v1/client/plan/add',
-            data: {
-                "client_id": clientId,
-                "plan": plan,
-                "start_date": startDate,
-                "duration": day,
-                "price": amount,
-            },
-            success: result => {
-                $(document).Toasts('create', {
-                    title: 'Client added',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Client Added Successfully',
-                    class: 'bg-success',
-                });
-                var project_id = result.data
-                window.location.href = `/admin/client/project-add?client_id=${clientId}&plan_id=${project_id.project_id}`
-            },
-            error: error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
-            }
+$('#btn_add').click(() => {
+    var plan = $('#list_planName').val(),
+        clientId = urlParams.get('client_id'),
+        day = $('#txt_days').val(),
+        amount = $('#txt_amount').val(),
+        startDate = $('#txt_startDate').val();
+    if (!plan) {
+        return $(document).Toasts('create', {
+            title: 'Plan name missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Plan name',
+            class: 'bg-danger',
         });
-    });
-
-    $('#btn_update').click(() => {
-        var clientId = urlParams.get('client_id'),
-            project_id = urlParams.get('plan_id'),
-            day = $('#txt_days').val(),
-            plan = $('#list_planName').val(),
-            amount = $('#txt_amount').val(),
-            startDate = $('#txt_startDate').val();
-        if (!plan) {
-            return $(document).Toasts('create', {
-                title: 'Plan name missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Plan name',
-                class: 'bg-danger',
-            });
-        }
-        if (!amount || isNaN(amount)) {
-            return $(document).Toasts('create', {
-                title: 'Amount missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Valid Plan Amount',
-                class: 'bg-danger',
-            });
-        }
-        if (!isNaN(amount)) {
-            if (amount <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Amount must be positive numbers',
-                    class: 'bg-danger',
-                });
-            }
-        }
-        if (!day || isNaN(day)) {
-            return $(document).Toasts('create', {
-                title: 'Duration missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Valid days',
-                class: 'bg-danger',
-            });
-        }
-        if (!isNaN(day)) {
-            if (day <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'days must be positive numbers',
-                    class: 'bg-danger',
-                });
-            }
-        }
-        if (!startDate) {
-            return $(document).Toasts('create', {
-                title: 'Date missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project start date',
-                class: 'bg-danger',
-            });
-        }
-        $.post({
-            type: 'POST',
-            url: '/admin/v1/client/plan/update',
-            data: {
-                "client_id": clientId,
-                "project_id": project_id,
-                "plan": plan,
-                "start_date": startDate,
-                "duration": day,
-                "price": amount,
-            },
-            success: result => {
-                $(document).Toasts('create', {
-                    title: 'Updated',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Plan Details Updated',
-                    class: 'bg-success',
-                });
-            },
-            error: error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
-            }
+    }
+    if (!amount || isNaN(amount)) {
+        return $(document).Toasts('create', {
+            title: 'Amount missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Valid Plan Amount',
+            class: 'bg-danger',
         });
+    }
+    if (amount <= 0) {
+        return $(document).Toasts('create', {
+            title: 'Error!',
+            autohide: true,
+            delay: 5000,
+            body: 'Amount must be greater than 0',
+            class: 'bg-danger',
+        });
+    }
+    if (!day || isNaN(day)) {
+        return $(document).Toasts('create', {
+            title: 'Duration missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Valid days',
+            class: 'bg-danger',
+        });
+    }
+    if (day <= 0) {
+        return $(document).Toasts('create', {
+            title: 'Error!',
+            autohide: true,
+            delay: 5000,
+            body: 'Days must be greater than 0',
+            class: 'bg-danger',
+        });
+    }
+    if (!startDate) {
+        return $(document).Toasts('create', {
+            title: 'Date missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Project start date',
+            class: 'bg-danger',
+        });
+    }
+    $.post({
+        url: '/admin/v1/client/plan/add',
+        data: {
+            "client_id": clientId,
+            "plan": plan,
+            "start_date": startDate,
+            "duration": day,
+            "price": amount,
+        },
+        success: result => {
+            $(document).Toasts('create', {
+                title: 'Client added',
+                autohide: true,
+                delay: 5000,
+                body: 'Client Added Successfully',
+                class: 'bg-success',
+            });
+            var project_id = result.data
+            window.location.href = `/admin/client/project-add?client_id=${clientId}&plan_id=${project_id.project_id}`
+        },
+        error: error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        }
     });
+});
 
-    $('#btn_remove').click(() => {
-        var clientId = urlParams.get('client_id'),
-            project_id = urlParams.get('plan_id');
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You want to remove this Project",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Remove'
-        }).then((result) => {
-            if (result.value) {
-                $.post({
-                    type: 'POST',
-                    url: '/admin/v1/client/plan/remove',
-                    data: {
-                        "client_id": clientId,
-                        "project_id": project_id,
-                    },
-                    success: result => {
-                        $(document).Toasts('create', {
-                            title: 'Removed',
-                            autohide: true,
-                            delay: 5000,
-                            body: 'Plan Details Removed Successfully',
-                            class: 'bg-success',
-                        });
-                        window.location.href = `/admin/client/project?client_id=${clientId}`
-                    },
-                    error: error => {
-                        error = error.responseJSON
-                        $(document).Toasts('create', {
-                            title: 'Error #' + error.code,
-                            autohide: true,
-                            delay: 5000,
-                            body: error.message,
-                            class: 'bg-danger',
-                        });
-                    }
-                });
-            }
-        })
+$('#btn_update').click(() => {
+    var clientId = urlParams.get('client_id'),
+        project_id = urlParams.get('plan_id'),
+        day = $('#txt_days').val(),
+        plan = $('#list_planName').val(),
+        amount = $('#txt_amount').val(),
+        startDate = $('#txt_startDate').val();
+    if (!plan) {
+        return $(document).Toasts('create', {
+            title: 'Plan name missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Plan name',
+            class: 'bg-danger',
+        });
+    }
+    if (!amount || isNaN(amount)) {
+        return $(document).Toasts('create', {
+            title: 'Amount missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Valid Plan Amount',
+            class: 'bg-danger',
+        });
+    }
+    if (!isNaN(amount)) {
+        if (amount <= 0) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Amount must be positive numbers',
+                class: 'bg-danger',
+            });
+        }
+    }
+    if (!day || isNaN(day)) {
+        return $(document).Toasts('create', {
+            title: 'Duration missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Valid days',
+            class: 'bg-danger',
+        });
+    }
+    if (!isNaN(day)) {
+        if (day <= 0) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'days must be positive numbers',
+                class: 'bg-danger',
+            });
+        }
+    }
+    if (!startDate) {
+        return $(document).Toasts('create', {
+            title: 'Date missing',
+            autohide: true,
+            delay: 5000,
+            body: 'Please Enter Project start date',
+            class: 'bg-danger',
+        });
+    }
+    $.post({
+        type: 'POST',
+        url: '/admin/v1/client/plan/update',
+        data: {
+            "client_id": clientId,
+            "project_id": project_id,
+            "plan": plan,
+            "start_date": startDate,
+            "duration": day,
+            "price": amount,
+        },
+        success: result => {
+            $(document).Toasts('create', {
+                title: 'Updated',
+                autohide: true,
+                delay: 5000,
+                body: 'Plan Details Updated',
+                class: 'bg-success',
+            });
+        },
+        error: error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        }
     });
+});
+
+$('#btn_remove').click(() => {
+    var clientId = urlParams.get('client_id'),
+        project_id = urlParams.get('plan_id');
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You want to remove this Project",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Remove'
+    }).then((result) => {
+        if (result.value) {
+            $.post({
+                type: 'POST',
+                url: '/admin/v1/client/plan/remove',
+                data: {
+                    "client_id": clientId,
+                    "project_id": project_id,
+                },
+                success: result => {
+                    $(document).Toasts('create', {
+                        title: 'Removed',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Plan Details Removed Successfully',
+                        class: 'bg-success',
+                    });
+                    window.location.href = `/admin/client/project?client_id=${clientId}`
+                },
+                error: error => {
+                    error = error.responseJSON
+                    $(document).Toasts('create', {
+                        title: 'Error #' + error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                    });
+                }
+            });
+        }
+    })
+});
 </script>
 
 </html>
