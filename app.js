@@ -8,7 +8,8 @@ var express = require('express'),
     packageInfo = require('./package.json'),
     { ConvertKeysToLowerCase } = require('./functions/functions'),
     favicon = require('serve-favicon'),
-    path = require('path')
+    path = require('path'),
+    { exec } = require('child_process')
 
 //--------------------------- CONFIGURATION ---------------------------
 
@@ -120,7 +121,15 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
     console.log('Swagger Ui: \x1b[31m\x1b[1mFailed: Development Environment is required \x1b[0m');
 }
 
-console.log(`------------------------------- ${packageInfo.name} -------------------------------`);
+//------------------------- GIT BRANCH --------------------------
+exec('git rev-parse --abbrev-ref HEAD', (err, stdout, stderr) => {
+    if (err) {
+        return console.log('Git Fetch Failed');
+    }
+
+    console.log(`Git Branch (Current): \x1b[36m\x1b[1m${stdout}\x1b[0m`)
+    console.log(`----------------------- School Score [${packageInfo.name}] -----------------------`);
+});
 
 //------------------------- API & VIEW ROUTES --------------------------
 
