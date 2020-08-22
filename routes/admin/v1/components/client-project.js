@@ -101,16 +101,25 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
 
                 if (tempService.deleted) { continue }
 
-                var tempJSONObject = {
-                    service_id: tempService.service_id,
-                    active: tempService.active,
-                    createdBy: tempService.createdBy,
-                    createdOn: tempService.createdOn,
-                    lastModifiedBy: tempService.lastModifiedBy,
-                    lastModifiedOn: tempService.lastModifiedOn
-                }
+                if (dbAdminSnapshot.services) {
+                    var dbService = dbAdminSnapshot.services,
+                        dbServiceKey = Object.keys(dbService)
 
-                postObject.service.push(tempJSONObject);
+                    for (var j = 0; j < dbServiceKey.length; j++) {
+                        if (!dbService[dbServiceKey[j]].deleted && dbService[dbServiceKey[j]].service_id == tempService.service_id) {
+                            var tempJSONObject = {
+                                service_id: tempService.service_id,
+                                active: tempService.active,
+                                createdBy: tempService.createdBy,
+                                createdOn: tempService.createdOn,
+                                lastModifiedBy: tempService.lastModifiedBy,
+                                lastModifiedOn: tempService.lastModifiedOn
+                            }
+
+                            postObject.service.push(tempJSONObject);
+                        }
+                    }
+                }
             }
 
             if (postObject.service.length == 0) {
@@ -133,20 +142,32 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                 var tempTeam = dbProjectTeam[dbProjectTeamKey[i]]
                 if (tempTeam.deleted) { continue }
 
-                var tempJSONObject = {
-                    employee_id: tempTeam.employee_id,
-                    active: tempTeam.active,
-                    createdOn: tempTeam.createdOn,
-                    createdBy: tempTeam.createdBy,
-                    lastModifiedBy: tempTeam.lastModifiedBy,
-                    lastModifiedOn: tempTeam.lastModifiedOn,
-                    permission: {
-                        activity: tempTeam.activity,
-                        review: tempTeam.review
+                // Check Employee is not deleted
+                if (dbAdminSnapshot.employees) {
+                    var dbEmployee = dbAdminSnapshot.employees,
+                        dbEmployeeKey = Object.keys(dbEmployee)
+
+                    for (var j = 0; j < dbEmployeeKey.length; j++) {
+                        if (!dbEmployee[dbEmployeeKey[j]].deleted && dbEmployee[dbEmployeeKey[j]].employee_id == tempTeam.employee_id) {
+                            var tempJSONObject = {
+                                employee_id: tempTeam.employee_id,
+                                active: tempTeam.active,
+                                createdOn: tempTeam.createdOn,
+                                createdBy: tempTeam.createdBy,
+                                lastModifiedBy: tempTeam.lastModifiedBy,
+                                lastModifiedOn: tempTeam.lastModifiedOn,
+                                permission: {
+                                    activity: tempTeam.activity,
+                                    review: tempTeam.review
+                                }
+                            }
+
+                            postObject.team.push(tempJSONObject)
+                        }
                     }
                 }
 
-                postObject.team.push(tempJSONObject)
+
             }
 
             if (postObject.team.length == 0) {
