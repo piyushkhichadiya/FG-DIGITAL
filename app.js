@@ -128,7 +128,7 @@ exec('git rev-parse --abbrev-ref HEAD', (err, stdout, stderr) => {
     }
 
     console.log(`Git Branch (Current): \x1b[36m\x1b[1m${stdout}\x1b[0m`)
-    console.log(`----------------------- School Score [${packageInfo.name}] -----------------------`);
+    console.log(`----------------------- FG Digital [${packageInfo.name}] -----------------------`);
 });
 
 //------------------------- API & VIEW ROUTES --------------------------
