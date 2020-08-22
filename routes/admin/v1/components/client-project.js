@@ -1285,13 +1285,14 @@ projectAPI.post('/review/update-post', (req, res) => {
 
                     if (req.body.description) {
                         tempPost.description = String(req.body.description).trim()
+                        tempPost.lastModifiedOn = String(new Date())
+                        tempPost.lastModifiedBy = "ADMIN"
                     }
 
                     // Append Documents
                     if (tempPost.documents) {
                         tempPost.documents.push.apply(tempPost.documents, documents)
-                        tempPost.lastModifiedOn = String(new Date())
-                        tempPost.lastModifiedBy = "ADMIN"
+
                     } else {
                         tempPost.documents = documents
                     }
