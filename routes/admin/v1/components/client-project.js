@@ -1152,7 +1152,6 @@ projectAPI.get('/service/remove', (req, res) => {
 })
 
 // 6.21 Review Update Post
-
 projectAPI.post('/review/update', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.21.1')
@@ -1205,7 +1204,6 @@ projectAPI.post('/review/update', (req, res) => {
 })
 
 // 6.22 Review Update Post
-
 projectAPI.post('/review/update-post', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.22.1')
@@ -1247,87 +1245,83 @@ projectAPI.post('/review/update-post', (req, res) => {
 
         for (var i = 0; i < file.length; i++) {
             var tempFile = file[i]
+
             if ((tempFile.size / 1024 / 1024) > 10) {
                 return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.22.7');
             }
-            var tempName;
+
             switch (tempFile.mimetype) {
                 case 'image/jpeg':
                 case 'image/jpg':
-                    tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
                     break;
                 case 'image/png':
-                    tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
                     break;
                 default:
-                    return response(res, 403, 'forbidden', 'Invalid File Type. JPEG/PNG are only valid file types.', undefined, 'A-6.22.8')
+                    return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG are only valid file types.', undefined, 'A-6.22.8')
 
             }
+
             fileNameData.push(tempName)
-            documents.push({ filename: tempName })
+            documents.push({
+                filename: tempName,
+                createdOn: String(new Date()),
+                createdBy: 'ADMIN'
+            })
         }
     }
     for (var i = 0; i < reviewDBKeys.length; i++) {
         var tempReview = reviewDB[reviewDBKeys[i]]
+
         if (tempReview.review_id == reviewID && !tempReview.closed && !tempReview.deleted) {
             if (tempReview.post) {
+
                 var postDB = tempReview.post,
                     postKeys = Object.keys(postDB)
+
                 if (postKeys.includes(postKey)) {
                     var tempPost = postDB[postKey]
+
                     if (req.body.description) {
-                        var description = String(req.body.description).trim()
-                        if (description == "undefined" || description == null) {
-                            return response(res, 403, 'required', 'Description is required ', undefined, 'A-6.22.11')
-                        }
-                        tempPost.description = description
-
+                        tempPost.description = String(req.body.description).trim()
                     }
-                    if (fileNameData && fileNameData.length == 1) {
-                        if (tempPost.documents) {
-                            tempPost.documents = documents.concat(tempPost.documents)
 
-                        } else {
-                            tempPost.documents = documents
-                        }
-                        var file = req.files.file,
-                            tempName = String(fileNameData)
-                        file.mv(directory + tempName, (error, abc) => {
+                    // Append Documents
+                    if (tempPost.documents) {
+                        tempPost.documents.push.apply(tempPost.documents, documents)
+                        tempPost.lastModifiedOn = String(new Date())
+                        tempPost.lastModifiedBy = "ADMIN"
+                    } else {
+                        tempPost.documents = documents
+                    }
+
+                    // Move files to directory 
+                    var file = req.files.file
+                    if (!Array.isArray(file)) {
+                        var file = [req.files.file]
+                    }
+                    for (var j = 0; j < file.length; j++) {
+                        var tempFile = file[j],
+                            tempName = fileNameData[j]
+                        tempFile.mv(directory + tempName, (error) => {
                             if (error) {
                                 return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.22.9')
                             }
                         })
-                    } else if (fileNameData && fileNameData.length > 1) {
-                        if (tempPost.documents) {
-                            tempPost.documents = documents.concat(tempPost.documents)
-
-                        } else {
-                            tempPost.documents = documents
-                        }
-                        var file = req.files.file
-                        for (var j = 0; j < file.length; j++) {
-                            var tempFile = file[j],
-                                tempName = fileNameData[j]
-                            tempFile.mv(directory + tempName, (error) => {
-                                if (error) {
-                                    return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.22.10')
-                                }
-                            })
-                        }
                     }
-                    tempPost.lastModifiedOn = String(new Date())
-                    tempPost.lastModifiedBy = "ADMIN"
+
                     return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/post/${postKey}/`).update(tempPost).then(() => {
-                        return response(res, 200, 'success', 'Review has been updated successfully', undefined, 'A-6.22.12')
+                        return response(res, 200, 'success', 'Review has been updated successfully', undefined, 'A-6.22.10')
                     })
                 } else {
-                    return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.13')
+                    return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.11')
                 }
             } else {
-                return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.14')
+                return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.12')
             }
         } else if (i == reviewDBKeys.length) {
-            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.22.15')
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.22.13')
         }
     }
 

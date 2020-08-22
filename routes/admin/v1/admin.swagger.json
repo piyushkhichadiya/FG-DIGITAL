@@ -89,7 +89,7 @@
                         },
                         "example": {
                             "email": "test@gmail.com",
-                            "password": "my-secret-password",
+                            "password": "Aa@123456",
                             "remember": true
                         }
                     }
@@ -1432,7 +1432,7 @@
                         "required": false,
                         "type": "string",
                         "schema": {
-                            "example": "-MFHplxSOeH2Xietj_z_"
+                            "example": "-MFI09sMQLktyYI-yYOf"
                         }
                     },
                     {
@@ -1448,7 +1448,7 @@
                     {
                         "name": "file",
                         "in": "formData",
-                        "description": "SUPPORT MULTIPLE FILES",
+                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG \n File Size Limit: 10 MB",
                         "required": false,
                         "type": "file"
                     }
