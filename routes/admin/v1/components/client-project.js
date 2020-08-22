@@ -1357,6 +1357,7 @@ function getKeys(project_id) {
         clientKey = Object.keys(clientDB)
     for (var i = 0; i < clientKey.length; i++) {
         if (clientDB[clientKey[i]].plans && !clientDB[clientKey[i]].deleted) {
+
             var planDB = clientDB[clientKey[i]].plans,
                 planKey = Object.keys(planDB)
             for (var j = 0; j < planKey.length; j++) {
@@ -1367,15 +1368,12 @@ function getKeys(project_id) {
                         "plan_key": planKey[j]
                     }
                     return pushData
-                } else if (j == planKey.length - 1) {
-                    return false
                 }
             }
         } else if (i == clientKey.length - 1) {
             return false
         }
     }
-    return false
 
 }
 module.exports = projectAPI
