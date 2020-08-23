@@ -896,7 +896,7 @@ projectAPI.get('/review/close', (req, res) => {
     var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
         reviewDBKey = Object.keys(reviewDB)
     for (var i = 0; i < reviewDBKey.length; i++) {
-        if (reviewID == reviewDBKey[i].review_id) {
+        if (reviewID == reviewDB[reviewDBKey[i]].review_id) {
             var tempReview = reviewDB[reviewDBKey[i]]
             if (tempReview.closed) {
                 return response(res, 403, 'Forbidden', 'Review is already closed', undefined, 'A-6.15.5')
@@ -1344,6 +1344,46 @@ projectAPI.post('/review/update-post', (req, res) => {
             }
         } else if (i == reviewDBKeys.length) {
             return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.22.13')
+        }
+    }
+
+})
+
+// 6.23 Review Activate
+projectAPI.get('/review/open', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.23.1')
+    }
+    if (!req.query.review_id) {
+        return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.23.2')
+    }
+
+    var projectID = String(req.query.project_id).trim(),
+        reviewID = String(req.query.review_id).trim(),
+        getKeyDB = getKeys(projectID)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.23.3') }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
+        return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.23.4')
+    }
+    var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+        reviewDBKeys = Object.keys(reviewDB)
+    for (var i = 0; i < reviewDBKeys.length; i++) {
+        var tempReview = reviewDB[reviewDBKeys[i]]
+        if (tempReview.review_id == reviewID) {
+            if (!tempReview.closed) {
+                return response(res, 403, 'notfound', 'Review is already active', undefined, 'A-6.23.5')
+            }
+            tempReview.closed = false
+            tempReview.lastModifiedOn = String(new Date())
+            tempReview.lastModifiedBy = "ADMIN"
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/`).update(tempReview).then(() => {
+                return response(res, 200, 'success', 'Review activated successfully', undefined, 'A-6.23.6')
+            })
+        } else if (i == reviewDBKey.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.23.7')
+
         }
     }
 

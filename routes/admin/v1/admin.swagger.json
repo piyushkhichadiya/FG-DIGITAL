@@ -1455,6 +1455,34 @@
                 ],
                 "responses": {}
             }
+        },
+        "/project/review/open": {
+            "get": {
+                "tags": ["6. Client Project"],
+                "summary": "Remove Service from client",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "description": "Project ID",
+                        "required": true,
+                        "type": "integer",
+                        "schema": {
+                            "example": 93492065515
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "type": "string",
+                        "required": true,
+                        "description": "Review ID",
+                        "schema": {
+                            "example": 688642606297
+                        }
+                    }
+                ],
+                "responses": {}
+            }
         }
 
     }
