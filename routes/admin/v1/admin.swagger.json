@@ -89,7 +89,7 @@
                         },
                         "example": {
                             "email": "test@gmail.com",
-                            "password": "my-secret-password",
+                            "password": "Aa@123456",
                             "remember": true
                         }
                     }
@@ -1371,6 +1371,88 @@
                         "example": 93492065515
                     }
                 }],
+                "responses": {}
+            }
+        },
+        "/project/review/update": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "Update review title and description",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["review_id", "project_id"],
+                        "properties": {
+                            "review_id": { "type": "integer" },
+                            "project_id": { "type": "integer" },
+                            "title": { "type": "string" },
+                            "description": { "type": "string" }
+                        },
+                        "example": {
+                            "review_id": 688642606297,
+                            "project_id": 93492065515,
+                            "title": "Demo update",
+                            "description": "Demo description update"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/review/update-post": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "Update review post and description",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "project_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "review_id",
+                        "description": "review_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "688642606297"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "post_key",
+                        "description": "post_key",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MFI09sMQLktyYI-yYOf"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "description",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "description": "Demo description"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG \n File Size Limit: 10 MB",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
                 "responses": {}
             }
         }
