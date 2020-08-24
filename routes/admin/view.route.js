@@ -15,7 +15,8 @@ routes.push.apply(routes, ['/plan/', '/plan/add'])
 
 // Client & Projects
 routes.push.apply(routes, ['/client/', '/client/add',
-    '/client/project/', '/client/project/dashboard/', '/client/project-add/', '/client/project-info/'
+    '/client/project/', '/client/project-dashboard/', '/client/project-add/', '/client/project-info/',
+    '/client/project-service/', '/client/project-team/', '/client/project-social-account/'
 ])
 
 // Employee
@@ -49,10 +50,13 @@ adminView.get('/client', (req, res) => { res.sendFile(process.cwd() + '/views/po
 adminView.get('/client/add', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-add.html') });
 
 // Client > Project
-adminView.get('/client/project/', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-projects.html') });
-adminView.get('/client/project/dashboard', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project-dashboard.html') });
+adminView.get('/client/project', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-projects.html') });
+adminView.get('/client/project-dashboard', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project-dashboard.html') });
 adminView.get('/client/project-add', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project-add.html') });
 adminView.get('/client/project-info', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project-info.html') });
+adminView.get('/client/project-service', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project/project-service.html') });
+adminView.get('/client/project-team', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project/project-team.html') });
+adminView.get('/client/project-social-account', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/client-project/project-social-account.html') });
 
 // Employee
 adminView.get('/employee', (req, res) => { res.sendFile(process.cwd() + '/views/portal/admin/employee.html') });

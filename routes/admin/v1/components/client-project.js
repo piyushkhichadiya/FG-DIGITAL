@@ -18,55 +18,289 @@ projectAPI.use((req, res, next) => {
 //------------------------------- 6. CLIENT-PROJECT -------------------------------
 
 // 6.1 GET ALL PROJECT DETAIL
-projectAPI.get(['/', '/get'], (req, res) => {
+projectAPI.get('/get', (req, res) => {
     if (!req.query.client_id) {
         return response(res, 400, 'required', 'ClientID is required', undefined, 'A-6.1.1')
     }
-    if (!dbAdminSnapshot.clients) {
+    var client_id = String(req.query.client_id).trim();
+
+    if (!dbAdminSnapshot.clients || !dbAdminSnapshot.clients[client_id]) {
         return response(res, 404, 'notfound', 'Incorrect Client ID', undefined, 'A-6.1.2')
     }
-    var dbClient = dbAdminSnapshot.clients,
-        dbClientKey = Object.keys(dbClient),
-        client_id = String(req.query.client_id).trim(),
-        pushData = []
-    for (var i = 0; i < dbClientKey.length; i++) {
-        if (client_id == dbClientKey[i]) {
-            if (dbClient[dbClientKey[i]].plans) {
-                var planDB = dbClient[dbClientKey[i]].plans,
-                    planKey = Object.keys(planDB)
-                for (var j = 0; j < planKey.length; j++) {
-                    var tempPlan = planDB[planKey[j]]
-                    if (!tempPlan.deleted) {
-                        var tempObj = {
-                            project_id: tempPlan.project_id,
-                            project_name: tempPlan.project_name,
-                            project_description: tempPlan.project_description,
-                            createdOn: tempPlan.createdOn,
-                            createdBy: tempPlan.createdBy,
-                            lastModifiedBy: tempPlan.lastModifiedBy,
-                            lastModifiedOn: tempPlan.lastModifiedOn,
-                            plan_name: tempPlan.plan_name,
-                            duration: tempPlan.duration,
-                            start_date: tempPlan.startDate
-                        }
-                        pushData.push(tempObj)
-                    }
-                }
-            }
-            return response(res, 200, 'success', undefined, pushData, 'A-6.1.3')
 
-        } else if (i == dbClientKey.length - 1) {
-            return response(res, 404, 'notFound', 'Incorrect Client ID', undefined, 'A-6.1.4')
+    var dbClient = dbAdminSnapshot.clients[client_id],
+        pushData = []
+    if (dbClient.plans) {
+        var planDB = dbClient.plans,
+            planKey = Object.keys(planDB)
+        for (var j = 0; j < planKey.length; j++) {
+            var tempPlan = planDB[planKey[j]]
+            if (!tempPlan.deleted) {
+                var tempObj = {
+                    project_id: tempPlan.project_id,
+                    project_name: tempPlan.project_name,
+                    project_description: tempPlan.project_description,
+                    createdOn: tempPlan.createdOn,
+                    createdBy: tempPlan.createdBy,
+                    lastModifiedBy: tempPlan.lastModifiedBy,
+                    lastModifiedOn: tempPlan.lastModifiedOn
+                }
+                pushData.push(tempObj)
+            }
         }
     }
+    return response(res, 200, 'success', undefined, pushData, 'A-6.1.3')
 })
 
 // 6.2 GET PROJECT DETAILS BY ID
-projectAPI.get('/project/:project_id', (req, res) => {
-    if (!req.params.project_id) {
-        return response(res, 400, 'required', 'ClientID is not found', undefined, 'A-6.2.1')
+projectAPI.get('/fetch/:project_id', (req, res) => {
+
+    var projectID = parseInt(req.params.project_id)
+    if (!getKeys(projectID)) { return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'A-6.2.1') }
+
+    var dbProject = dbAdminSnapshot.clients[getKeys(projectID).client_key].plans[getKeys(projectID).plan_key],
+        postObject = {
+            project_id: projectID
+        }
+
+    if (req.query.scope) {
+        var scope = String(req.query.scope).split(' ')
+        postObject.scope = [];
+    } else {
+        return response(res, 200, 'success', 'No Scope Identified', { projectID: projectID }, 'A-6.2.2')
     }
-    //REMAINING DUE TO INSUFFICIENT DATA
+
+    // Basic Information
+    if (scope.includes('info')) {
+        postObject.scope.push('info');
+
+        var tempObj = {
+            project_name: dbProject.project_name,
+            description: dbProject.project_description,
+            createdBy: dbProject.createdBy,
+            createdOn: dbProject.createdOn,
+            lastModifiedBy: dbProject.lastModifiedBy,
+            lastModifiedOn: dbProject.lastModifiedOn
+        }
+
+        postObject.info = tempObj;
+    }
+
+    // Attached Service
+    if (scope.includes('service')) {
+        postObject.scope.push('service')
+
+        if (dbProject.service) {
+            var dbProjectService = dbProject.service,
+                dbProjectServiceKey = Object.keys(dbProjectService)
+
+            postObject.service = [];
+
+            for (var i = 0; i < dbProjectServiceKey.length; i++) {
+                var tempService = dbProjectService[dbProjectServiceKey[i]];
+
+                if (tempService.deleted) { continue }
+
+                if (dbAdminSnapshot.services) {
+                    var dbService = dbAdminSnapshot.services,
+                        dbServiceKey = Object.keys(dbService)
+
+                    for (var j = 0; j < dbServiceKey.length; j++) {
+                        if (!dbService[dbServiceKey[j]].deleted && dbService[dbServiceKey[j]].service_id == tempService.service_id) {
+                            var tempJSONObject = {
+                                service_id: tempService.service_id,
+                                active: tempService.active,
+                                createdBy: tempService.createdBy,
+                                createdOn: tempService.createdOn,
+                                lastModifiedBy: tempService.lastModifiedBy,
+                                lastModifiedOn: tempService.lastModifiedOn
+                            }
+
+                            postObject.service.push(tempJSONObject);
+                        }
+                    }
+                }
+            }
+
+            if (postObject.service.length == 0) {
+                delete postObject.service
+            }
+        }
+    }
+
+    // Allocated Team Members
+    if (scope.includes('team')) {
+        postObject.scope.push('team')
+
+        if (dbProject.team) {
+            var dbProjectTeam = dbProject.team,
+                dbProjectTeamKey = Object.keys(dbProjectTeam)
+
+            postObject.team = [];
+
+            for (var i = 0; i < dbProjectTeamKey.length; i++) {
+                var tempTeam = dbProjectTeam[dbProjectTeamKey[i]]
+                if (tempTeam.deleted) { continue }
+
+                // Check Employee is not deleted
+                if (dbAdminSnapshot.employees) {
+                    var dbEmployee = dbAdminSnapshot.employees,
+                        dbEmployeeKey = Object.keys(dbEmployee)
+
+                    for (var j = 0; j < dbEmployeeKey.length; j++) {
+                        if (!dbEmployee[dbEmployeeKey[j]].deleted && dbEmployee[dbEmployeeKey[j]].employee_id == tempTeam.employee_id) {
+                            var tempJSONObject = {
+                                employee_id: tempTeam.employee_id,
+                                active: tempTeam.active,
+                                createdOn: tempTeam.createdOn,
+                                createdBy: tempTeam.createdBy,
+                                lastModifiedBy: tempTeam.lastModifiedBy,
+                                lastModifiedOn: tempTeam.lastModifiedOn,
+                                permission: {
+                                    activity: tempTeam.activity,
+                                    review: tempTeam.review
+                                }
+                            }
+
+                            postObject.team.push(tempJSONObject)
+                        }
+                    }
+                }
+
+
+            }
+
+            if (postObject.team.length == 0) {
+                delete postObject.team
+            }
+
+        }
+    }
+
+    // Social Accounts
+    if (scope.includes('accounts')) {
+        postObject.scope.push('accounts')
+
+        if (dbProject.social_account) {
+            var dbSocialAccount = dbProject.social_account,
+                dbSocialAccountKey = Object.keys(dbSocialAccount)
+
+            postObject.accounts = [];
+
+            for (var i = 0; i < dbSocialAccountKey.length; i++) {
+                var tempSocialAccount = dbSocialAccount[dbSocialAccountKey[i]];
+
+                if (tempSocialAccount.deleted) { continue }
+
+                var tempJSONObject = {
+                    account_id: dbSocialAccountKey[i],
+                    account_name: tempSocialAccount.account_name,
+                    reference: tempSocialAccount.reference,
+                    createdBy: tempSocialAccount.createdBy,
+                    createdOn: tempSocialAccount.createdOn,
+                    lastModifiedOn: tempSocialAccount.lastModifiedOn,
+                    lastModifiedBy: tempSocialAccount.lastModifiedBy
+                }
+
+                postObject.accounts.push(tempJSONObject);
+            }
+
+            if (postObject.accounts.length == 0) {
+                delete postObject.accounts
+            }
+        }
+    }
+
+    // Reviews
+    if (scope.includes('review')) {
+        postObject.scope.push('review');
+
+        if (dbProject.review) {
+            var dbReview = dbProject.review,
+                dbReviewKey = Object.keys(dbReview)
+
+            postObject.review = []
+
+            for (var i = 0; i < dbReviewKey.length; i++) {
+                var tempReview = dbReview[dbReviewKey[i]];
+
+                if (tempReview.deleted) { continue }
+
+                var tempJSONObject = {
+                    review_id: tempReview.review_id,
+                    title: tempReview.title,
+                    description: tempReview.description,
+                    createdOn: tempReview.createdOn,
+                    createdBy: tempReview.createdBy,
+                    lastModifiedBy: tempReview.lastModifiedBy,
+                    lastModifiedOn: tempReview.lastModifiedOn
+                }
+
+                if (tempReview.post) {
+                    var dbReviewPost = tempReview.post,
+                        dbReviewPostKey = Object.keys(dbReviewPost)
+
+                    tempJSONObject.posts = []
+
+                    for (var j = 0; j < dbReviewPostKey.length; j++) {
+                        var tempReviewPost = dbReviewPost[dbReviewPostKey[j]];
+
+                        if (tempReviewPost.deleted) { continue }
+                        var tempPostObj = {
+                            post_key: dbReviewPostKey[j],
+                            description: tempReviewPost.description,
+                            createdOn: tempReviewPost.createdOn,
+                            createdBy: tempReviewPost.createdBy,
+                            lastModifiedBy: tempReviewPost.lastModifiedBy,
+                            lastModifiedOn: tempReviewPost.lastModifiedOn,
+                        }
+
+                        if (tempReviewPost.documents) {
+                            var dbPostDocuments = tempReviewPost.documents,
+                                dbPostDocumentsKey = Object.keys(dbPostDocuments)
+
+                            tempPostObj.documents = []
+
+                            for (var k = 0; k < dbPostDocumentsKey.length; k++) {
+                                var tempDocument = dbPostDocuments[dbPostDocumentsKey[k]]
+
+                                if (tempDocument.deleted) { continue }
+
+                                var tempDocObj = {
+                                    document_id: dbPostDocumentsKey[k],
+                                    filename: tempDocument.filename,
+                                    lastModifiedOn: tempDocument.lastModifiedOn,
+                                    lastModifiedBy: tempDocument.lastModifiedBy,
+                                    createdOn: tempDocument.createdOn,
+                                    createdBy: tempDocument.createdBy
+                                }
+
+                                tempPostObj.documents.push(tempDocObj)
+                            }
+
+                            if (tempPostObj.documents.length == 0) {
+                                delete tempPostObj.documents
+                            }
+                        }
+
+                        tempJSONObject.posts.push(tempPostObj)
+                    }
+                    if (tempJSONObject.posts.length == 0) {
+                        delete tempJSONObject.posts
+                    }
+                }
+
+                postObject.review.push(tempJSONObject)
+            }
+
+            if (postObject.review.length == 0) {
+                delete postObject.review
+            }
+        }
+    }
+
+    return response(res, 200, 'success', undefined, postObject, 'A-6.2.3')
+
 })
 
 // 6.3 ASSIGN EMPLOYEE TO PROJECT
@@ -479,12 +713,12 @@ projectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.13.1')
     }
-    if (!req.body.review_key) {
+    if (!req.body.review_id) {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.13.2')
     }
     var projectID = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectID),
-        reviewID = String(req.body.review_key).trim(),
+        reviewID = String(req.body.review_id).trim(),
         pushData = {
             createdOn: String(new Date()),
             createdBy: "ADMIN"
@@ -499,57 +733,37 @@ projectAPI.post('/review/add-post', (req, res) => {
         var description = String(req.body.description).trim()
         pushData.description = description
     }
+
     if (req.files && req.files.file) {
-        pushData.images = []
+        pushData.documents = []
         var file = req.files.file,
             fileNameData = [],
             directory = storageDirectory() + `/clients/${getKeyDB.client_key}/reviews/`
 
-        if (Array.isArray(file)) {
-            //FOR MULTIPLE FILE
+        if (!Array.isArray(file)) {
+            var file = [req.files.file]
+        }
 
-            for (var i = 0; i < file.length; i++) {
-                var tempFile = file[i]
-                if ((tempFile.size / 1024 / 1024) > 10) {
-                    return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.13.4');
-                }
-                var tempName;
-                switch (tempFile.mimetype) {
-                    case 'image/jpeg':
-                    case 'image/jpg':
-                        tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
-                        break;
-                    case 'image/png':
-                        tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
-                        break;
-                    default:
-                        return response(res, 403, 'forbidden', 'Invalid File Type. JPEG/PNG are only valid file types.', undefined, 'A-6.13.5')
-
-                }
-                fileNameData.push(tempName)
-                pushData.images.push({ filename: tempName })
-            }
-        } else {
-            // FOR SINGLE FILE
-            var tempFile = file
+        for (var i = 0; i < file.length; i++) {
+            var tempFile = file[i]
             if ((tempFile.size / 1024 / 1024) > 10) {
-                return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.13.6');
+                return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.13.4');
             }
-            var tempName = ''
+            var tempName;
             switch (tempFile.mimetype) {
                 case 'image/jpeg':
                 case 'image/jpg':
                     tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
                     break;
                 case 'image/png':
-                    tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';;
+                    tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
                     break;
                 default:
-                    return response(res, 403, 'forbidden', 'Invalid File Type. JPEG/PNG are only valid file types.', undefined, 'A-6.13.7')
+                    return response(res, 403, 'forbidden', 'Invalid File Type. JPEG/PNG are only valid file types.', undefined, 'A-6.13.5')
 
             }
             fileNameData.push(tempName)
-            pushData.images.push({ filename: tempName })
+            pushData.documents.push({ filename: tempName })
         }
 
     }
@@ -559,13 +773,16 @@ projectAPI.post('/review/add-post', (req, res) => {
             reviewDBKey = Object.keys(reviewDB)
         for (var j = 0; j < reviewDBKey.length; j++) {
             var tempReview = reviewDB[reviewDBKey[j]]
-            if (reviewDBKey[j] == reviewID && !tempReview.deleted && !tempReview.closed) {
+            if (!tempReview.deleted && tempReview.review_id == reviewID) {
+                if (tempReview.closed) {
+                    return response(res, 403, 'forbidden', 'This review is already closed', undefined, 'A-6.13.6')
+                }
                 if (fileNameData && fileNameData.length == 1) {
                     var file = req.files.file,
                         tempName = String(fileNameData)
                     file.mv(directory + tempName, (error, abc) => {
                         if (error) {
-                            return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.13.8')
+                            return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.13.7')
                         }
                     })
                 } else if (fileNameData && fileNameData.length > 1) {
@@ -575,20 +792,20 @@ projectAPI.post('/review/add-post', (req, res) => {
                             tempName = fileNameData[i]
                         tempFile.mv(directory + tempName, (error) => {
                             if (error) {
-                                return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.13.9')
+                                return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.13.8')
                             }
                         })
                     }
                 }
-                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewID}/post`).push(pushData).then(() => {
-                    return response(res, 200, 'success', 'Social Account Created', undefined, 'A-6.13.10')
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post`).push(pushData).then(() => {
+                    return response(res, 200, 'success', 'Social Account Created', undefined, 'A-6.13.9')
                 })
             } else if (j == reviewDBKey.length - 1) {
-                return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.13.1z')
+                return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.13.10')
             }
         }
     } else {
-        return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.13.13')
+        return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.13.11')
     }
 
 })
@@ -617,7 +834,7 @@ projectAPI.get('/review/remove-post', (req, res) => {
 
     for (var j = 0; j < reviewDBKey.length; j++) {
         var tempReview = reviewDB[reviewDBKey[j]]
-        if (reviewDBKey[j] == reviewID && !tempReview.deleted) {
+        if (tempReview.review_id == reviewID && !tempReview.deleted) {
             if (tempReview.closed) {
                 return response(res, 403, 'forbidden', 'Modifications on closed reviews are not allowed', undefined, 'A-6.14.4')
             }
@@ -645,7 +862,7 @@ projectAPI.get('/review/remove-post', (req, res) => {
                         tempReviewPost.lastModifiedBy = 'ADMIN'
                         tempReviewPost.lastModifiedOn = String(new Date())
 
-                        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewID}/post/${postID}`).update(tempReviewPost).then(() => {
+                        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postID}`).update(tempReviewPost).then(() => {
                             return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'A-6.14.5')
                         })
                     } else if (i == postDBKey.length - 1) {
@@ -679,23 +896,20 @@ projectAPI.get('/review/close', (req, res) => {
     var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
         reviewDBKey = Object.keys(reviewDB)
     for (var i = 0; i < reviewDBKey.length; i++) {
-        if (reviewID == reviewDBKey[i]) {
+        if (reviewID == reviewDBKey[i].review_id) {
             var tempReview = reviewDB[reviewDBKey[i]]
             if (tempReview.closed) {
                 return response(res, 403, 'Forbidden', 'Review is already closed', undefined, 'A-6.15.5')
-
             }
             tempReview.closed = true,
                 tempReview.lastModifiedBy = "ADMIN",
                 tempReview.lastModifiedOn = String(new Date())
-            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewID}/`).update(tempReview).then(() => {
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[i]}/`).update(tempReview).then(() => {
                 return response(res, 200, 'success', 'Review has been closed successfully', undefined, 'A-6.15.6')
 
             })
-
         } else if (i == reviewDBKey.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.15.7')
-
         }
     }
 })
@@ -728,7 +942,7 @@ projectAPI.get('/review/remove-file', (req, res) => {
         reviewDBKey = Object.keys(reviewDB)
     for (var j = 0; j < reviewDBKey.length; j++) {
         var tempReview = reviewDB[reviewDBKey[j]]
-        if (reviewDBKey[j] == reviewID) {
+        if (tempReview.review_id == reviewID) {
             if (tempReview.closed) {
                 return response(res, 403, 'forbidden', 'Modifications on closed reviews are not allowed', undefined, 'A-6.16.7')
             }
@@ -736,36 +950,38 @@ projectAPI.get('/review/remove-file', (req, res) => {
                 var postDB = tempReview.post,
                     postDBKey = Object.keys(postDB)
                 for (var i = 0; i < postDBKey.length; i++) {
+
                     // removing Images
                     var tempReviewPost = postDB[postDBKey[i]]
-                    if (tempReviewPost.deleted) {
-                        return response(res, 403, 'Forbidden', 'Post is already removed', undefined, 'A-6.16.8')
-                    }
-                    if (tempReviewPost.images) {
-                        var imagesDB = tempReviewPost.images,
-                            imagesDBKeys = Object.keys(imagesDB)
-                        for (var k = 0; k < imagesDBKeys.length; k++) {
-                            var tempImage = imagesDB[imagesDBKeys[k]]
-                            if (tempImage.filename == fileName) {
-                                if (tempImage.deleted) {
-                                    return response(res, 403, 'Forbidden', 'Image is already removed', undefined, 'A-6.16.9')
-                                }
+
+                    if (!tempReviewPost.deleted && tempReviewPost.documents) {
+                        var documentsDB = tempReviewPost.documents,
+                            documentsDBKeys = Object.keys(documentsDB)
+
+                        for (var k = 0; k < documentsDBKeys.length; k++) {
+                            var tempImage = documentsDB[documentsDBKeys[k]]
+                            if (!tempImage.deleted && tempImage.filename == fileName) {
+
                                 try { fs.unlinkSync(directory + tempImage.filename) } catch {}
+
                                 tempImage.deleted = true
                                 tempImage.lastModifiedBy = 'ADMIN'
                                 tempImage.lastModifiedOn = String(new Date())
-                                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewID}/post/${postDBKey[i]}/images/${imagesDBKeys[k]}/`).update(tempImage).then(() => {
-                                    return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'A-6.16.10')
+
+                                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postDBKey[i]}/documents/${documentsDBKeys[k]}/`).update(tempImage).then(() => {
+                                    return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'A-6.16.8')
                                 })
                             }
                         }
+                    } else if (i == postDBKey.length - 1) {
+                        return response(res, 404, 'notfound', 'Incorrect File Name', undefined, 'A-6.16.9')
                     }
                 }
             } else {
-                return response(res, 404, 'notfound', 'Incorrect File Name', undefined, 'A-6.16.11')
+                return response(res, 404, 'notfound', 'Incorrect File Name', undefined, 'A-6.16.10')
             }
         } else if (j == reviewDBKey.length - 1) {
-            return response(res, 404, 'notfound', 'Incorrect Review ID or FileName', undefined, 'A-6.16.12')
+            return response(res, 404, 'notfound', 'Incorrect Review ID or FileName', undefined, 'A-6.16.11')
         }
     }
 })
@@ -948,12 +1164,189 @@ projectAPI.get('/service/remove', (req, res) => {
             tempService.lastModifiedOn = String(new Date())
 
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/service/${serviceDBClientKey[i]}/`).update(tempService).then(() => {
-                return response(res, 200, 'success', 'Service has been updated successfully', undefined, 'A-6.20.6')
+                return response(res, 200, 'success', 'Service has been updated successfully', undefined, 'A-6.20.5')
             })
         } else if (i == serviceDBClientKey.length - 1) {
-            return response(res, 404, 'notfound', 'Incorrect Service ID', undefined, 'A-6.20.7')
+            return response(res, 404, 'notfound', 'Incorrect Service ID', undefined, 'A-6.20.6')
         }
     }
+})
+
+// 6.21 Review Update Post
+projectAPI.post('/review/update', (req, res) => {
+    if (!req.body.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.21.1')
+    }
+    if (!req.body.review_id) {
+        return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.21.2')
+    }
+    if (!req.body.title && !req.body.description) {
+        return response(res, 400, 'required', 'Title or Description  is required', undefined, 'A-6.21.3')
+    }
+    var projectID = String(req.body.project_id).trim(),
+        reviewID = String(req.body.review_id).trim(),
+        getKeyDB = getKeys(projectID)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.21.4') }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
+        return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.21.5')
+    }
+    var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+        reviewDBKeys = Object.keys(dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review)
+    for (var i = 0; i < reviewDBKeys.length; i++) {
+        var tempReview = reviewDB[reviewDBKeys[i]]
+        if (tempReview.review_id == reviewID) {
+            if (req.body.title) {
+                var title = String(req.body.title).trim()
+                if (title == "undefined" || title == null) {
+                    return response(res, 400, 'required', 'Title is required ', undefined, 'A-6.21.6')
+                }
+                tempReview.title = title
+            }
+            if (req.body.description) {
+                var description = String(req.body.description).trim()
+                if (description == "undefined" || description == null) {
+                    return response(res, 400, 'required', 'Description is required ', undefined, 'A-6.21.7')
+                }
+                tempReview.description = description
+            }
+            tempReview.lastModifiedBy = 'ADMIN'
+            tempReview.lastModifiedOn = String(new Date())
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}`).update(tempReview).then(() => {
+                return response(res, 200, 'success', 'Review has been updated successfully', undefined, 'A-6.21.8')
+
+            })
+        } else if (i == reviewDBKeys.length) {
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.21.9')
+        }
+    }
+
+})
+
+// 6.22 Review Update Post
+projectAPI.post('/review/update-post', (req, res) => {
+    if (!req.body.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.22.1')
+    }
+    if (!req.body.review_id) {
+        return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.22.2')
+    }
+    if (!req.body.post_key) {
+        return response(res, 400, 'required', 'Post key is required', undefined, 'A-6.22.3')
+    }
+
+    if (!req.files && !req.body.description) {
+        return response(res, 400, 'required', 'Description or file is required', undefined, 'A-6.22.4')
+    }
+    var projectID = String(req.body.project_id).trim(),
+        reviewID = String(req.body.review_id).trim(),
+        postKey = String(req.body.post_key).trim(),
+        getKeyDB = getKeys(projectID)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.22.5') }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
+        return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.22.6')
+    }
+    directoryCreate(`/clients/${getKeyDB.client_key}/reviews`)
+
+    var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+        reviewDBKeys = Object.keys(dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review)
+    if (req.files && req.files.file) {
+
+        var file = req.files.file,
+            fileNameData = [],
+            documents = [],
+            directory = storageDirectory() + `/clients/${getKeyDB.client_key}/reviews/`
+
+        if (!Array.isArray(file)) {
+            var file = [req.files.file]
+        }
+
+        for (var i = 0; i < file.length; i++) {
+            var tempFile = file[i]
+
+            if ((tempFile.size / 1024 / 1024) > 10) {
+                return response(res, 403, 'forbidden', 'File size limit exceed. 10 MB/per file is maximum', undefined, 'A-6.22.7');
+            }
+
+            switch (tempFile.mimetype) {
+                case 'image/jpeg':
+                case 'image/jpg':
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
+                    break;
+                case 'image/png':
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
+                    break;
+                default:
+                    return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG are only valid file types.', undefined, 'A-6.22.8')
+
+            }
+
+            fileNameData.push(tempName)
+            documents.push({
+                filename: tempName,
+                createdOn: String(new Date()),
+                createdBy: 'ADMIN'
+            })
+        }
+    }
+    for (var i = 0; i < reviewDBKeys.length; i++) {
+        var tempReview = reviewDB[reviewDBKeys[i]]
+
+        if (tempReview.review_id == reviewID && !tempReview.closed && !tempReview.deleted) {
+            if (tempReview.post) {
+
+                var postDB = tempReview.post,
+                    postKeys = Object.keys(postDB)
+
+                if (postKeys.includes(postKey)) {
+                    var tempPost = postDB[postKey]
+
+                    if (req.body.description) {
+                        tempPost.description = String(req.body.description).trim()
+                        tempPost.lastModifiedOn = String(new Date())
+                        tempPost.lastModifiedBy = "ADMIN"
+                    }
+
+                    // Append Documents
+                    if (tempPost.documents) {
+                        tempPost.documents.push.apply(tempPost.documents, documents)
+
+                    } else {
+                        tempPost.documents = documents
+                    }
+
+                    // Move files to directory 
+                    var file = req.files.file
+                    if (!Array.isArray(file)) {
+                        var file = [req.files.file]
+                    }
+                    for (var j = 0; j < file.length; j++) {
+                        var tempFile = file[j],
+                            tempName = fileNameData[j]
+                        tempFile.mv(directory + tempName, (error) => {
+                            if (error) {
+                                return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.22.9')
+                            }
+                        })
+                    }
+
+                    return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/post/${postKey}/`).update(tempPost).then(() => {
+                        return response(res, 200, 'success', 'Review has been updated successfully', undefined, 'A-6.22.10')
+                    })
+                } else {
+                    return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.11')
+                }
+            } else {
+                return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.12')
+            }
+        } else if (i == reviewDBKeys.length) {
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.22.13')
+        }
+    }
+
 })
 
 function getKeys(project_id) {
@@ -964,6 +1357,7 @@ function getKeys(project_id) {
         clientKey = Object.keys(clientDB)
     for (var i = 0; i < clientKey.length; i++) {
         if (clientDB[clientKey[i]].plans && !clientDB[clientKey[i]].deleted) {
+
             var planDB = clientDB[clientKey[i]].plans,
                 planKey = Object.keys(planDB)
             for (var j = 0; j < planKey.length; j++) {
@@ -974,15 +1368,12 @@ function getKeys(project_id) {
                         "plan_key": planKey[j]
                     }
                     return pushData
-                } else if (j == planKey.length - 1) {
-                    return false
                 }
             }
         } else if (i == clientKey.length - 1) {
             return false
         }
     }
-    return false
 
 }
 module.exports = projectAPI
