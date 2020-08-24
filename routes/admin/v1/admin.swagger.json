@@ -1483,6 +1483,92 @@
                 ],
                 "responses": {}
             }
+        },
+        "/project/activity": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "Add Activity",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "project_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "type",
+                        "description": "type",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "service"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "service_id",
+                        "description": "service_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "371889110187"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "criteria_id",
+                        "description": "criteria_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "390441675983"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "description",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "description": "Demo description"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "title",
+                        "description": "title",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "title": "Demo Title"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "date",
+                        "description": "date",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "date": "22/08/2021"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG, PDF \n File Size Limit: 15 MB",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
         }
 
     }

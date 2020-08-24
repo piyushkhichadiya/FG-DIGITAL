@@ -1252,7 +1252,7 @@ projectAPI.post('/review/update-post', (req, res) => {
     directoryCreate(`/clients/${getKeyDB.client_key}/reviews`)
 
     var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
-        reviewDBKeys = Object.keys(dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review)
+        reviewDBKeys = Object.keys(reviewDB)
     if (req.files && req.files.file) {
 
         var file = req.files.file,
@@ -1387,6 +1387,259 @@ projectAPI.get('/review/open', (req, res) => {
         }
     }
 
+})
+
+// 6.24 Activity Add
+projectAPI.post('/activity', (req, res) => {
+    if (!req.body.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.24.1')
+    }
+    if (!req.body.type) {
+        return response(res, 400, 'required', 'Type is required', undefined, 'A-6.24.2')
+    }
+
+    var projectID = String(req.body.project_id).trim(),
+        type = String(req.body.type).trim(),
+        getKeyDB = getKeys(projectID)
+    if (type != "service" && type != "activity") {
+        return response(res, 400, 'required', 'Type is required', undefined, 'A-6.24.3')
+    }
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.23.3') }
+
+
+    if (type == "service") {
+        if (!req.body.service_id) {
+            return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.24.4')
+        }
+        if (!req.body.criteria_id) {
+            return response(res, 400, 'required', 'Criteria ID is required', undefined, 'A-6.24.5')
+        }
+
+        if (!dbAdminSnapshot.services) {
+            return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.6')
+
+        }
+        if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
+            return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.24.7')
+        }
+        var serviceDBAdmin = dbAdminSnapshot.services,
+            serviceDBAdminKeys = Object.keys(serviceDBAdmin),
+            serviceID = String(req.body.service_id),
+            criteriaID = String(req.body.criteria_id)
+        for (var i = 0; i < serviceDBAdminKeys.length; i++) {
+            var tempService = serviceDBAdmin[serviceDBAdminKeys[i]]
+                //Check service in admin
+            if (tempService.service_id == serviceID && !tempService.deleted) {
+                var criteriaDB = tempService.criteria,
+                    criteriaDBKeys = Object.keys(criteriaDB)
+                for (var j = 0; j < criteriaDBKeys.length; j++) {
+                    // Check Criteria in admin
+                    var tempCriteria = criteriaDB[criteriaDBKeys[j]]
+                    if (tempCriteria.criteria_id == criteriaID && !tempCriteria.deleted) {
+                        // Check service in client
+                        var serviceDBClient = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+                            serviceDBClientKey = Object.keys(serviceDBClient)
+                        for (var k = 0; k < serviceDBClientKey.length; k++) {
+                            var tempServiceClient = serviceDBClient[serviceDBClientKey[k]]
+                            if (tempServiceClient.active && tempServiceClient.service_id == serviceID && !tempServiceClient.deleted) {
+                                var pushData = {
+                                    createdOn: String(new Date()),
+                                    createdBy: "ADMIN",
+                                    service_id: serviceID,
+                                    criteria_id: criteriaID
+                                }
+                                if (req.body.title) {
+                                    var title = String(req.body.title).trim()
+                                    if (title == "undefined") {
+                                        return response(res, 403, 'badRequest', 'Title has bad content', undefined, 'A-6.24.8')
+                                    }
+                                    pushData.title = title
+                                }
+                                if (req.body.description) {
+                                    var description = String(req.body.description).trim()
+                                    if (description == "undefined") {
+                                        return response(res, 403, 'badRequest', 'Description has bad content', undefined, 'A-6.24.9')
+                                    }
+                                    pushData.description = description
+                                }
+                                if (req.body.date) {
+                                    var date = new Date(req.body.date)
+                                    if (date == "invalid") {
+                                        return response(res, 403, 'badRequest', 'Date is not proper', undefined, 'A-6.24.10')
+                                    }
+                                    pushData.date = String(date)
+                                }
+                                var fileNameData = []
+                                if (req.files && req.files.file) {
+                                    directoryCreate(`/clients/${getKeyDB.client_key}/activity`)
+
+                                    var file = req.files.file,
+                                        documents = [],
+                                        directory = storageDirectory() + `/clients/${getKeyDB.client_key}/activity/`
+
+                                    if (!Array.isArray(file)) {
+                                        var file = [req.files.file]
+                                    }
+
+                                    for (var i = 0; i < file.length; i++) {
+                                        var tempFile = file[i]
+
+                                        if ((tempFile.size / 1024 / 1024) > 15) {
+                                            return response(res, 403, 'forbidden', 'File size limit exceed. 15 MB/per file is maximum', undefined, 'A-6.24.11');
+                                        }
+
+                                        switch (tempFile.mimetype) {
+                                            case 'image/jpeg':
+                                            case 'image/jpg':
+                                                var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
+                                                break;
+                                            case 'image/png':
+                                                var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
+                                                break;
+                                            case 'application/pdf':
+                                                var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.pdf';
+                                                break;
+                                            default:
+                                                return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG/PDF are only valid file types.', undefined, 'A-6.24.12')
+
+                                        }
+
+                                        fileNameData.push(tempName)
+                                        documents.push({
+                                            filename: tempName,
+                                            createdOn: String(new Date()),
+                                            createdBy: 'ADMIN'
+                                        })
+                                    }
+
+                                }
+                                if (fileNameData.length != 0) {
+                                    pushData.documents = documents
+                                        // Move files  
+                                    var file = req.files.file
+                                    if (!Array.isArray(file)) {
+                                        var file = [req.files.file]
+                                    }
+                                    for (var j = 0; j < file.length; j++) {
+                                        var tempFile = file[j],
+                                            tempName = fileNameData[j]
+                                        tempFile.mv(directory + tempName, (error) => {
+                                            if (error) {
+                                                return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.24.13')
+                                            }
+                                        })
+                                    }
+                                }
+                                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/`).push(pushData).then(() => {
+                                    return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.14')
+                                })
+                            } else if (k == serviceDBClientKey.length - 1) {
+                                return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.15')
+
+                            }
+                        }
+
+                    } else if (j == criteriaDBKeys.length - 1) {
+                        return response(res, 404, 'notfound', 'Criteria ID Incorrect ', undefined, 'A-6.24.16')
+
+                    }
+                }
+
+            } else if (i == serviceDBAdminKeys.length - 1) {
+                return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.17')
+
+            }
+        }
+    }
+    if (type == "activity") {
+        var fileNameData = []
+        if (!req.body.title) {
+            return response(res, 400, 'required', 'Title ID is required', undefined, 'A-6.24.18')
+        }
+        var title = String(req.body.title).trim(),
+            description = String(req.body.description).trim()
+        if (title == "undefined") {
+            return response(res, 403, 'badRequest', 'data is not proper', undefined, 'A-6.24.19')
+        }
+
+        var pushData = {
+            title: title,
+            createdOn: String(new Date()),
+            createdBy: "ADMIN"
+        }
+
+        if (req.body.description) {
+            var description = String(req.body.description).trim()
+            if (description == "undefined") {
+                return response(res, 403, 'badRequest', 'Description has bad content', undefined, 'A-6.24.20')
+            }
+            pushData.description = description
+        }
+        if (req.files && req.files.file) {
+            directoryCreate(`/clients/${getKeyDB.client_key}/activity`)
+
+            var file = req.files.file,
+                documents = [],
+                directory = storageDirectory() + `/clients/${getKeyDB.client_key}/activity/`
+
+            if (!Array.isArray(file)) {
+                var file = [req.files.file]
+            }
+
+            for (var i = 0; i < file.length; i++) {
+                var tempFile = file[i]
+
+                if ((tempFile.size / 1024 / 1024) > 15) {
+                    return response(res, 403, 'forbidden', 'File size limit exceed. 15 MB/per file is maximum', undefined, 'A-6.24.21');
+                }
+
+                switch (tempFile.mimetype) {
+                    case 'image/jpeg':
+                    case 'image/jpg':
+                        var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
+                        break;
+                    case 'image/png':
+                        var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
+                        break;
+                    case 'application/pdf':
+                        var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.pdf';
+                        break;
+                    default:
+                        return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG/PDF are only valid file types.', undefined, 'A-6.24.22')
+
+                }
+
+                fileNameData.push(tempName)
+                documents.push({
+                    filename: tempName,
+                    createdOn: String(new Date()),
+                    createdBy: 'ADMIN'
+                })
+            }
+
+        }
+        if (fileNameData.length != 0) {
+            pushData.documents = documents
+                // Move files  
+            var file = req.files.file
+            if (!Array.isArray(file)) {
+                var file = [req.files.file]
+            }
+            for (var j = 0; j < file.length; j++) {
+                var tempFile = file[j],
+                    tempName = fileNameData[j]
+                tempFile.mv(directory + tempName, (error) => {
+                    if (error) {
+                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.24.23')
+                    }
+                })
+            }
+        }
+
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/`).push(pushData).then(() => {
+            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.24')
+        })
+    }
 })
 
 function getKeys(project_id) {
