@@ -246,7 +246,7 @@
 
         $.get(`/admin/v1/plan/get`, (data) => {
             planData = data.data;
-            var options = '<option>Select Plan</option>'
+            var options = '<option value="">Select Plan</option>'
             $(planData).each(function(index, value) {
                 options += '<option value="' + value.plan_name + '">' + value.plan_name + '</option>';
             });
