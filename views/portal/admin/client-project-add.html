@@ -152,6 +152,7 @@
                         <div class="row form-group">
                             <div class="col-md-12">
                                 <button class="btn btn-outline-primary float-right" id="btn_add"><i class="fas fa-plus"></i> Add Project</button>
+                                <button class="btn btn-outline-primary float-right" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
                             </div>
                         </div>
                         <div id="div_projectInfo" style="display: none;">
@@ -160,7 +161,7 @@
                             <div class="row form-group">
                                 <label for="inputEmail3" class="col-md-2 col-form-label">Project Name:</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" id="txt_project" placeholder="Project Name">
+                                    <input type="text" class="form-control" id="txt_projectName" placeholder="Project Name">
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -172,7 +173,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <button class="btn btn-outline-danger float-right ml-2" id="btn_remove"><i class="fas fa-trash-alt"></i> Remove</button>
-                                    <button class="btn btn-outline-primary float-right" id="btn_update"><i class="fas fa-pencil-alt"></i> Update Details</button>
+                                    <button class="btn btn-outline-primary float-right" id="btn_updateInfo"><i class="fas fa-pencil-alt"></i> Update Information</button>
                                 </div>
                             </div>
                         </div>
@@ -231,19 +232,21 @@
     const urlParams = new URLSearchParams(window.location.search);
     var planData
     $(document).ready(() => {
-        var plan_id = urlParams.get('plan_id')
+        var plan_id = urlParams.get('plan_id'),
+            client_id = urlParams.get('client_id');
         if (urlParams.has('plan_id')) {
             if (urlParams.get('plan_id') == '') {
                 return window.location.href = `/admin/client/project-add?client_id=${urlParams.get('client_id')}`
             }
             $('#div_projectInfo').show();
             $('#btn_add').hide();
+            $('#btn_update').show();
+
         }
 
-        $('#list_planName').val('');
         $.get(`/admin/v1/plan/get`, (data) => {
             planData = data.data;
-            var options
+            var options = '<option>Select Plan</option>'
             $(planData).each(function(index, value) {
                 options += '<option value="' + value.plan_name + '">' + value.plan_name + '</option>';
             });
@@ -287,6 +290,30 @@
 
             };
 
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+
+        $.get(`/admin/v1/project/get?client_id=${client_id}`, (data) => {
+            var ProjectData = data.data;
+            if (ProjectData) {
+                for (var i = 0; i < ProjectData.length; i++) {
+                    var tempProj = ProjectData[i]
+                    if (tempProj.project_id == plan_id) {
+                        var Description = tempProj.project_description,
+                            ProjectName = tempProj.project_name;
+                        $('#txt_projectName').val(ProjectName);
+                        $('#txt_description').val(Description);
+                    }
+                }
+            }
         }).fail(error => {
             error = error.responseJSON
             $(document).Toasts('create', {
@@ -488,6 +515,62 @@
                     autohide: true,
                     delay: 5000,
                     body: 'Plan Details Updated',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
+    });
+
+    $('#btn_updateInfo').click(() => {
+        var project_id = urlParams.get('plan_id'),
+            project_name = $('#txt_projectName').val(),
+            project_description = $('#txt_description').val();
+        if (!project_name) {
+            return $(document).Toasts('create', {
+                title: 'Project Name Missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Project Name',
+                class: 'bg-danger',
+            });
+        } else {
+            project_name = String(project_name)
+        }
+        if (!project_description) {
+            return $(document).Toasts('create', {
+                title: 'Description Missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Project Description',
+                class: 'bg-danger',
+            });
+        } else {
+            project_description = String(project_description)
+        }
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/update',
+            data: {
+                "project_id": project_id,
+                "project_name": project_name,
+                "project_description": project_description,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Projects Info. Updated',
                     class: 'bg-success',
                 });
             },

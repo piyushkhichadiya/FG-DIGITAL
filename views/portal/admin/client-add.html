@@ -20,6 +20,7 @@
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
+
     </style>
 </head>
 
@@ -109,7 +110,8 @@
                             </ol>
                         </div>
                     </div>
-                </div><!-- /.container-fluid -->
+                </div>
+                <!-- /.container-fluid -->
             </section>
             <!-- Main content -->
             <section class="content">
@@ -199,232 +201,248 @@
     <script src="plugins/toastr/toastr.min.js"></script>
 </body>
 <script>
-const urlParams = new URLSearchParams(window.location.search);
-$(document).ready(() => {
-    var client_id = urlParams.get('client_id')
-    if (urlParams.has('client_id')) {
-        if (urlParams.get('client_id') == '') {
-            return window.location.href = '/admin/client'
-        }
-        $('#btn_add').hide();
-        $('#btn_update').show();
-        $('#btn_remove').show();
-        $('#div_password').hide();
-        $('#div_Update_Password').show();
-        $.get(`/admin/v1/client/get?client_id=${client_id}`, (data) => {
-            var clientData = data.data;
-            $('#txt_name').val(clientData.name)
-            $('#txt_email').val(clientData.email)
-        }).fail(error => {
-            error = error.responseJSON
-            if (error.status == 404) {
-                window.location.href = '/admin/client'
-            } else {
-                $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'client Not Found',
-                    class: 'bg-danger',
-                });
+    const urlParams = new URLSearchParams(window.location.search);
+    $(document).ready(() => {
+        var client_id = urlParams.get('client_id')
+        if (urlParams.has('client_id')) {
+            if (urlParams.get('client_id') == '') {
+                return window.location.href = '/admin/client'
             }
-        });
-    }
-});
-
-$('#btn_add').click(() => {
-    var name = $('#txt_name').val(),
-        email = $('#txt_email').val(),
-        password = $('#txt_password').val();
-    if (!name) {
-        return $(document).Toasts('create', {
-            title: 'Name missing',
-            autohide: true,
-            delay: 5000,
-            body: 'Please Enter Client name',
-            class: 'bg-danger',
-        });
-    }
-    if (!email) {
-        return $(document).Toasts('create', {
-            title: 'Email missing',
-            autohide: true,
-            delay: 5000,
-            body: 'Please Enter Email address',
-            class: 'bg-danger',
-        });
-    }
-    if (!password) {
-        return $(document).Toasts('create', {
-            title: 'Password Missing',
-            autohide: true,
-            delay: 5000,
-            body: 'Please enter password',
-            class: 'bg-danger',
-        });
-    }
-    $.post({
-        url: '/admin/v1/client/create',
-        data: {
-            "name": name,
-            "email": email,
-            "password": password,
-        },
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Client added',
-                autohide: true,
-                delay: 5000,
-                body: 'Client Added Successfully',
-                class: 'bg-success',
-            });
+            $('#btn_add').hide();
+            $('#btn_update').show();
+            $('#btn_remove').show();
             $('#div_password').hide();
-            window.location.href = '/admin/client';
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        }
-    });
-});
-
-$('#btn_update').click(() => {
-    var client_id = urlParams.get('client_id'),
-        name = $('#txt_name').val(),
-        email = $('#txt_email').val();
-    if (name) {
-        name = String(name)
-    }
-    if (email) {
-        email = String(email)
-    }
-    $.post({
-        url: '/admin/v1/client/update',
-        data: {
-            "client_id": client_id,
-            "name": name,
-            "email": email
-        },
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Updated',
-                autohide: true,
-                delay: 5000,
-                body: 'Client details Updated',
-                class: 'bg-success',
-            });
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        }
-    });
-});
-
-$('#btn_remove').click(() => {
-    var client_id = urlParams.get('client_id')
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to remove Client account",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Remove'
-    }).then((result) => {
-        if (result.value) {
-            $.get({
-                url: `/admin/v1/client/remove?client_id=${client_id}`,
-                success: function() {
-                    $(document).Toasts('create', {
-                        title: 'Success',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Member removed successfully',
-                        class: 'bg-success',
-                    });
+            $('#div_Update_Password').show();
+            $.get(`/admin/v1/client/get?client_id=${client_id}`, (data) => {
+                var clientData = data.data;
+                $('#txt_name').val(clientData.name)
+                $('#txt_email').val(clientData.email)
+            }).fail(error => {
+                error = error.responseJSON
+                if (error.status == 404) {
                     window.location.href = '/admin/client'
-                },
-                error: function() {
-                    error = error.responseJSON
+                } else {
                     $(document).Toasts('create', {
-                        title: 'Error #' + error.code,
+                        title: 'Error!',
                         autohide: true,
                         delay: 5000,
-                        body: error.message,
+                        body: 'client Not Found',
                         class: 'bg-danger',
                     });
                 }
             });
         }
-    })
-});
+    });
 
-$('#btn_updatePassword').click(() => {
-    var client_id = urlParams.get('client_id'),
-        password = $('#txt_newPassword').val(),
-        conPassword = $('#txt_cPass').val();
-    if (!password || !conPassword) {
-        return $(document).Toasts('create', {
-            title: 'Password and Confirm password required',
-            autohide: true,
-            delay: 5000,
-            body: 'Add Password and Confirm Password',
-            class: 'bg-danger',
-        });
-    } else {
-        password = String(password)
-        conPassword = String(conPassword)
-    }
-    if (password != conPassword) {
-        return $(document).Toasts('create', {
-            title: 'Error!',
-            autohide: true,
-            delay: 5000,
-            body: 'Password and Confirm Password must be same',
-            class: 'bg-danger',
-        });
-    }
-    $.post({
-        url: '/admin/v1/client/change-password',
-        data: {
-            "client_id": client_id,
-            "password": password,
-        },
-        success: result => {
-            $(document).Toasts('create', {
-                title: 'Password Changed',
+    $('#btn_add').click(() => {
+        var name = $('#txt_name').val(),
+            email = $('#txt_email').val(),
+            password = $('#txt_password').val();
+        if (!name) {
+            return $(document).Toasts('create', {
+                title: 'Name missing',
                 autohide: true,
                 delay: 5000,
-                body: 'Your Password has been changed Successfully',
-                class: 'bg-success',
-            });
-            $('#txt_newPassword').val(null)
-            $('#txt_cPass').val(null)
-        },
-        error: error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
+                body: 'Please Enter Client name',
                 class: 'bg-danger',
             });
         }
+        if (!email) {
+            return $(document).Toasts('create', {
+                title: 'Email missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Email address',
+                class: 'bg-danger',
+            });
+        }
+        if (!password) {
+            return $(document).Toasts('create', {
+                title: 'Password Missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please enter password',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            url: '/admin/v1/client/create',
+            data: {
+                "name": name,
+                "email": email,
+                "password": password,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Client added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Client Added Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_password').hide();
+                window.location.href = '/admin/client';
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
     });
 
-})
+    $('#btn_update').click(() => {
+        var client_id = urlParams.get('client_id'),
+            name = $('#txt_name').val(),
+            email = $('#txt_email').val();
+        if (!name) {
+            return $(document).Toasts('create', {
+                title: 'Name Missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please enter Name',
+                class: 'bg-danger',
+            });
+        } else {
+            name = String(name)
+        }
+        if (!email) {
+            return $(document).Toasts('create', {
+                title: 'Email Missing',
+                autohide: true,
+                delay: 5000,
+                body: 'Please enter Email',
+                class: 'bg-danger',
+            });
+        } else {
+            email = String(email)
+        }
+        $.post({
+            url: '/admin/v1/client/update',
+            data: {
+                "client_id": client_id,
+                "name": name,
+                "email": email
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Client details Updated',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
+    });
+
+    $('#btn_remove').click(() => {
+        var client_id = urlParams.get('client_id')
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove Client account",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/client/remove?client_id=${client_id}`,
+                    success: function() {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Member removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.href = '/admin/client'
+                    },
+                    error: function() {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    }
+                });
+            }
+        })
+    });
+
+    $('#btn_updatePassword').click(() => {
+        var client_id = urlParams.get('client_id'),
+            password = $('#txt_newPassword').val(),
+            conPassword = $('#txt_cPass').val();
+        if (!password || !conPassword) {
+            return $(document).Toasts('create', {
+                title: 'Password and Confirm password required',
+                autohide: true,
+                delay: 5000,
+                body: 'Add Password and Confirm Password',
+                class: 'bg-danger',
+            });
+        } else {
+            password = String(password)
+            conPassword = String(conPassword)
+        }
+        if (password != conPassword) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Password and Confirm Password must be same',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            url: '/admin/v1/client/change-password',
+            data: {
+                "client_id": client_id,
+                "password": password,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Password Changed',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Your Password has been changed Successfully',
+                    class: 'bg-success',
+                });
+                $('#txt_newPassword').val(null)
+                $('#txt_cPass').val(null)
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
+
+    })
 </script>
 
 </html>
