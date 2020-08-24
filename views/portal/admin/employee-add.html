@@ -597,9 +597,9 @@
     })
 
     function addSocialAccount() {
-        emp_id = urlParams.get('emp_id')
-        accountName = $('#list_social').val()
-        reference = $('#txt_link').val();
+        var emp_id = urlParams.get('emp_id'),
+            accountName = $('#list_social').val(),
+            reference = $('#txt_link').val();
         if (!accountName) {
             return $(document).Toasts('create', {
                 title: 'Error!',
@@ -652,11 +652,10 @@
     }
 
     function updateSocial(index, account_id) {
-        // getEmployee(urlParams.get('emp_id'))
-        accountName = $(`#list_social_${index}`).val()
-        reference = $(`#txt_link_${index}`).val();
-        emp_id = urlParams.get('emp_id')
-        formData = new FormData();
+        var accountName = $(`#list_social_${index}`).val(),
+            reference = $(`#txt_link_${index}`).val(),
+            emp_id = urlParams.get('emp_id'),
+            formData = new FormData();
         formData.append('employee_id', emp_id)
         formData.append('account_id', account_id)
         if (accountName) {
@@ -694,7 +693,7 @@
     }
 
     function removeSocial(account_id) {
-        emp_id = urlParams.get('emp_id')
+        var emp_id = urlParams.get('emp_id');
         Swal.fire({
             title: 'Are you sure?',
             text: "You want to remove this Social account",
