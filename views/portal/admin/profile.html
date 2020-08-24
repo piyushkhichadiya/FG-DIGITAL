@@ -18,10 +18,8 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <!-- Toastr -->
     <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
-
-    <style>
-        
-    </style>
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
 </head>
 
 <body class="hold-transition sidebar-mini sidebar-collapse">
@@ -34,38 +32,11 @@
                     <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
                 </li>
             </ul>
-            
+
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-                <!-- Notifications Dropdown Menu -->
-                <!-- <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="javascript:void(0);">
-                        <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-item dropdown-header">15 Notifications</span>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new messages
-                            <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="javascript:void(0);" class="dropdown-item dropdown-footer">See All Notifications</a>
-                    </div>
-                </li> -->
                 <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
-                
+
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -140,45 +111,45 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                	<div class="card-body card">
-                    <div class="row">
-                        <div class="col-md-3">
+                    <div class="card-body card">
+                        <div class="row">
+                            <div class="col-md-3">
                                 <img src="images/logo-small.png" id="img_profile" style="width: 100px;height: 100px; border-radius:50%;">
                                 <img src="" id="img_originalProfile" style="width: 100px;height: 100px; border-radius:50%; display: none"><br>
                                 <i class="fa fa-camera mt-2" id="icon_camera" style="margin-left: 41px;cursor: pointer;"></i>
                                 <input type="file" id="file_profile" accept=".png, .jpg, .jpeg" style="display: none">
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="exampleInputEmail1">Username</label>
-                                <input type="text" class="form-control" id="txt_username" placeholder="Enter Username">
                             </div>
-                            <div class="form-group">
-                                <label for="exampleInputEmail1">Email</label>
-                                <input type="email" class="form-control" id="txt_email" placeholder="" disabled>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Username</label>
+                                    <input type="text" class="form-control" id="txt_username" placeholder="Enter Username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Email</label>
+                                    <input type="email" class="form-control" id="txt_email" placeholder="" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-outline-primary float-right" id="btn_updateProfile">Update Profile</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <h4 class="header-text">Update Password</h4>
+                        <div class="row">
+                            <div class="col-md-3 mt-2">
+                                <input type="password" class="form-control" id="txt_password" placeholder="Enter New Password">
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <input type="password" class="form-control" id="txt_cpassword" placeholder="Confirm Password">
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <button class="btn btn-outline-primary" id="btn_update">Update Password</button>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                    	<div class="col-md-12">
-                            <button class="btn btn-outline-primary float-right" id="btn_updateProfile">Update Profile</button>
-                    	</div>
-                    </div>
-                    <hr>
-                    <h4 class="header-text">Update Password</h4>
-                    <div class="row">
-                         <div class="col-md-3 mt-2">
-                            <input type="password" class="form-control" id="txt_password" placeholder="Enter New Password">
-                         </div>   
-                         <div class="col-md-3 mt-2">
-                            <input type="password" class="form-control" id="txt_cpassword" placeholder="Confirm Password">
-                         </div>
-                         <div class="col-md-3 mt-2">
-                         	<button class="btn btn-outline-primary" id="btn_update">Update Password</button>
-                         </div>
-                    </div>
-                	</div>
-            	</div>
+                </div>
             </section>
             <!-- /.content -->
         </div>
@@ -209,33 +180,35 @@
     <script src="dist/js/demo.js"></script>
     <!-- sweetalert -->
     <script src="dist/js/sweetalert2.js"></script>
-    <!-- Logout -->
-    <script src="dist/js/logout.js"></script>
     <!-- Toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
-    <!-- <script src="https://unpkg.com/ionicons@5.0.0/dist/ionicons.js"></script> -->
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
+
+    <!-- Custom JS -->
+    <script src="dist/js/logout.js"></script>
 
 </body>
 <script>
-    $('#icon_camera,#img_profile,#img_originalProfile').click(()=>{
+    $('#icon_camera,#img_profile,#img_originalProfile').click(() => {
         $('#file_profile').click();
     });
 
-    $("#file_profile").change(function(){
+    $("#file_profile").change(function() {
         if (this.files[0]) {
             var file = this.files[0]
             var type = file.type.split('/').pop().toLowerCase();
-            if(type != "jpeg" && type != "jpg" && type != "png"){
+            if (type != "jpeg" && type != "jpg" && type != "png") {
                 return $(document).Toasts('create', {
                     title: 'File Formate not Correct ',
                     autohide: true,
                     delay: 5000,
                     body: 'Select valid File Formate',
                     class: 'bg-danger',
-                  });
+                });
 
             }
-            if(file.size > 102400){
+            if (file.size > 102400) {
                 return $(document).Toasts('create', {
                     title: 'File is too Large',
                     autohide: true,
@@ -247,122 +220,129 @@
             $('#img_originalProfile').hide()
             const objectURL = URL.createObjectURL(file)
             return $('#img_profile').attr('src', objectURL).show();
-            }else{
-                if($('#img_originalProfile').attr('src') == ''){
-                $('#img_profile').attr('src', 'images/logo-small.png' ).show() 
+        } else {
+            if ($('#img_originalProfile').attr('src') == '') {
+                $('#img_profile').attr('src', 'images/logo-small.png').show()
                 $('#img_originalProfile').hide()
-            }else{
+            } else {
                 $('#img_profile').hide()
                 $('#img_originalProfile').show()
-        }
             }
+        }
     });
 
-    $('#btn_updateProfile').click(()=>{
-        var username= $('#txt_username').val()
+
+
+    $('#btn_updateProfile').click(() => {
+        var username = $('#txt_username').val()
         var formData = new FormData();
         formData.append('name', username);
         formData.append('profile_image', $('#file_profile')[0].files[0]);
+
         $.post({
             type: 'POST',
             url: '/admin/v1/profile/update',
             data: formData,
             processData: false,
             contentType: false,
-            success : result=>{
-              $(document).Toasts('create', {
-                title: 'Updated',
-                autohide: true,
-                delay: 5000,
-                body: 'Your Profile Has been Successfully Updated',
-                class: 'bg-success',
-              });
-            },error:error=>{
-                  error=error.responseJSON
-                  $(document).Toasts('create', {
-                    title: 'Error #'+error.code,
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Your Profile Has been Successfully Updated',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
                     autohide: true,
                     delay: 5000,
                     body: error.message,
                     class: 'bg-danger',
-                  });
-              }
+                });
+            }
         })
     });
 
-    $(document).ready(()=>{
-        $.get("/admin/v1/profile", (data)=>{
+    $(document).ready(() => {
+        $.get("/admin/v1/profile", (data) => {
             var dbdata = data.data
             $('#txt_username').val(dbdata.name)
             $('#txt_email').val(dbdata.email)
-            $('#img_originalProfile').attr('src','/admin/v1/profile/file/'+ dbdata.profile_image).show()
+            $('#img_originalProfile').attr('src', '/admin/v1/profile/file/' + dbdata.profile_image).show()
             $('#img_profile').hide()
-        }).fail(error=>{
-            error=error.responseJSON
+        }).fail(error => {
+            error = error.responseJSON
             $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
                 autohide: true,
                 delay: 5000,
                 body: 'Add Password and Confirm Password',
                 class: 'bg-danger',
-              });
+            });
         });
     });
 
-    $('#btn_update').click(()=>{
-        var password= $('#txt_password').val(),
-            conpassword= $('#txt_cpassword').val()
-            if(!password || !conpassword){
-                return $(document).Toasts('create', {
-                    title: 'Password and Confirm password required',
+    $('#btn_update').click(() => {
+
+        var password = $('#txt_password').val(),
+            conpassword = $('#txt_cpassword').val()
+        if (!password || !conpassword) {
+            return $(document).Toasts('create', {
+                title: 'Password and Confirm password required',
+                autohide: true,
+                delay: 5000,
+                body: 'Add Password and Confirm Password',
+                class: 'bg-danger',
+            });
+        } else {
+            password = String(password)
+            conpassword = String(conpassword)
+        }
+
+        if (password != conpassword) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Password and Confirm Password must be same',
+                class: 'bg-danger',
+            });
+
+        }
+
+        $.post({
+            url: '/admin/v1/profile/password',
+            data: {
+                "password": password,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Password Changed',
                     autohide: true,
                     delay: 5000,
-                    body: 'Add Password and Confirm Password',
-                    class: 'bg-danger',
-                  });
-            }else{
-              password= String(password)
-              conpassword= String(conpassword)
-            }
-
-            if(password != conpassword){
-                return $(document).Toasts('create', {
-                        title: 'Error!',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Password and Confirm Password must be same',
-                        class: 'bg-danger',
-                    });
-                
-                }     
-
-            $.post({
-                    url:'/admin/v1/profile/password',
-                    data:{
-                      "password": password,
-                    },
-                    success:result=>{
-                      $(document).Toasts('create', {
-                        title: 'Password Changed',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Your Password has been changed Successfully',
-                        class: 'bg-success',
-                      });
-                        $('#txt_password').val(null)
-                        $('#txt_cpassword').val(null)
-                    },error:error=>{
-                      error=error.responseJSON
-                      $(document).Toasts('create', {
-                        title: 'Error #'+error.code,
-                        autohide: true,
-                        delay: 5000,
-                        body: error.message,
-                        class: 'bg-danger',
-                      });
-                  }
+                    body: 'Your Password has been changed Successfully',
+                    class: 'bg-success',
                 });
-            
+                $('#txt_password').val(null)
+                $('#txt_cpassword').val(null)
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            }
+        });
+
     })
 </script>
+
 </html>
