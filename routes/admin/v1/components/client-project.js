@@ -889,21 +889,24 @@ projectAPI.get('/review/close', (req, res) => {
     var projectID = String(req.query.project_id).trim(),
         reviewID = String(req.query.review_id).trim(),
         getKeyDB = getKeys(projectID)
+
     if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.15.3') }
+
     if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
-        return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.15.4')
+        return response(res, 404, 'notfound', 'Review ID Incorrect', undefined, 'A-6.15.4')
     }
+
     var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
         reviewDBKey = Object.keys(reviewDB)
     for (var i = 0; i < reviewDBKey.length; i++) {
         if (reviewID == reviewDB[reviewDBKey[i]].review_id) {
             var tempReview = reviewDB[reviewDBKey[i]]
             if (tempReview.closed) {
-                return response(res, 403, 'Forbidden', 'Review is already closed', undefined, 'A-6.15.5')
+                return response(res, 403, 'forbidden', 'Review is already closed', undefined, 'A-6.15.5')
             }
-            tempReview.closed = true,
-                tempReview.lastModifiedBy = "ADMIN",
-                tempReview.lastModifiedOn = String(new Date())
+            tempReview.closed = true
+            tempReview.lastModifiedBy = "ADMIN"
+            tempReview.lastModifiedOn = String(new Date())
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[i]}/`).update(tempReview).then(() => {
                 return response(res, 200, 'success', 'Review has been closed successfully', undefined, 'A-6.15.6')
 
@@ -1367,10 +1370,13 @@ projectAPI.get('/review/open', (req, res) => {
     if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
         return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.23.4')
     }
+
     var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
         reviewDBKeys = Object.keys(reviewDB)
+
     for (var i = 0; i < reviewDBKeys.length; i++) {
         var tempReview = reviewDB[reviewDBKeys[i]]
+
         if (tempReview.review_id == reviewID) {
             if (!tempReview.closed) {
                 return response(res, 403, 'notfound', 'Review is already active', undefined, 'A-6.23.5')
@@ -1381,9 +1387,8 @@ projectAPI.get('/review/open', (req, res) => {
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/`).update(tempReview).then(() => {
                 return response(res, 200, 'success', 'Review activated successfully', undefined, 'A-6.23.6')
             })
-        } else if (i == reviewDBKey.length - 1) {
+        } else if (i == reviewDBKeys.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.23.7')
-
         }
     }
 
@@ -1399,15 +1404,16 @@ projectAPI.post('/activity', (req, res) => {
     }
 
     var projectID = String(req.body.project_id).trim(),
-        type = String(req.body.type).trim(),
+        type = String(req.body.type).trim().toUpperCase(),
         getKeyDB = getKeys(projectID)
-    if (type != "service" && type != "activity") {
-        return response(res, 400, 'required', 'Type is required', undefined, 'A-6.24.3')
+
+    if (type != "SERVICE" && type != "ACTIVITY") {
+        return response(res, 400, 'invalid', 'Invalid Type. Valid Activity Type: []', undefined, 'A-6.24.3')
     }
     if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.23.3') }
 
 
-    if (type == "service") {
+    if (type == "SERVICE") {
         if (!req.body.service_id) {
             return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.24.4')
         }
@@ -1417,36 +1423,42 @@ projectAPI.post('/activity', (req, res) => {
 
         if (!dbAdminSnapshot.services) {
             return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.6')
-
         }
         if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
             return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.24.7')
         }
-        var serviceDBAdmin = dbAdminSnapshot.services,
-            serviceDBAdminKeys = Object.keys(serviceDBAdmin),
+
+        var dbAdminService = dbAdminSnapshot.services,
+            dbAdminServiceKeys = Object.keys(dbAdminService),
             serviceID = String(req.body.service_id),
             criteriaID = String(req.body.criteria_id)
-        for (var i = 0; i < serviceDBAdminKeys.length; i++) {
-            var tempService = serviceDBAdmin[serviceDBAdminKeys[i]]
-                //Check service in admin
+
+        for (var i = 0; i < dbAdminServiceKeys.length; i++) {
+            var tempService = dbAdminService[dbAdminServiceKeys[i]]
+
+            //Check service in admin
             if (tempService.service_id == serviceID && !tempService.deleted) {
                 var criteriaDB = tempService.criteria,
                     criteriaDBKeys = Object.keys(criteriaDB)
                 for (var j = 0; j < criteriaDBKeys.length; j++) {
+
                     // Check Criteria in admin
                     var tempCriteria = criteriaDB[criteriaDBKeys[j]]
                     if (tempCriteria.criteria_id == criteriaID && !tempCriteria.deleted) {
+
                         // Check service in client
-                        var serviceDBClient = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
-                            serviceDBClientKey = Object.keys(serviceDBClient)
-                        for (var k = 0; k < serviceDBClientKey.length; k++) {
-                            var tempServiceClient = serviceDBClient[serviceDBClientKey[k]]
-                            if (tempServiceClient.active && tempServiceClient.service_id == serviceID && !tempServiceClient.deleted) {
+                        var dbClientService = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+                            dbClientServiceKey = Object.keys(dbClientService)
+
+                        for (var k = 0; k < dbClientServiceKey.length; k++) {
+                            var tempClientService = dbClientService[dbClientServiceKey[k]]
+                            if (tempClientService.active && tempClientService.service_id == serviceID && !tempClientService.deleted) {
                                 var pushData = {
                                     createdOn: String(new Date()),
                                     createdBy: "ADMIN",
                                     service_id: serviceID,
-                                    criteria_id: criteriaID
+                                    criteria_id: criteriaID,
+                                    type: type
                                 }
                                 if (req.body.title) {
                                     var title = String(req.body.title).trim()
@@ -1530,12 +1542,12 @@ projectAPI.post('/activity', (req, res) => {
                                         })
                                     }
                                 }
+
                                 return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/`).push(pushData).then(() => {
                                     return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.14')
                                 })
-                            } else if (k == serviceDBClientKey.length - 1) {
+                            } else if (k == dbClientServiceKey.length - 1) {
                                 return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.15')
-
                             }
                         }
 
@@ -1545,13 +1557,13 @@ projectAPI.post('/activity', (req, res) => {
                     }
                 }
 
-            } else if (i == serviceDBAdminKeys.length - 1) {
+            } else if (i == dbAdminServiceKeys.length - 1) {
                 return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.17')
 
             }
         }
     }
-    if (type == "activity") {
+    if (type == "ACTIVITY") {
         var fileNameData = []
         if (!req.body.title) {
             return response(res, 400, 'required', 'Title ID is required', undefined, 'A-6.24.18')
@@ -1565,7 +1577,8 @@ projectAPI.post('/activity', (req, res) => {
         var pushData = {
             title: title,
             createdOn: String(new Date()),
-            createdBy: "ADMIN"
+            createdBy: "ADMIN",
+            type: type
         }
 
         if (req.body.description) {
@@ -1575,6 +1588,7 @@ projectAPI.post('/activity', (req, res) => {
             }
             pushData.description = description
         }
+
         if (req.files && req.files.file) {
             directoryCreate(`/clients/${getKeyDB.client_key}/activity`)
 
