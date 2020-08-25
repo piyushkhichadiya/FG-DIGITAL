@@ -95,7 +95,7 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
     }));
 
     // EMPLOYEE
-    app.use('/api/employee', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
+    app.use('/api/employee', swaggerUI.serve, swaggerUI.setup(require('./routes/employee/v1/employee.swagger.json'), {
         explorer: false,
         customCss: '.swagger-ui .topbar { display: none }',
         customSiteTitle: "Employee APIs v1.0",
@@ -137,7 +137,7 @@ exec('git rev-parse --abbrev-ref HEAD', (err, stdout, stderr) => {
 
 // v1
 app.use('/admin/v1', require('./routes/admin/api.admin'))
-app.use('/employee/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS') })
+app.use('/employee/v1', require('./routes/employee/api.employee'))
 app.use('/client/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS') })
 
 // Views

@@ -67,7 +67,6 @@
         },
         "/user/login": {
             "post": {
-
                 "tags": ["1. User Account"],
                 "summary": "Authentication for Access admin panel",
                 "parameters": [{

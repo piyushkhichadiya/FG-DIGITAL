@@ -2,7 +2,7 @@ const firebase = require('firebase-admin'),
     { response, jwtDecode } = require('../../../../functions/functions');
 
 module.exports = {
-    adminAuthToken: async(req, res) => {
+    adminAuthToken: async(req, res, next) => {
         if (req.cookies && req.cookies.adminAuthToken || req.session.adminAuthToken) {
             var jwtToken = req.cookies.adminAuthToken || req.session.adminAuthToken;
             if (jwtDecode(jwtToken)) {
@@ -26,7 +26,7 @@ module.exports = {
                             var dbAdminSnapshot = await firebase.database().ref('/admin').once('value').then(snapshot => { return snapshot.val() });
                             req.session.dbAdminSnapshot = dbAdminSnapshot;
                             req.session.decode_adminAuthToken = token;
-                            return true;
+                            return next();
                         } else {
                             response(res, 403, 'accountDeleted', 'Account does not exist', undefined, 'A-MW-6');
                             return false;

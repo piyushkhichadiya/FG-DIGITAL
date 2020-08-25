@@ -1,6 +1,6 @@
 const profileAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, randomString, storageDirectory, bcryptHash, jwtSign, bcryptHashCompare } = require('../../../../functions/functions'),
+    { response, randomString, storageDirectory, bcryptHash, jwtSign } = require('../../../../functions/functions'),
     fs = require('fs')
 
 //----------------------------- CONFIGURATION ------------------------------
@@ -52,7 +52,7 @@ profileAPI.post('/update', (req, res) => {
             filename;
 
         if ((file.size / 1024) > 100) {
-            return response(res, 400, 'badContent', 'File size limit exceed 1024 KB (1 MB)', undefined, 'A-2.2.2');
+            return response(res, 400, 'badContent', 'File size limit exceed 100 KB (1 MB)', undefined, 'A-2.2.2');
         }
 
         switch (file.mimetype) {
@@ -61,7 +61,7 @@ profileAPI.post('/update', (req, res) => {
                 filename = 'ADMIN_PROFILE_IMAGE ' + randomString(10) + '.jpeg';
                 break;
             case 'image/png':
-                filename = 'ADMIN_PROFILE_IMAGE ' + randomString(10) + '.jpeg';
+                filename = 'ADMIN_PROFILE_IMAGE ' + randomString(10) + '.png';
                 break;
             default:
                 return response(res, 400, 'badContent', 'Invalid File Type. (JPEG/JPG/PNG) is only valid', undefined, 'A-2.2.3');
@@ -118,6 +118,8 @@ profileAPI.post('/password', async(req, res) => {
     // Cookie
     if (req.cookies.adminAuthToken) {
         res.cookie('adminAuthToken', token, { maxAge: 1000 * 60 * 60 * 24 * 30 }) // 30 Days
+    } else {
+        res.clearCookie('adminAuthToken')
     }
 
     firebase.database().ref('/admin/users/' + adminAuthToken.user_key + '/').update(dbUser).then(() => {
