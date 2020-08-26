@@ -1263,13 +1263,8 @@ projectAPI.post('/review/update-post', (req, res) => {
 
     if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.22.5') }
 
-    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
-        return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.22.6')
-    }
     directoryCreate(`/clients/${getKeyDB.client_key}/reviews`)
 
-    var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
-        reviewDBKeys = Object.keys(reviewDB)
     if (req.files && req.files.file) {
 
         var file = req.files.file,
@@ -1309,61 +1304,62 @@ projectAPI.post('/review/update-post', (req, res) => {
             })
         }
     }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
+        return response(res, 404, 'notfound', 'Review ID Incorrect ', undefined, 'A-6.22.6')
+    }
+
+    var reviewDB = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+        reviewDBKeys = Object.keys(reviewDB)
+
     for (var i = 0; i < reviewDBKeys.length; i++) {
         var tempReview = reviewDB[reviewDBKeys[i]]
 
         if (tempReview.review_id == reviewID && !tempReview.closed && !tempReview.deleted) {
-            if (tempReview.post) {
 
-                var postDB = tempReview.post,
-                    postKeys = Object.keys(postDB)
+            if (tempReview.post && tempReview.post[postKey] && !tempReview.post[postKey].deleted) {
 
-                if (postKeys.includes(postKey)) {
-                    var tempPost = postDB[postKey]
+                var tempPost = postDB[postKey]
 
-                    if (req.body.description) {
-                        tempPost.description = String(req.body.description).trim()
-                        tempPost.lastModifiedOn = String(new Date())
-                        tempPost.lastModifiedBy = "ADMIN"
-                    }
-
-                    // Append Documents
-                    if (tempPost.documents) {
-                        tempPost.documents.push.apply(tempPost.documents, documents)
-
-                    } else {
-                        tempPost.documents = documents
-                    }
-
-                    // Move files to directory 
-                    var file = req.files.file
-                    if (!Array.isArray(file)) {
-                        var file = [req.files.file]
-                    }
-                    for (var j = 0; j < file.length; j++) {
-                        var tempFile = file[j],
-                            tempName = fileNameData[j]
-                        tempFile.mv(directory + tempName, (error) => {
-                            if (error) {
-                                return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.22.9')
-                            }
-                        })
-                    }
-
-                    return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/post/${postKey}/`).update(tempPost).then(() => {
-                        return response(res, 200, 'success', 'Post has been updated successfully', undefined, 'A-6.22.10')
-                    })
-                } else {
-                    return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.11')
+                if (req.body.description) {
+                    tempPost.description = String(req.body.description).trim()
+                    tempPost.lastModifiedOn = String(new Date())
+                    tempPost.lastModifiedBy = "ADMIN"
                 }
+
+                // Append Documents
+                if (tempPost.documents) {
+                    tempPost.documents.push.apply(tempPost.documents, documents)
+
+                } else {
+                    tempPost.documents = documents
+                }
+
+                // Move files to directory 
+                var file = req.files.file
+                if (!Array.isArray(file)) {
+                    var file = [req.files.file]
+                }
+                for (var j = 0; j < file.length; j++) {
+                    var tempFile = file[j],
+                        tempName = fileNameData[j]
+                    tempFile.mv(directory + tempName, (error) => {
+                        if (error) {
+                            return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.22.9')
+                        }
+                    })
+                }
+
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/post/${postKey}/`).update(tempPost).then(() => {
+                    return response(res, 200, 'success', 'Post has been updated successfully', undefined, 'A-6.22.10')
+                })
             } else {
-                return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.12')
+                return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.22.11')
             }
-        } else if (i == reviewDBKeys.length) {
-            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.22.13')
+        } else if (i == reviewDBKeys.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.22.12')
         }
     }
-
 })
 
 // 6.23 Review Activate
