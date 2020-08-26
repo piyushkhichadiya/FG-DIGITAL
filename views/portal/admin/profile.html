@@ -44,7 +44,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="/" class="brand-link">
+            <a href="/admin" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -54,10 +54,11 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="dist/img/user2-160x160.jpg" id="img_profileImage" class="img-circle elevation-2" alt="User Image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+
                     </div>
                     <div class="info">
-                        <a href="/admin" id="lbl_profileName" class="d-block">Alexander Pierce</a>
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
 
@@ -265,6 +266,15 @@
                     class: 'bg-danger',
                 });
                 $('#btn_updateProfile').attr('disabled', false)
+            },
+            xhr: () => {
+                var xhr = $.ajaxSettings.xhr();
+                if ($('#file_profile')[0].files[0]) {
+                    xhr.upload.onprogress = function(evt) {
+                        console.log(evt.loaded / evt.total * 100);
+                    };
+                }
+                return xhr;
             }
         })
     });
@@ -290,8 +300,8 @@
 
     $('#btn_update').click(() => {
         var password = $('#txt_password').val(),
-            conpassword = $('#txt_cpassword').val()
-        if (!password || !conpassword) {
+            confirm_password = $('#txt_cpassword').val()
+        if (!password || !confirm_password) {
             return $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
                 autohide: true,
@@ -301,9 +311,9 @@
             });
         } else {
             password = String(password)
-            conpassword = String(conpassword)
+            confirm_password = String(confirm_password)
         }
-        if (password != conpassword) {
+        if (password != confirm_password) {
             return $(document).Toasts('create', {
                 title: 'Error!',
                 autohide: true,
