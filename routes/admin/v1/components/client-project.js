@@ -1395,7 +1395,7 @@ projectAPI.get('/review/open', (req, res) => {
 })
 
 // 6.24 Activity Add
-projectAPI.post('/activity', (req, res) => {
+projectAPI.post('/activity/add', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.24.1')
     }
@@ -1408,21 +1408,67 @@ projectAPI.post('/activity', (req, res) => {
         getKeyDB = getKeys(projectID)
 
     if (type != "SERVICE" && type != "ACTIVITY") {
-        return response(res, 400, 'invalid', 'Invalid Type. Valid Activity Type: []', undefined, 'A-6.24.3')
+        return response(res, 400, 'invalid', 'Invalid Type. Valid Activity Type: [Service, Activity]', undefined, 'A-6.24.3')
     }
     if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.23.3') }
+    directoryCreate(`/clients/${getKeyDB.client_key}/activity`)
+
+    if (req.files && req.files.file) {
 
 
+        var file = req.files.file,
+            documents = [],
+            directory = storageDirectory() + `/clients/${getKeyDB.client_key}/activity/`,
+            fileNameData = []
+
+        if (!Array.isArray(file)) {
+            var file = [req.files.file]
+        }
+
+        for (var i = 0; i < file.length; i++) {
+            var tempFile = file[i]
+
+            if ((tempFile.size / 1024 / 1024) > 15) {
+                return response(res, 403, 'forbidden', 'File size limit exceed. 15 MB/per file is maximum', undefined, 'A-6.24.21');
+            }
+
+            switch (tempFile.mimetype) {
+                case 'image/jpeg':
+                case 'image/jpg':
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
+                    break;
+                case 'image/png':
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
+                    break;
+                case 'application/pdf':
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.pdf';
+                    break;
+                default:
+                    return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG/PDF are only valid file types.', undefined, 'A-6.24.22')
+
+            }
+
+            fileNameData.push(tempName)
+            documents.push({
+                filename: tempName,
+                createdOn: String(new Date()),
+                createdBy: 'ADMIN'
+            })
+        }
+
+    }
+
+    // Activity Type: Service
     if (type == "SERVICE") {
         if (!req.body.service_id) {
             return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.24.4')
         }
-        if (!req.body.criteria_id) {
-            return response(res, 400, 'required', 'Criteria ID is required', undefined, 'A-6.24.5')
+        if (!req.body.criteria) {
+            return response(res, 400, 'required', 'Criteria is required', undefined, 'A-6.24.5')
         }
 
         if (!dbAdminSnapshot.services) {
-            return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.6')
+            return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.24.6')
         }
         if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
             return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.24.7')
@@ -1430,149 +1476,136 @@ projectAPI.post('/activity', (req, res) => {
 
         var dbAdminService = dbAdminSnapshot.services,
             dbAdminServiceKeys = Object.keys(dbAdminService),
-            serviceID = String(req.body.service_id),
-            criteriaID = String(req.body.criteria_id)
+            serviceID = String(req.body.service_id)
 
+        try {
+            criteria = JSON.parse(req.body.criteria)
+        } catch {
+            return response(res, 404, 'notfound', 'Criteria must be in JSON Object. Hint: Stringify JSON object', {
+                json_object_sample: {
+                    "0": { "criteria_id": 13245689, "value": 50 },
+                    "1": { "criteria_id": 98765412, "value": 55 },
+                    "2": { "criteria_id": 32186547, "value": 55 }
+                }
+            }, 'A-6.24.7')
+        }
+
+
+        // DB Service - Criteria Validation
         for (var i = 0; i < dbAdminServiceKeys.length; i++) {
             var tempService = dbAdminService[dbAdminServiceKeys[i]]
 
-            //Check service in admin
+            // Check service in admin
             if (tempService.service_id == serviceID && !tempService.deleted) {
-                var criteriaDB = tempService.criteria,
-                    criteriaDBKeys = Object.keys(criteriaDB)
-                for (var j = 0; j < criteriaDBKeys.length; j++) {
 
-                    // Check Criteria in admin
-                    var tempCriteria = criteriaDB[criteriaDBKeys[j]]
-                    if (tempCriteria.criteria_id == criteriaID && !tempCriteria.deleted) {
+                // Project Service in client
+                var dbClientService = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+                    dbClientServiceKey = Object.keys(dbClientService)
+                for (var k = 0; k < dbClientServiceKey.length; k++) {
+                    var tempClientService = dbClientService[dbClientServiceKey[k]]
+                    if (tempClientService.active && tempClientService.service_id == serviceID && !tempClientService.deleted) {
 
-                        // Check service in client
-                        var dbClientService = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
-                            dbClientServiceKey = Object.keys(dbClientService)
+                        // DB Criteria
+                        if (tempService.criteria) {
+                            var dbServiceCriteria = tempService.criteria,
+                                dbServiceCriteriaKeys = Object.keys(dbServiceCriteria),
+                                activeCriteria = []
 
-                        for (var k = 0; k < dbClientServiceKey.length; k++) {
-                            var tempClientService = dbClientService[dbClientServiceKey[k]]
-                            if (tempClientService.active && tempClientService.service_id == serviceID && !tempClientService.deleted) {
-                                var pushData = {
-                                    createdOn: String(new Date()),
-                                    createdBy: "ADMIN",
-                                    service_id: serviceID,
-                                    criteria_id: criteriaID,
-                                    type: type
+                            for (var l = 0; l < dbServiceCriteriaKeys.length; l++) {
+                                if (!dbServiceCriteria[dbServiceCriteriaKeys[l]].deleted) {
+                                    activeCriteria.push(dbServiceCriteria[dbServiceCriteriaKeys[l]].criteria_id)
                                 }
-                                if (req.body.title) {
-                                    var title = String(req.body.title).trim()
-                                    if (title == "undefined") {
-                                        return response(res, 403, 'badRequest', 'Title has bad content', undefined, 'A-6.24.8')
-                                    }
-                                    pushData.title = title
-                                }
-                                if (req.body.description) {
-                                    var description = String(req.body.description).trim()
-                                    if (description == "undefined") {
-                                        return response(res, 403, 'badRequest', 'Description has bad content', undefined, 'A-6.24.9')
-                                    }
-                                    pushData.description = description
-                                }
-                                if (req.body.date) {
-                                    var date = new Date(req.body.date)
-                                    if (date == "invalid") {
-                                        return response(res, 403, 'badRequest', 'Date is not proper', undefined, 'A-6.24.10')
-                                    }
-                                    pushData.date = String(date)
-                                }
-                                var fileNameData = []
-                                if (req.files && req.files.file) {
-                                    directoryCreate(`/clients/${getKeyDB.client_key}/activity`)
-
-                                    var file = req.files.file,
-                                        documents = [],
-                                        directory = storageDirectory() + `/clients/${getKeyDB.client_key}/activity/`
-
-                                    if (!Array.isArray(file)) {
-                                        var file = [req.files.file]
-                                    }
-
-                                    for (var i = 0; i < file.length; i++) {
-                                        var tempFile = file[i]
-
-                                        if ((tempFile.size / 1024 / 1024) > 15) {
-                                            return response(res, 403, 'forbidden', 'File size limit exceed. 15 MB/per file is maximum', undefined, 'A-6.24.11');
-                                        }
-
-                                        switch (tempFile.mimetype) {
-                                            case 'image/jpeg':
-                                            case 'image/jpg':
-                                                var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
-                                                break;
-                                            case 'image/png':
-                                                var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
-                                                break;
-                                            case 'application/pdf':
-                                                var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.pdf';
-                                                break;
-                                            default:
-                                                return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG/PDF are only valid file types.', undefined, 'A-6.24.12')
-
-                                        }
-
-                                        fileNameData.push(tempName)
-                                        documents.push({
-                                            filename: tempName,
-                                            createdOn: String(new Date()),
-                                            createdBy: 'ADMIN'
-                                        })
-                                    }
-
-                                }
-                                if (fileNameData.length != 0) {
-                                    pushData.documents = documents
-                                        // Move files  
-                                    var file = req.files.file
-                                    if (!Array.isArray(file)) {
-                                        var file = [req.files.file]
-                                    }
-                                    for (var j = 0; j < file.length; j++) {
-                                        var tempFile = file[j],
-                                            tempName = fileNameData[j]
-                                        tempFile.mv(directory + tempName, (error) => {
-                                            if (error) {
-                                                return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.24.13')
-                                            }
-                                        })
-                                    }
-                                }
-
-                                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/`).push(pushData).then(() => {
-                                    return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.14')
-                                })
-                            } else if (k == dbClientServiceKey.length - 1) {
-                                return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.15')
                             }
                         }
 
-                    } else if (j == criteriaDBKeys.length - 1) {
-                        return response(res, 404, 'notfound', 'Criteria ID Incorrect ', undefined, 'A-6.24.16')
+                        // Body Criteria Validation
+                        var pushCriteria = [];
+                        var bodyCriteriaKey = Object.keys(criteria)
+                        for (var l = 0; l < bodyCriteriaKey.length; l++) {
+                            var tempCriteria = criteria[bodyCriteriaKey[l]];
+                            if (tempCriteria.criteria_id && tempCriteria.value) {
+                                if (!activeCriteria.includes(tempCriteria.criteria_id)) {
+                                    return response(res, 403, 'forbidden', 'Invalid Criteria ID. Criteria ID does not exist in Service.', { invalid_criteria_id: tempCriteria.criteria_id })
+                                }
 
+                                pushCriteria.push({
+                                    criteria_id: tempCriteria.criteria_id,
+                                    value: tempCriteria.value
+                                })
+                            } else {
+                                return response(res, 403, 'forbidden', 'Criteria ID and Value both are required', undefined, )
+                            }
+                        }
+
+                        i = dbAdminServiceKeys.length;
+                        break;
+                    } else if (k == dbClientServiceKey.length - 1) {
+                        return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.24.15')
                     }
                 }
-
             } else if (i == dbAdminServiceKeys.length - 1) {
-                return response(res, 404, 'notfound', 'Service ID Incorrect ', undefined, 'A-6.24.17')
-
+                return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.24.17')
             }
         }
+
+        var pushData = {
+            createdOn: String(new Date()),
+            createdBy: "ADMIN",
+            service_id: serviceID,
+            criteria: pushCriteria,
+            type: type
+        }
+
+        if (req.body.title) {
+            var title = String(req.body.title).trim()
+            pushData.title = title
+        }
+
+        if (req.body.description) {
+            var description = String(req.body.description).trim()
+            pushData.description = description
+        }
+
+        if (req.body.date) {
+            var date = new Date(req.body.date)
+            if (date == "Invalid Date" && date > new Date()) {
+                return response(res, 403, 'badRequest', 'Invalid Date. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.24.10')
+            }
+            pushData.date = String(date)
+        }
+
+
+
+        if (fileNameData && fileNameData.length != 0) {
+            pushData.documents = documents
+                // Move files  
+            var file = req.files.file
+            if (!Array.isArray(file)) {
+                var file = [req.files.file]
+            }
+            for (var j = 0; j < file.length; j++) {
+                var tempFile = file[j],
+                    tempName = fileNameData[j]
+                tempFile.mv(directory + tempName, (error) => {
+                    if (error) {
+                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.24.13')
+                    }
+                })
+            }
+        }
+
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/`).push(pushData).then(() => {
+            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.14')
+        })
     }
+
+    // Activity Type: Activity
     if (type == "ACTIVITY") {
-        var fileNameData = []
+
         if (!req.body.title) {
             return response(res, 400, 'required', 'Title ID is required', undefined, 'A-6.24.18')
         }
-        var title = String(req.body.title).trim(),
-            description = String(req.body.description).trim()
-        if (title == "undefined") {
-            return response(res, 403, 'badRequest', 'data is not proper', undefined, 'A-6.24.19')
-        }
+        var title = String(req.body.title).trim()
 
         var pushData = {
             title: title,
@@ -1581,58 +1614,19 @@ projectAPI.post('/activity', (req, res) => {
             type: type
         }
 
+        if (req.body.date) {
+            if (new Date(req.body.date) == "Invalid Date" && new Date(req.body.date) > new Date()) {
+                return response(res, 403, 'invalid', 'Invalid Date. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.24.10')
+            }
+            pushData.date = String(new Date(req.body.date))
+        }
+
         if (req.body.description) {
-            var description = String(req.body.description).trim()
-            if (description == "undefined") {
-                return response(res, 403, 'badRequest', 'Description has bad content', undefined, 'A-6.24.20')
-            }
-            pushData.description = description
+            pushData.description = String(req.body.description).trim()
         }
 
-        if (req.files && req.files.file) {
-            directoryCreate(`/clients/${getKeyDB.client_key}/activity`)
 
-            var file = req.files.file,
-                documents = [],
-                directory = storageDirectory() + `/clients/${getKeyDB.client_key}/activity/`
-
-            if (!Array.isArray(file)) {
-                var file = [req.files.file]
-            }
-
-            for (var i = 0; i < file.length; i++) {
-                var tempFile = file[i]
-
-                if ((tempFile.size / 1024 / 1024) > 15) {
-                    return response(res, 403, 'forbidden', 'File size limit exceed. 15 MB/per file is maximum', undefined, 'A-6.24.21');
-                }
-
-                switch (tempFile.mimetype) {
-                    case 'image/jpeg':
-                    case 'image/jpg':
-                        var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
-                        break;
-                    case 'image/png':
-                        var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
-                        break;
-                    case 'application/pdf':
-                        var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.pdf';
-                        break;
-                    default:
-                        return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG/PDF are only valid file types.', undefined, 'A-6.24.22')
-
-                }
-
-                fileNameData.push(tempName)
-                documents.push({
-                    filename: tempName,
-                    createdOn: String(new Date()),
-                    createdBy: 'ADMIN'
-                })
-            }
-
-        }
-        if (fileNameData.length != 0) {
+        if (fileNameData && fileNameData.length != 0) {
             pushData.documents = documents
                 // Move files  
             var file = req.files.file
@@ -1683,4 +1677,4 @@ function getKeys(project_id) {
     }
 
 }
-module.exports = projectAPI
+module.exports = projectAPI;

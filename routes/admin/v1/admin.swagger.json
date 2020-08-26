@@ -1484,7 +1484,7 @@
                 "responses": {}
             }
         },
-        "/project/activity": {
+        "/project/activity/add": {
             "post": {
                 "tags": ["6. Client Project"],
                 "summary": "Add Activity",
@@ -1521,12 +1521,16 @@
                     },
                     {
                         "in": "formData",
-                        "name": "criteria_id",
-                        "description": "criteria_id",
+                        "name": "criteria",
+                        "description": "criteria",
                         "required": false,
-                        "type": "number",
+                        "type": "string",
                         "schema": {
-                            "example": "390441675983"
+                            "example": {
+                                "0": { "criteria_id": 390441675983, "value": 50 },
+                                "1": { "criteria_id": 1386407953254, "value": 55 },
+                                "2": { "criteria_id": 547034266151, "value": 55 }
+                            }
                         }
                     },
                     {
@@ -1556,7 +1560,7 @@
                         "required": false,
                         "type": "string",
                         "schema": {
-                            "date": "22/08/2021"
+                            "date": "2021/08/21 12:25:25"
                         }
                     },
                     {
