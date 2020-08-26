@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Project Services - FG Digital</title>
+    <title>Project Review View - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -103,14 +103,14 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Services</h1>
+                            <h1>Project Reviews</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/client">Client</a></li>
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">{project ID}</a></li>
-                                <li class="breadcrumb-item active">Services</li>
+                                <li class="breadcrumb-item active">Reviews</li>
                             </ol>
                         </div>
                     </div>
@@ -127,17 +127,17 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right mb-3" id="btn_add"><i class="fas fa-plus"></i> Add</button>
+                                    <button class="btn btn-outline-primary float-right mb-3" id="btn_create"><i class="fas fa-plus"></i> Create</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
                             <div class="col-md-12">
-                                <table id="tbl_Service" class="table table-bordered table-striped w-100">
+                                <table id="tbl_review" class="table table-bordered table-striped w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Service Name</th>
-                                            <th>Status</th>
+                                            <th>Review Title</th>
+                                            <th>Description</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -146,8 +146,8 @@
                                     <tfoot>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Service Name</th>
-                                            <th>Status</th>
+                                            <th>Review Title</th>
+                                            <th>Description</th>
                                             <th>Action</th>
                                         </tr>
                                     </tfoot>
@@ -180,37 +180,6 @@
     </div>
     <!-- ./wrapper -->
 
-    <div class="modal fade" id="modal_Service">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Add Service to Project</h4>
-                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"> -->
-                    <!-- <span aria-hidden="true">&times;</span> -->
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Services</label>
-                                <select class="form-control" id="list_service">
-                              </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary"><i class="fas fa-plus"></i> Add to Project</button>
-                </div>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-    </div>
-    <!-- /.modal -->
-
     <!-- jQuery -->
     <script src="plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -235,26 +204,8 @@
     <script src="dist/js/profile.js"></script>-->
 </body>
 <script>
-    var tblService = $("#tbl_Service").DataTable({
+    var tblReview = $("#tbl_review").DataTable({
         "responsive": true,
-    });
-    var serviceData
-
-    $(document).ready(() => {
-
-    });
-
-    $('#btn_add').click(() => {
-        $('#modal_Service').modal('show')
-        $.get('/admin/v1/service/get', (data) => {
-            serviceData = data.data
-            var option = `<option value=''>Select Service</option>`
-            for (var i = 0; i < serviceData.length; i++) {
-                var tempService = serviceData[i]
-                option += `<option value='${tempService.service_id}'>${tempService.title}</option>`;
-                $('#list_service').html(option);
-            }
-        });
     });
 </script>
 

@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
@@ -45,7 +47,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="javascript:void(0);" class="brand-link">
+            <a href="/" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -55,10 +57,10 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="dist/img/user2-160x160.jpg" id="img_profileImage" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="javascript:void(0);" class="d-block">Alexander Pierce</a>
+                        <a href="/admin" id="lbl_profileName" class="d-block">Alexander Pierce</a>
                     </div>
                 </div>
 
@@ -100,8 +102,8 @@
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Plan</a></li>
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/plan">Plan</a></li>
                                 <li class="breadcrumb-item active">Add Plan</li>
                             </ol>
                         </div>
@@ -134,9 +136,9 @@
                         </div>
                         <div class="row form-group">
                             <div class="col-md-12">
-                                <button class="btn btn-outline-primary float-right mr-2 ml-2" id="btn_add">Add</button>
-                                <button class="btn btn-outline-primary float-right ml-2" id="btn_update">Update</button>
-                                <button class="btn btn-outline-danger float-right" id="btn_remove">Remove</button>
+                                <button class="btn btn-outline-primary float-right mr-2 ml-2" id="btn_add"><i class="fas fa-plus"></i> Add</button>
+                                <button class="btn btn-outline-primary float-right ml-2" id="btn_update"><i class="fas fa-pencil-alt"></i> Update</button>
+                                <button class="btn btn-outline-danger float-right" id="btn_remove"><i class="fas fa-trash-alt"></i> Remove</button>
 
                             </div>
                         </div>
@@ -174,14 +176,17 @@
     <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
     <!-- sweetalert -->
     <script src="dist/js/sweetalert2.js"></script>
-    <!-- Logout -->
-    <script src="dist/js/logout.js"></script>
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- customJS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
 </body>
 <script>
     $('#btn_add').click(() => {
@@ -189,69 +194,61 @@
         amount = $('#txt_amount').val()
         days = $('#txt_days').val()
         if (!plan || !amount || !days) {
-            $(document).Toasts('create', {
+            return $(document).Toasts('create', {
                 title: 'Data missing',
                 autohide: true,
                 delay: 5000,
                 body: 'Please fill out all fields',
                 class: 'bg-danger',
             });
-        } else {
-            if (isNaN(amount) || isNaN(days)) {
-                $("#txt_amount").validate({
-                    rules: {
-                        field: {
-                            min: 0
-                        }
-                    }
-                });
-                $("#txt_days").validate({
-                    rules: {
-                        field: {
-                            min: 0
-                        }
-                    }
-                });
+        }
+        if (isNaN(amount) || isNaN(days)) {
+            return $(document).Toasts('create', {
+                title: 'Please Enter valid Input',
+                autohide: true,
+                delay: 5000,
+                body: 'Amount and Day must be numbers',
+                class: 'bg-danger',
+            });
+        }
+        if (amount <= 0 || days <= 0) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Amount and Days must be Greater than 0',
+                class: 'bg-danger',
+            });
+        }
+        $('#btn_add').attr('disabled', true)
+        $.post({
+            url: '/admin/v1/plan/add',
+            data: {
+                "plan_name": plan,
+                "price": amount,
+                "days": days,
+            },
+            success: result => {
                 $(document).Toasts('create', {
-                    title: 'Error!',
+                    title: 'Success',
                     autohide: true,
                     delay: 5000,
-                    body: 'Please Enter Valid Input',
+                    body: 'Plan details add Successfully',
+                    class: 'bg-success',
+                });
+                window.location.href = '/admin/plan'
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
                     class: 'bg-danger',
                 });
-            } else {
-                $.post({
-                    url: '/admin/v1/plan/add',
-                    data: {
-                        "plan_name": plan,
-                        "price": amount,
-                        "days": days,
-                    },
-                    success: result => {
-                        $(document).Toasts('create', {
-                            title: 'Success',
-                            autohide: true,
-                            delay: 5000,
-                            body: 'Plan details add Successfully',
-                            class: 'bg-success',
-                        });
-                        $('#txt_pname').val(null)
-                        $('#txt_amount').val(null)
-                        $('#txt_days').val(null)
-                    },
-                    error: error => {
-                        error = error.responseJSON
-                        $(document).Toasts('create', {
-                            title: 'Error #' + error.code,
-                            autohide: true,
-                            delay: 5000,
-                            body: error.message,
-                            class: 'bg-danger',
-                        });
-                    }
-                });
             }
-        }
+        });
     });
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -281,56 +278,80 @@
         plan = $('#txt_pname').val()
         amount = $('#txt_amount').val()
         days = $('#txt_days').val()
-        if (!plan || !amount || !days) {
-            $(document).Toasts('create', {
-                title: 'Data missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please fill out all fields',
-                class: 'bg-danger',
-            });
-        } else {
+        if (amount || days) {
             if (isNaN(amount) || isNaN(days)) {
-                $("#txt_amount").validate({
-                    rules: {
-                        field: {
-                            required: true,
-                            min: 0
-                        }
-                    }
+                return $(document).Toasts('create', {
+                    title: 'Please Enter valid Input',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Amount and Day must be numbers',
+                    class: 'bg-danger',
                 });
-                $("#txt_days").validate({
-                    rules: {
-                        field: {
-                            required: true,
-                            min: 0
-                        }
-                    }
-                });
-                $(document).Toasts('create', {
+            }
+            if (amount < 0 || days < 0) {
+                return $(document).Toasts('create', {
                     title: 'Error!',
                     autohide: true,
                     delay: 5000,
-                    body: 'Please Enter Valid Input',
+                    body: 'Amount and Days must be Greater than 0',
                     class: 'bg-danger',
                 });
-            } else {
-                $.post({
-                    url: '/admin/v1/plan/update',
-                    data: {
-                        "plan_id": p_id,
-                        "plan_name": plan,
-                        "price": amount,
-                        "days": days,
-                    },
+            }
+            $('#btn_update').attr('disabled', true)
+            $.post({
+                url: '/admin/v1/plan/update',
+                data: {
+                    "plan_id": p_id,
+                    "plan_name": plan,
+                    "price": amount,
+                    "days": days,
+                },
+                success: result => {
+                    $(document).Toasts('create', {
+                        title: 'Success',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Plan Details update Successfully',
+                        class: 'bg-success',
+                    });
+                    $('#btn_update').attr('disabled', false)
+                },
+                error: error => {
+                    error = error.responseJSON
+                    $(document).Toasts('create', {
+                        title: 'Error #' + error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                    });
+                }
+            });
+        }
+    });
+
+    $('#btn_remove').click(() => {
+        var p_id = urlParams.get('plan_id')
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Plan",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $('#btn_remove').attr('disabled', true)
+                $.get({
+                    url: `/admin/v1/plan/remove?plan_id=${p_id}`,
                     success: result => {
                         $(document).Toasts('create', {
                             title: 'Success',
                             autohide: true,
                             delay: 5000,
-                            body: 'Plan Details update Successfully',
+                            body: 'Plan removed successfully',
                             class: 'bg-success',
                         });
+                        window.location.href = '/admin/plan'
                     },
                     error: error => {
                         error = error.responseJSON
@@ -342,32 +363,6 @@
                             class: 'bg-danger',
                         });
                     }
-                });
-            }
-        }
-    });
-
-    $('#btn_remove').click(() => {
-        var p_id = urlParams.get('plan_id')
-        $.get({
-            url: `/admin/v1/plan/remove?plan_id=${p_id}`,
-            success: result => {
-                $(document).Toasts('create', {
-                    title: 'Success',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Plan removed successfully',
-                    class: 'bg-success',
-                });
-            },
-            error: error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
                 });
             }
         });
