@@ -2,7 +2,7 @@ const projectAPI = require('express').Router(),
     firebase = require('firebase-admin'),
     fs = require('fs'),
     directoryCreate = require('../../../../config/directory'),
-    { response, storageDirectory } = require('../../../../functions/functions')
+    { response, storageDirectory, unlinkFile } = require('../../../../functions/functions')
 
 //----------------------------- CONFIGURATION ------------------------------
 
@@ -1183,6 +1183,8 @@ projectAPI.get('/service/remove', (req, res) => {
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/service/${serviceDBClientKey[i]}/`).update(tempService).then(() => {
                 return response(res, 200, 'success', 'Service has been removed successfully', undefined, 'A-6.20.5')
             })
+
+
         } else if (i == serviceDBClientKey.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Service ID', undefined, 'A-6.20.6')
         }
@@ -1213,7 +1215,7 @@ projectAPI.post('/review/update', (req, res) => {
         reviewDBKeys = Object.keys(dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review)
     for (var i = 0; i < reviewDBKeys.length; i++) {
         var tempReview = reviewDB[reviewDBKeys[i]]
-        if (tempReview.review_id == reviewID) {
+        if (tempReview.review_id == reviewID && !tempReview.closed && !tempReview.deleted) {
             if (req.body.title) {
                 var title = String(req.body.title).trim()
                 if (title == "undefined" || title == null) {
@@ -1234,7 +1236,7 @@ projectAPI.post('/review/update', (req, res) => {
                 return response(res, 200, 'success', 'Review has been updated successfully', undefined, 'A-6.21.8')
 
             })
-        } else if (i == reviewDBKeys.length) {
+        } else if (i == reviewDBKeys.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.21.9')
         }
     }
@@ -1547,6 +1549,9 @@ projectAPI.post('/activity/add', (req, res) => {
                             }
                         }
 
+                        if (pushCriteria.length == 0) {
+                            return response(res, 400, 'required', 'At least one criteria is required', undefined, 'A-6.25.21')
+                        }
                         i = dbAdminServiceKeys.length;
                         break;
                     } else if (k == dbClientServiceKey.length - 1) {
@@ -1658,6 +1663,331 @@ projectAPI.post('/activity/add', (req, res) => {
             return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.22')
         })
     }
+})
+
+// 6.25 Activity Update
+projectAPI.post('/activity/update', (req, res) => {
+    if (!req.body.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.25.1')
+    }
+    if (!req.body.type) {
+        return response(res, 400, 'required', 'Type is required', undefined, 'A-6.25.2')
+    }
+    if (!req.body.activity_key) {
+        return response(res, 400, 'required', 'Activity Key is required', undefined, 'A-6.25.3')
+    }
+
+    var projectID = String(req.body.project_id).trim(),
+        type = String(req.body.type).trim().toUpperCase(),
+        getKeyDB = getKeys(projectID),
+        activityKey = String(req.body.activity_key).trim(),
+        documents = []
+
+    if (type != "SERVICE" && type != "ACTIVITY") {
+        return response(res, 400, 'invalid', 'Invalid Type. Valid Activity Type: [Service, Activity]', undefined, 'A-6.25.4')
+    }
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.25.5') }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity) {
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.25.6')
+    }
+
+    var dbClientActivity = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity
+    if (!dbClientActivity[activityKey] || dbClientActivity[activityKey].deleted) {
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.25.7')
+    }
+
+    var tempActivity = dbClientActivity[activityKey]
+    if (tempActivity.type != type) {
+        return response(res, 404, 'notfound', 'Incorrect type', undefined, 'A-6.25.8')
+    }
+
+    directoryCreate(`/clients/${getKeyDB.client_key}/activity`)
+
+    if (req.files && req.files.file) {
+
+        var file = req.files.file,
+            directory = storageDirectory() + `/clients/${getKeyDB.client_key}/activity/`,
+            fileNameData = []
+
+        if (!Array.isArray(file)) {
+            var file = [req.files.file]
+        }
+
+        for (var i = 0; i < file.length; i++) {
+            var tempFile = file[i]
+
+            if ((tempFile.size / 1024 / 1024) > 15) {
+                return response(res, 403, 'forbidden', 'File size limit exceed. 15 MB/per file is maximum', undefined, 'A-6.25.9');
+            }
+
+            switch (tempFile.mimetype) {
+                case 'image/jpeg':
+                case 'image/jpg':
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.jpeg';
+                    break;
+                case 'image/png':
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.png';
+                    break;
+                case 'application/pdf':
+                    var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.pdf';
+                    break;
+                default:
+                    return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG/PDF are only valid file types.', undefined, 'A-6.25.10')
+
+            }
+
+            fileNameData.push(tempName)
+            documents.push({
+                filename: tempName,
+                createdOn: String(new Date()),
+                createdBy: 'ADMIN'
+            })
+        }
+
+    }
+
+    // Update for type : ACTIVITY
+    if (type == "ACTIVITY") {
+
+        if (!req.body.title) {
+            return response(res, 400, 'required', 'Title is required', undefined, 'A-6.25.11')
+        }
+
+        var title = String(req.body.title).trim()
+        tempActivity.title = title
+        tempActivity.lastModifiedBy = "ADMIN"
+        tempActivity.lastModifiedOn = String(new Date())
+
+        if (req.body.date) {
+            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) > new Date()) {
+                return response(res, 400, 'invalid', 'Invalid Date.Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.25.12')
+            }
+            tempActivity.date = String(new Date(req.body.date))
+        }
+
+        if (req.body.description) {
+            tempActivity.description = String(req.body.description).trim()
+        }
+
+        if (fileNameData && fileNameData.length != 0) {
+            if (tempActivity.documents) {
+                tempActivity.documents.push.apply(tempActivity.documents, documents)
+            } else {
+                tempActivity.documents = documents
+
+            }
+            // Move files  
+            var file = req.files.file
+            if (!Array.isArray(file)) {
+                var file = [req.files.file]
+            }
+            for (var j = 0; j < file.length; j++) {
+                var tempFile = file[j],
+                    tempName = fileNameData[j]
+                tempFile.mv(directory + tempName, (error) => {
+                    if (error) {
+                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.25.13')
+                    }
+                })
+            }
+        }
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}`).update(tempActivity).then(() => {
+            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.25.14')
+        })
+    }
+
+    // Update for type : SERVICE
+    if (type == "SERVICE") {
+        if (!req.body.service_id) {
+            return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.25.15')
+        }
+        if (!req.body.criteria) {
+            return response(res, 400, 'required', 'Criteria is required', undefined, 'A-6.25.16')
+        }
+
+        if (!dbAdminSnapshot.services) {
+            return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.17')
+        }
+        if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
+            return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.18')
+        }
+
+        var dbAdminService = dbAdminSnapshot.services,
+            dbAdminServiceKeys = Object.keys(dbAdminService),
+            serviceID = String(req.body.service_id)
+
+        try {
+            criteria = JSON.parse(req.body.criteria)
+        } catch {
+            return response(res, 404, 'notfound', 'Criteria must be in JSON Object. Hint: Stringify JSON object', {
+                json_object_sample: {
+                    "0": { "criteria_id": 13245689, "value": 50 },
+                    "1": { "criteria_id": 98765412, "value": 55 },
+                    "2": { "criteria_id": 32186547, "value": 55 }
+                }
+            }, 'A-6.25.19')
+        }
+
+
+        // DB Service - Criteria Validation
+        for (var i = 0; i < dbAdminServiceKeys.length; i++) {
+            var tempService = dbAdminService[dbAdminServiceKeys[i]]
+
+            // Check service in admin
+            if (tempService.service_id == serviceID && !tempService.deleted) {
+
+                // Project Service in client
+                var dbClientService = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+                    dbClientServiceKey = Object.keys(dbClientService)
+                for (var k = 0; k < dbClientServiceKey.length; k++) {
+                    var tempClientService = dbClientService[dbClientServiceKey[k]]
+                    if (tempClientService.active && tempClientService.service_id == serviceID && !tempClientService.deleted) {
+
+                        // DB Criteria
+                        if (tempService.criteria) {
+                            var dbServiceCriteria = tempService.criteria,
+                                dbServiceCriteriaKeys = Object.keys(dbServiceCriteria),
+                                activeCriteria = []
+
+                            for (var l = 0; l < dbServiceCriteriaKeys.length; l++) {
+                                if (!dbServiceCriteria[dbServiceCriteriaKeys[l]].deleted) {
+                                    activeCriteria.push(dbServiceCriteria[dbServiceCriteriaKeys[l]].criteria_id)
+                                }
+                            }
+                        }
+
+                        // Body Criteria Validation
+                        var pushCriteria = [];
+                        var bodyCriteriaKey = Object.keys(criteria)
+
+                        for (var l = 0; l < bodyCriteriaKey.length; l++) {
+                            var tempCriteria = criteria[bodyCriteriaKey[l]];
+                            if (tempCriteria.criteria_id && tempCriteria.value) {
+                                if (!activeCriteria.includes(tempCriteria.criteria_id)) {
+                                    return response(res, 403, 'forbidden', 'Invalid Criteria ID. Criteria ID does not exist in Service.', { invalid_criteria_id: tempCriteria.criteria_id }, 'A-6.25.20')
+                                }
+
+                                pushCriteria.push({
+                                    criteria_id: tempCriteria.criteria_id,
+                                    value: tempCriteria.value
+                                })
+                            } else {
+                                return response(res, 403, 'forbidden', 'Criteria ID and Value both are required', undefined, 'A-6.25.21')
+                            }
+                        }
+                        if (pushCriteria.length == 0) {
+                            return response(res, 400, 'required', 'At least one criteria is required', undefined, 'A-6.25.21')
+
+                        }
+                        i = dbAdminServiceKeys.length;
+                        break;
+                    } else if (k == dbClientServiceKey.length - 1) {
+                        return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.22')
+                    }
+                }
+            } else if (i == dbAdminServiceKeys.length - 1) {
+                return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.23')
+            }
+        }
+        tempActivity.lastModifiedOn = String(new Date())
+        tempActivity.lastModifiedBy = "ADMIN"
+        tempActivity.service_id = serviceID
+        tempActivity.criteria = pushCriteria
+
+        if (req.body.title) {
+            var title = String(req.body.title).trim()
+            tempActivity.title = title
+        }
+
+        if (req.body.description) {
+            var description = String(req.body.description).trim()
+            tempActivity.description = description
+        }
+
+        if (req.body.date) {
+            var date = new Date(req.body.date)
+            if (date == "Invalid Date" || date > new Date()) {
+                return response(res, 400, 'invalid', 'Invalid Date. Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.25.24')
+            }
+            tempActivity.date = String(date)
+        }
+
+        if (fileNameData && fileNameData.length != 0) {
+            pushData.documents = documents
+                // Move files  
+            var file = req.files.file
+            if (!Array.isArray(file)) {
+                var file = [req.files.file]
+            }
+            for (var j = 0; j < file.length; j++) {
+                var tempFile = file[j],
+                    tempName = fileNameData[j]
+                tempFile.mv(directory + tempName, (error) => {
+                    if (error) {
+                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.25.25')
+                    }
+                })
+            }
+        }
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).update(tempActivity).then(() => {
+            return response(res, 200, 'success', 'Activity has been updated successfully', undefined, 'A-6.25.26')
+        })
+    }
+})
+
+// 6.26 Remove File
+projectAPI.post('/activity/remove-file', (req, res) => {
+    if (!req.body.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.26.1')
+    }
+
+    if (!req.body.activity_key) {
+        return response(res, 400, 'required', 'Activity key is required', undefined, 'A-6.26.2')
+    }
+
+    if (!req.body.filename) {
+        return response(res, 400, 'required', 'Filename is required', undefined, 'A-6.26.3')
+    }
+
+    var projectID = String(req.body.project_id).trim(),
+        activityKey = String(req.body.activity_key).trim(),
+        fileName = String(req.body.filename).trim(),
+        getKeyDB = getKeys(projectID)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.26.4') }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity) {
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.26.5')
+    }
+
+    var dbClientActivity = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity
+    if (!dbClientActivity[activityKey] || dbClientActivity[activityKey].deleted || !dbClientActivity[activityKey].documents) {
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.26.6')
+    }
+
+    var activityDocuments = dbClientActivity[activityKey].documents,
+        activityDocumentsKeys = Object.keys(activityDocuments)
+
+    for (var i = 0; i < activityDocumentsKeys.length; i++) {
+
+        var tempImage = activityDocuments[activityDocumentsKeys[i]]
+        if (!tempImage.deleted && tempImage.filename == fileName) {
+
+            unlinkFile(fileName)
+            tempImage.deleted = true
+            tempImage.lastModifiedBy = "ADMIN"
+            tempImage.lastModifiedOn = String(new Date())
+
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/documents/${activityDocumentsKeys[i]}/`).update(tempImage).then(() => {
+                return response(res, 200, 'success', 'File has been removed successfully', undefined, 'A-6.26.7')
+            })
+
+        } else if (i == activityDocumentsKeys.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect filename', undefined, 'A-6.26.8')
+        }
+    }
+
 })
 
 function getKeys(project_id) {

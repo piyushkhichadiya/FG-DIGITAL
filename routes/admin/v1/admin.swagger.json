@@ -1573,6 +1573,131 @@
                 ],
                 "responses": {}
             }
+        },
+        "/project/activity/update": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "Add Activity",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "project_id",
+                        "required": true,
+                        "type": "number",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "type",
+                        "description": "Valid Type: Service, Activity",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "Service"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "activity_key",
+                        "description": "Activity key",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MFg4CmInxxcB1CoE8A-"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "service_id",
+                        "description": "Service ID. Required for Type Service",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "371889110187"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "criteria",
+                        "description": "JSON Object of Criteria",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": {
+                                "0": { "criteria_id": 390441675983, "value": 50 },
+                                "1": { "criteria_id": 1386407953254, "value": 55 },
+                                "2": { "criteria_id": 547034266151, "value": 55 }
+                            }
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "Describe Activity",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "description": "Demo description"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "title",
+                        "description": "Give title to activity. Required for type 'Activity'",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "title": "Demo Title"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "date",
+                        "description": "Date: YYYY/MM/DD HH:MM:SS AM/PM \n Use AM/PM for 12 Hour format",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "date": "2021/08/21 12:25:25 PM"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG, PDF \n File Size Limit: 15 MB",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/activity/remove-file": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "Update criteria to service",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "activity_key", "filename"],
+                        "properties": {
+                            "project_id": { "type": "integer" },
+                            "activity_key": { "type": "string" },
+                            "filename": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": 93492065515,
+                            "activity_key": "-MFd17vs4xBhgRPtEbrh",
+                            "filename": "Post-374085231658.png"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
         }
+
     }
 }

@@ -1,5 +1,6 @@
 const secrets = require('../config/secrets'),
     jwt = require('jsonwebtoken'),
+    fs = require('fs'),
     bcrypt = require('bcryptjs');
 
 module.exports = {
@@ -105,5 +106,30 @@ module.exports = {
             output[i.toLowerCase()] = jsonObject[i];
         }
         return output;
+    },
+    unlinkFile: (fileName) => {
+        var path = module.exports.storageDirectory() + '/',
+            filename = fileName
+        if (!fs.existsSync(path)) {
+            fs.mkdirSync(path, { recursive: true })
+        }
+        try {
+            var finder = finder = require('findit')(path),
+                finder_flag = false;
+            finder.on('directory', function(dir, stat, stop) {
+                var newPath = dir + '/'
+                if (fs.existsSync(newPath + filename)) {
+                    finder_flag = true;
+                    try {
+                        fs.unlinkSync(newPath + filename)
+                    } catch {}
+                    return true
+                }
+            });
+
+            finder.on('end', function() {
+                return false
+            });
+        } catch {}
     }
 }
