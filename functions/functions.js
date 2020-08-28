@@ -127,16 +127,17 @@ module.exports = {
         }
         return output;
     },
-    unlinkFile: (fileName) => {
+    unlinkFile: (filename) => {
         // Remove File from Storage Directory
 
         if (!filename) { return false }
 
-        var path = module.exports.storageDirectory() + '/',
-            filename = fileName
+        var path = module.exports.storageDirectory() + '/'
+
         if (!fs.existsSync(path)) {
             fs.mkdirSync(path, { recursive: true })
         }
+
         try {
             var finder = finder = require('findit')(path)
             finder.on('directory', function(dir, stat, stop) {

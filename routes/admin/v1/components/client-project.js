@@ -1220,7 +1220,6 @@ projectAPI.post('/review/update', (req, res) => {
             if (tempReview.closed) {
                 return response(res, 403, 'forbidden', 'Modification on Closed review are not allowed', undefined, 'A-6.21.10')
             }
-
             if (req.body.title) {
                 var title = String(req.body.title).trim()
                 if (title == "undefined" || title == null) {
@@ -1323,11 +1322,9 @@ projectAPI.post('/review/update-post', (req, res) => {
         var tempReview = reviewDB[reviewDBKeys[i]]
 
         if (tempReview.review_id == reviewID && !tempReview.deleted) {
-
             if (tempReview.closed) {
                 return response(res, 403, 'forbidden', 'Modification on Closed review are not allowed', undefined, 'A-6.22.13')
             }
-
             if (tempReview.post && tempReview.post[postKey] && !tempReview.post[postKey].deleted) {
 
                 var tempPost = postDB[postKey]
@@ -1476,7 +1473,6 @@ projectAPI.post('/activity/add', (req, res) => {
                 createdBy: 'ADMIN'
             })
         }
-
     }
 
     // Activity Type: Service
@@ -1505,7 +1501,7 @@ projectAPI.post('/activity/add', (req, res) => {
             return response(res, 404, 'notfound', 'Criteria must be in JSON Object. Hint: Stringify JSON object', {
                 json_object_sample: {
                     "0": { "criteria_id": 13245689, "value": 50 },
-                    "1": { "criteria_id": 98765412, "value": 55 },
+                    "1": { "criteria_id": 13245689, "value": 55 },
                     "2": { "criteria_id": 32186547, "value": 55 }
                 }
             }, 'A-6.24.11')
@@ -1540,19 +1536,31 @@ projectAPI.post('/activity/add', (req, res) => {
                         }
 
                         // Body Criteria Validation
-                        var pushCriteria = [];
-                        var bodyCriteriaKey = Object.keys(criteria)
+                        var pushCriteria = [],
+                            tempPushCriteria = [],
+                            bodyCriteriaKey = Object.keys(criteria)
+
                         for (var l = 0; l < bodyCriteriaKey.length; l++) {
                             var tempCriteria = criteria[bodyCriteriaKey[l]];
                             if (tempCriteria.criteria_id && tempCriteria.value) {
+
+                                if (isNaN(parseInt(tempCriteria.value)) || parseInt(tempCriteria.value) < 0) {
+                                    return response(res, 400, 'invalid', 'Criteria Value must be integer and greater than 0', undefined, 'A-6.24.24');
+                                }
+
                                 if (!activeCriteria.includes(tempCriteria.criteria_id)) {
                                     return response(res, 403, 'forbidden', 'Invalid Criteria ID. Criteria ID does not exist in Service.', { invalid_criteria_id: tempCriteria.criteria_id }, 'A-6.24.12')
                                 }
 
+                                if (tempPushCriteria.includes(tempCriteria.criteria_id)) {
+                                    return response(res, 400, 'invalid', 'Criteria ID must be unique', undefined, 'A-6.24.23')
+                                }
+
                                 pushCriteria.push({
                                     criteria_id: tempCriteria.criteria_id,
-                                    value: tempCriteria.value
+                                    value: parseInt(tempCriteria.value)
                                 })
+                                tempPushCriteria.push(tempCriteria.criteria_id)
                             } else {
                                 return response(res, 403, 'forbidden', 'Criteria ID and Value both are required', undefined, 'A-6.24.13')
                             }
@@ -1679,37 +1687,28 @@ projectAPI.post('/activity/update', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.25.1')
     }
-    if (!req.body.type) {
-        return response(res, 400, 'required', 'Type is required', undefined, 'A-6.25.2')
-    }
     if (!req.body.activity_key) {
-        return response(res, 400, 'required', 'Activity Key is required', undefined, 'A-6.25.3')
+        return response(res, 400, 'required', 'Activity Key is required', undefined, 'A-6.25.2')
     }
 
     var projectID = String(req.body.project_id).trim(),
-        type = String(req.body.type).trim().toUpperCase(),
         getKeyDB = getKeys(projectID),
-        activityKey = String(req.body.activity_key).trim(),
-        documents = []
+        activityKey = String(req.body.activity_key).trim()
 
-    if (type != "SERVICE" && type != "ACTIVITY") {
-        return response(res, 400, 'invalid', 'Invalid Type. Valid Activity Type: [Service, Activity]', undefined, 'A-6.25.4')
-    }
-    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.25.5') }
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.25.3') }
 
     if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity) {
-        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.25.6')
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.25.4')
     }
 
     var dbClientActivity = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity
     if (!dbClientActivity[activityKey] || dbClientActivity[activityKey].deleted) {
-        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.25.7')
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.25.5')
     }
 
-    var tempActivity = dbClientActivity[activityKey]
-    if (tempActivity.type != type) {
-        return response(res, 404, 'notfound', 'Incorrect type', undefined, 'A-6.25.8')
-    }
+    var tempActivity = dbClientActivity[activityKey],
+        type = tempActivity.type
 
     directoryCreate(`/clients/${getKeyDB.client_key}/activity`)
 
@@ -1717,7 +1716,8 @@ projectAPI.post('/activity/update', (req, res) => {
 
         var file = req.files.file,
             directory = storageDirectory() + `/clients/${getKeyDB.client_key}/activity/`,
-            fileNameData = []
+            fileNameData = [],
+            documents = []
 
         if (!Array.isArray(file)) {
             var file = [req.files.file]
@@ -1727,7 +1727,7 @@ projectAPI.post('/activity/update', (req, res) => {
             var tempFile = file[i]
 
             if ((tempFile.size / 1024 / 1024) > 15) {
-                return response(res, 403, 'forbidden', 'File size limit exceed. 15 MB/per file is maximum', undefined, 'A-6.25.9');
+                return response(res, 403, 'forbidden', 'File size limit exceed. 15 MB/per file is maximum', undefined, 'A-6.25.6');
             }
 
             switch (tempFile.mimetype) {
@@ -1742,7 +1742,7 @@ projectAPI.post('/activity/update', (req, res) => {
                     var tempName = 'Post-' + Math.floor(new Date().valueOf() * Math.random()) + '.pdf';
                     break;
                 default:
-                    return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG/PDF are only valid file types.', undefined, 'A-6.25.10')
+                    return response(res, 403, 'forbidden', 'Invalid File Type. JPG/JPEG/PNG/PDF are only valid file types.', undefined, 'A-6.25.7')
 
             }
 
@@ -1759,18 +1759,14 @@ projectAPI.post('/activity/update', (req, res) => {
     // Update for type : ACTIVITY
     if (type == "ACTIVITY") {
 
-        if (!req.body.title) {
-            return response(res, 400, 'required', 'Title is required', undefined, 'A-6.25.11')
+        if (req.body.title) {
+            var title = String(req.body.title).trim()
+            tempActivity.title = title
         }
-
-        var title = String(req.body.title).trim()
-        tempActivity.title = title
-        tempActivity.lastModifiedBy = "ADMIN"
-        tempActivity.lastModifiedOn = String(new Date())
 
         if (req.body.date) {
             if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) > new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date.Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.25.12')
+                return response(res, 400, 'invalid', 'Invalid Date.Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.25.8')
             }
             tempActivity.date = String(new Date(req.body.date))
         }
@@ -1784,8 +1780,8 @@ projectAPI.post('/activity/update', (req, res) => {
                 tempActivity.documents.push.apply(tempActivity.documents, documents)
             } else {
                 tempActivity.documents = documents
-
             }
+
             // Move files  
             var file = req.files.file
             if (!Array.isArray(file)) {
@@ -1796,113 +1792,151 @@ projectAPI.post('/activity/update', (req, res) => {
                     tempName = fileNameData[j]
                 tempFile.mv(directory + tempName, (error) => {
                     if (error) {
-                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.25.13')
+                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.25.9')
                     }
                 })
             }
         }
+
+        tempActivity.lastModifiedBy = "ADMIN"
+        tempActivity.lastModifiedOn = String(new Date())
+
         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}`).update(tempActivity).then(() => {
-            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.25.14')
+            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.25.10')
         })
     }
 
     // Update for type : SERVICE
     if (type == "SERVICE") {
-        if (!req.body.service_id) {
-            return response(res, 400, 'required', 'Service ID is required', undefined, 'A-6.25.15')
-        }
-        if (!req.body.criteria) {
-            return response(res, 400, 'required', 'Criteria is required', undefined, 'A-6.25.16')
-        }
+
+        var serviceID = tempActivity.service_id
 
         if (!dbAdminSnapshot.services) {
-            return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.17')
+            return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.11')
         }
         if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service) {
-            return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.18')
+            return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.12')
         }
 
-        var dbAdminService = dbAdminSnapshot.services,
-            dbAdminServiceKeys = Object.keys(dbAdminService),
-            serviceID = String(req.body.service_id)
-
-        try {
-            criteria = JSON.parse(req.body.criteria)
-        } catch {
-            return response(res, 404, 'notfound', 'Criteria must be in JSON Object. Hint: Stringify JSON object', {
-                json_object_sample: {
-                    "0": { "criteria_id": 13245689, "value": 50 },
-                    "1": { "criteria_id": 98765412, "value": 55 },
-                    "2": { "criteria_id": 32186547, "value": 55 }
-                }
-            }, 'A-6.25.19')
-        }
-
-
-        // DB Service - Criteria Validation
-        for (var i = 0; i < dbAdminServiceKeys.length; i++) {
-            var tempService = dbAdminService[dbAdminServiceKeys[i]]
-
-            // Check service in admin
-            if (tempService.service_id == serviceID && !tempService.deleted) {
-
-                // Project Service in client
-                var dbClientService = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
-                    dbClientServiceKey = Object.keys(dbClientService)
-                for (var k = 0; k < dbClientServiceKey.length; k++) {
-                    var tempClientService = dbClientService[dbClientServiceKey[k]]
-                    if (tempClientService.active && tempClientService.service_id == serviceID && !tempClientService.deleted) {
-
-                        // DB Criteria
-                        if (tempService.criteria) {
-                            var dbServiceCriteria = tempService.criteria,
-                                dbServiceCriteriaKeys = Object.keys(dbServiceCriteria),
-                                activeCriteria = []
-
-                            for (var l = 0; l < dbServiceCriteriaKeys.length; l++) {
-                                if (!dbServiceCriteria[dbServiceCriteriaKeys[l]].deleted) {
-                                    activeCriteria.push(dbServiceCriteria[dbServiceCriteriaKeys[l]].criteria_id)
-                                }
-                            }
-                        }
-
-                        // Body Criteria Validation
-                        var pushCriteria = [];
-                        var bodyCriteriaKey = Object.keys(criteria)
-
-                        for (var l = 0; l < bodyCriteriaKey.length; l++) {
-                            var tempCriteria = criteria[bodyCriteriaKey[l]];
-                            if (tempCriteria.criteria_id && tempCriteria.value) {
-                                if (!activeCriteria.includes(tempCriteria.criteria_id)) {
-                                    return response(res, 403, 'forbidden', 'Invalid Criteria ID. Criteria ID does not exist in Service.', { invalid_criteria_id: tempCriteria.criteria_id }, 'A-6.25.20')
-                                }
-
-                                pushCriteria.push({
-                                    criteria_id: tempCriteria.criteria_id,
-                                    value: tempCriteria.value
-                                })
-                            } else {
-                                return response(res, 403, 'forbidden', 'Criteria ID and Value both are required', undefined, 'A-6.25.21')
-                            }
-                        }
-                        if (pushCriteria.length == 0) {
-                            return response(res, 400, 'required', 'At least one criteria is required', undefined, 'A-6.25.21')
-
-                        }
-                        i = dbAdminServiceKeys.length;
-                        break;
-                    } else if (k == dbClientServiceKey.length - 1) {
-                        return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.22')
+        if (req.body.criteria) {
+            try {
+                JSON.parse(req.body.criteria)
+            } catch {
+                return response(res, 404, 'notfound', 'Criteria must be in JSON Object. Hint: Stringify JSON object', {
+                    json_object_sample: {
+                        "0": { "criteria_id": 13245689, "value": 50 },
+                        "1": { "criteria_id": 98765412, "value": 55 },
+                        "2": { "criteria_id": 32186547, "value": 55 }
                     }
+                }, 'A-6.25.13')
+            }
+
+            var dbAdminService = dbAdminSnapshot.services,
+                dbAdminServiceKeys = Object.keys(dbAdminService)
+
+            // DB Service - Criteria Validation
+            for (var i = 0; i < dbAdminServiceKeys.length; i++) {
+                var tempService = dbAdminService[dbAdminServiceKeys[i]]
+
+                // Check service in admin
+                if (tempService.service_id == serviceID && !tempService.deleted) {
+
+                    i = dbAdminServiceKeys.length; // Break DB Service Loop, Because Service ID matched
+
+                    // Project Service in client
+                    var dbClientService = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].service,
+                        dbClientServiceKey = Object.keys(dbClientService)
+
+                    for (var k = 0; k < dbClientServiceKey.length; k++) {
+                        var tempClientService = dbClientService[dbClientServiceKey[k]]
+
+                        if (tempClientService.active && tempClientService.service_id == serviceID && !tempClientService.deleted) {
+
+                            // DB Criteria
+                            if (tempService.criteria) {
+                                var dbServiceCriteria = tempService.criteria,
+                                    dbServiceCriteriaKeys = Object.keys(dbServiceCriteria),
+                                    activeCriteria = [],
+                                    inActiveCriteria = []
+
+                                for (var l = 0; l < dbServiceCriteriaKeys.length; l++) {
+                                    if (!dbServiceCriteria[dbServiceCriteriaKeys[l]].deleted) {
+                                        activeCriteria.push(dbServiceCriteria[dbServiceCriteriaKeys[l]].criteria_id)
+                                    } else {
+                                        inActiveCriteria.push(dbServiceCriteria[dbServiceCriteriaKeys[l]].criteria_id)
+                                    }
+                                }
+                            }
+
+                            // Body Criteria Validation
+                            var bodyCriteria = JSON.parse(req.body.criteria),
+                                bodyCriteriaKey = Object.keys(bodyCriteria),
+                                newPushCriteria = [],
+                                newCriteria = []
+                            for (var l = 0; l < bodyCriteriaKey.length; l++) {
+
+                                var tempCriteria = bodyCriteria[bodyCriteriaKey[l]];
+
+                                if (tempCriteria.criteria_id && tempCriteria.value) {
+
+                                    if (isNaN(parseInt(tempCriteria.value)) || parseInt(tempCriteria.value) < 0) {
+                                        return response(res, 400, 'invalid', 'Criteria Value must be integer and greater than 0', undefined, 'A-6.25.14');
+                                    }
+
+                                    // Check That criteria is active
+                                    if (activeCriteria.includes(tempCriteria.criteria_id)) {
+
+                                        if (tempActivity.criteria) {
+
+                                            // Check DB that Criteria is already exit or not
+                                            var tempActivityCriteria = tempActivity.criteria,
+                                                tempActivityCriteriaKey = Object.keys(tempActivityCriteria)
+
+                                            for (var c = 0; c < tempActivityCriteriaKey.length; c++) {
+                                                var tempClientCriteria = tempActivityCriteria[tempActivityCriteriaKey[c]]
+
+                                                // If exist
+                                                if (tempClientCriteria.criteria_id == tempCriteria.criteria_id) {
+
+                                                    if (tempClientCriteria.value != tempCriteria.value) {
+                                                        tempClientCriteria.value = parseInt(tempCriteria.value)
+                                                        tempClientCriteria.lastModifiedOn = String(new Date())
+                                                        tempClientCriteria.lastModifiedBy = 'ADMIN'
+                                                    }
+                                                    break;
+                                                } else if (c == tempActivityCriteriaKey.length - 1 && !newPushCriteria.includes(tempCriteria.criteria_id)) {
+                                                    // If already not exist
+                                                    newCriteria.push({
+                                                        criteria_id: tempCriteria.criteria_id,
+                                                        value: parseInt(tempCriteria.value),
+                                                        createdOnOn: String(new Date()),
+                                                        createdOnBy: 'ADMIN'
+                                                    });
+
+                                                    // For Checking, New Criteria Repeat or not
+                                                    newPushCriteria.push(tempCriteria.criteria_id)
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    return response(res, 403, 'forbidden', 'Criteria ID and Value both are required', undefined, 'A-6.25.15')
+                                }
+
+                                if (l == bodyCriteriaKey.length - 1 && newCriteria.length != 0) {
+                                    tempActivityCriteria.push.apply(tempActivityCriteria, newCriteria)
+                                }
+                            }
+                            break;
+                        } else if (k == dbClientServiceKey.length - 1) {
+                            return response(res, 404, 'notfound', 'Service ID Incorrect. Service ID is not associated with Project', undefined, 'A-6.25.16')
+                        }
+                    }
+                } else if (i == dbAdminServiceKeys.length - 1) {
+                    return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.17')
                 }
-            } else if (i == dbAdminServiceKeys.length - 1) {
-                return response(res, 404, 'notfound', 'Service ID Incorrect', undefined, 'A-6.25.23')
             }
         }
-        tempActivity.lastModifiedOn = String(new Date())
-        tempActivity.lastModifiedBy = "ADMIN"
-        tempActivity.service_id = serviceID
-        tempActivity.criteria = pushCriteria
 
         if (req.body.title) {
             var title = String(req.body.title).trim()
@@ -1917,14 +1951,19 @@ projectAPI.post('/activity/update', (req, res) => {
         if (req.body.date) {
             var date = new Date(req.body.date)
             if (date == "Invalid Date" || date > new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date. Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.25.24')
+                return response(res, 400, 'invalid', 'Invalid Date. Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.25.18')
             }
             tempActivity.date = String(date)
         }
 
         if (fileNameData && fileNameData.length != 0) {
-            pushData.documents = documents
-                // Move files  
+            if (tempActivity.documents) {
+                tempActivity.documents.push.apply(tempActivity.documents, documents)
+            } else {
+                tempActivity.documents = documents
+            }
+
+            // Move files  
             var file = req.files.file
             if (!Array.isArray(file)) {
                 var file = [req.files.file]
@@ -1934,13 +1973,16 @@ projectAPI.post('/activity/update', (req, res) => {
                     tempName = fileNameData[j]
                 tempFile.mv(directory + tempName, (error) => {
                     if (error) {
-                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.25.25')
+                        return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.25.19')
                     }
                 })
             }
         }
+
+        tempActivity.lastModifiedOn = String(new Date())
+        tempActivity.lastModifiedBy = "ADMIN"
         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).update(tempActivity).then(() => {
-            return response(res, 200, 'success', 'Activity has been updated successfully', undefined, 'A-6.25.26')
+            return response(res, 200, 'success', 'Activity has been updated successfully', undefined, 'A-6.25.20')
         })
     }
 })
@@ -1961,8 +2003,9 @@ projectAPI.post('/activity/remove-file', (req, res) => {
 
     var projectID = String(req.body.project_id).trim(),
         activityKey = String(req.body.activity_key).trim(),
-        fileName = String(req.body.filename).trim(),
+        filename = String(req.body.filename).trim(),
         getKeyDB = getKeys(projectID)
+
 
     if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.26.4') }
 
@@ -1971,7 +2014,7 @@ projectAPI.post('/activity/remove-file', (req, res) => {
     }
 
     var dbClientActivity = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity
-    if (!dbClientActivity[activityKey] || dbClientActivity[activityKey].deleted || !dbClientActivity[activityKey].documents) {
+    if (!dbClientActivity[activityKey] || dbClientActivity[activityKey].deleted) {
         return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.26.6')
     }
 
@@ -1984,15 +2027,16 @@ projectAPI.post('/activity/remove-file', (req, res) => {
 
     for (var i = 0; i < activityDocumentsKeys.length; i++) {
 
-        var tempImage = activityDocuments[activityDocumentsKeys[i]]
-        if (!tempImage.deleted && tempImage.filename == fileName) {
+        var tempDocument = activityDocuments[activityDocumentsKeys[i]]
 
-            unlinkFile(fileName)
-            tempImage.deleted = true
-            tempImage.lastModifiedBy = "ADMIN"
-            tempImage.lastModifiedOn = String(new Date())
+        if (!tempDocument.deleted && tempDocument.filename == filename) {
 
-            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/documents/${activityDocumentsKeys[i]}/`).update(tempImage).then(() => {
+            console.log(unlinkFile(filename), filename)
+            tempDocument.deleted = true
+            tempDocument.lastModifiedBy = "ADMIN"
+            tempDocument.lastModifiedOn = String(new Date())
+
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/documents/${activityDocumentsKeys[i]}/`).update(tempDocument).then(() => {
                 return response(res, 200, 'success', 'File has been removed successfully', undefined, 'A-6.26.7')
             })
 
