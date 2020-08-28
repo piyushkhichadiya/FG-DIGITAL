@@ -103,13 +103,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Service Details</h1>
+                            <h1 id="lbl_title">Create Service</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item active"><a href="/admin/services">Services</a></li>
-                                <li class="breadcrumb-item active">Service Details</li>
+                                <li class="breadcrumb-item active" id="lbl_navTitle">Create</li>
                             </ol>
                         </div>
                     </div>
@@ -204,6 +204,8 @@
             $('#btn_update').show();
             $('#div_Remove').show();
             $('#div_Criteria').show();
+            $('#lbl_navTitle').html('Details');
+            $('#lbl_title').html('Service Details');
         }
     });
 
@@ -249,14 +251,13 @@
         var name = $('#txt_service').val()
         if (!name) {
             return $(document).Toasts('create', {
-                title: 'Service Name missing',
+                title: 'Service Name required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Service name',
                 class: 'bg-danger',
             });
         }
-        $('#btn_create').attr('disabled', true)
         $.post({
             url: '/admin/v1/service/create',
             data: {
@@ -282,7 +283,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_create').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_create').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_create').removeAttr('disabled')
             }
         });
 
@@ -293,14 +299,13 @@
             name = $('#txt_service').val();
         if (!name) {
             return $(document).Toasts('create', {
-                title: 'Service Name missing',
+                title: 'Service Name required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Service name',
                 class: 'bg-danger',
             });
         };
-        $('#btn_update').attr('disabled', true)
         $.post({
             type: 'POST',
             url: '/admin/v1/service/update',
@@ -316,7 +321,6 @@
                     body: 'Service Updated',
                     class: 'bg-success',
                 });
-                $('#btn_update').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -327,7 +331,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_update').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
             }
         });
     });
@@ -342,7 +351,6 @@
             confirmButtonText: 'Remove'
         }).then((result) => {
             if (result.value) {
-                $('#btn_remove').attr('disabled', true)
                 $.get({
                     url: `/admin/v1/service/remove?service_id=${service_id}`,
                     success: function() {
@@ -364,7 +372,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
-                        $('#btn_remove').attr('disabled', false)
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
                     }
                 });
             }
@@ -383,7 +396,6 @@
                 class: 'bg-danger',
             });
         }
-        $('#btn_add').attr('disabled', true)
         $.post({
             url: '/admin/v1/service/criteria/add',
             data: {
@@ -400,7 +412,7 @@
                 });
                 $('#div_criteriaAdd').empty();
                 getService(service_id);
-                $('#btn_add').attr('disabled', false)
+                $('#txt_Criteria').val('');
             },
             error: error => {
                 error = error.responseJSON
@@ -411,7 +423,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_add').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
             }
         });
     })
@@ -428,7 +445,6 @@
                 class: 'bg-danger',
             });
         }
-        $(`#btn_UpdateCriteria_${index}`).attr('disabled', true)
         $.post({
             url: '/admin/v1/service/criteria/update',
             data: {
@@ -444,7 +460,6 @@
                     body: 'Criteria Updated Successfully',
                     class: 'bg-success',
                 });
-                $(`#btn_UpdateCriteria_${index}`).attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -455,7 +470,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $(`#btn_UpdateCriteria_${index}`).attr('disabled', false)
+            },
+            beforeSend: () => {
+                $(`#btn_UpdateCriteria_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_UpdateCriteria_${index}`).removeAttr('disabled')
             }
         });
     }
@@ -470,7 +490,6 @@
             confirmButtonText: 'Remove'
         }).then((result) => {
             if (result.value) {
-                $(`#btn_removeCriteria_${index}`).attr('disabled', true)
                 $.get({
                     url: `/admin/v1/service/criteria/remove?service_id=${service_id}&criteria_id=${criteria_id}`,
                     success: result => {
@@ -493,7 +512,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
-                        $(`#btn_removeCriteria_${index}`).attr('disabled', false)
+                    },
+                    beforeSend: () => {
+                        $(`#btn_removeCriteria_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`#btn_removeCriteria_${index}`).removeAttr('disabled')
                     }
                 });
             }

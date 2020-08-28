@@ -210,12 +210,11 @@
         $.getJSON('/admin/v1/employee/get', (data) => {
             var empData = data.data
             for (var i = 0; i < empData.length; i++) {
-                console.log(empData[0])
                 var tempEmp = empData[i],
-                    button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/employee/add?emp_id=${tempEmp.employee_id}'">open</button>`,
+                    button = `<button class='btn btn-info' onclick="window.location.href ='/admin/employee/view?emp_id=${tempEmp.employee_id}'"><i class="fas fa-eye"></i> View</button>`,
                     image;
                 if (tempEmp.profile_image) {
-                    image = `<img src='/admin/v1/profile/file/${tempEmp.profile_image}' style='border-radius: 50%; height:70px;width:70px'>`
+                    image = `<img src='/admin/v1/profile/file/${tempEmp.profile_image}' onError="this.onerror=null;this.src='images/logo-small.png';" style='border-radius: 50%; height:70px;width:70px'>`
                 } else {
                     image = `<img src='images/logo-small.png' style='border-radius: 50%; height:70px;width:70px'>`
                 }

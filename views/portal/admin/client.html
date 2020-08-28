@@ -76,7 +76,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
                                 <p>Client</p>
                             </a>
                         </li>
@@ -207,7 +207,7 @@
             var dataClient = data.data
             for (var i = 0; i < dataClient.length; i++) {
                 var tempClient = dataClient[i];
-                button = `<div class="btn-group"><button class='btn btn-secondary m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'"><i class='fas fa-eye'></i> View</button><button class='btn btn-secondary m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'"><i class='fas fa-passport'></i> Projects</button></div>`
+                button = `<div class="btn-group"><button class='btn btn-info m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'"><i class='fas fa-eye'></i> View</button><button class='btn btn-warning m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'"><i class='fas fa-passport'></i> Projects</button></div>`
                 tblClient.row.add([
                     `${i+1}`, tempClient.name, tempClient.email, button
                 ]).draw();

@@ -105,13 +105,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Add Project</h1>
+                            <h1 id="lbl_project">Add Project</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                                <li class="breadcrumb-item"><a href="/admin/client">Client</a></li>
-                                <li class="breadcrumb-item active">Add Project</li>
+                                <li class="breadcrumb-item"><a href="/admin/client">{Client name}</a></li>
+                                <li class="breadcrumb-item active" id="lbl_navProject">Add Project</li>
                             </ol>
                         </div>
                     </div>
@@ -128,6 +128,7 @@
                                     <label>Plan Name:</label>
                                     <select class="form-control" id="list_planName">
                                     </select>
+                                    <input type="text" id="txt_planName" class="form-control" placeholder="Amount" style="display:none;">
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -155,29 +156,8 @@
                         <div class="row form-group">
                             <div class="col-md-12">
                                 <button class="btn btn-outline-primary float-right" id="btn_add"><i class="fas fa-plus"></i> Add Project</button>
+                                <button class="btn btn-outline-danger float-right ml-2" id="btn_remove" style="display: none;"><i class="fas fa-trash-alt"></i> Remove</button>
                                 <button class="btn btn-outline-primary float-right" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
-                            </div>
-                        </div>
-                        <div id="div_projectInfo" style="display: none;">
-                            <hr>
-                            <h4 class="header-title">Project Info.</h4>
-                            <div class="row form-group">
-                                <label for="inputEmail3" class="col-md-2 col-form-label">Project Name:</label>
-                                <div class="col-md-3">
-                                    <input type="text" class="form-control" id="txt_projectName" placeholder="Project Name">
-                                </div>
-                            </div>
-                            <div class="row form-group">
-                                <label for="inputEmail3" class="col-md-2 col-form-label">Description:</label>
-                                <div class="col-md-3">
-                                    <textarea class="form-control" id="txt_description" rows="4" placeholder="Description ..."></textarea>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button class="btn btn-outline-danger float-right ml-2" id="btn_remove"><i class="fas fa-trash-alt"></i> Remove</button>
-                                    <button class="btn btn-outline-primary float-right" id="btn_updateInfo"><i class="fas fa-pencil-alt"></i> Update Information</button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -247,7 +227,9 @@
             $('#div_projectInfo').show();
             $('#btn_add').hide();
             $('#btn_update').show();
-
+            $('#btn_remove').show();
+            $('#lbl_navProject').html('View Project')
+            $('#lbl_project').html('View Project')
         }
 
         $.get(`/admin/v1/plan/get`, (data) => {
@@ -285,9 +267,11 @@
                     d = start_date.getDate(),
                     m = start_date.getMonth() + 1,
                     y = start_date.getFullYear();
-                $('#list_planName').val(plan);
                 if (urlParams.has('plan_id')) {
-                    $('#list_planName').attr('disabled', true)
+                    $('#list_planName').remove();
+                    $('#txt_planName').show();
+                    $('#txt_planName').val(plan);
+                    $('#txt_planName').attr('disabled', true);
                 }
                 $('#txt_amount').val(price);
                 $('#txt_days').val(days);
@@ -299,30 +283,6 @@
 
             };
 
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
-
-        $.get(`/admin/v1/project/get?client_id=${client_id}`, (data) => {
-            var ProjectData = data.data;
-            if (ProjectData) {
-                for (var i = 0; i < ProjectData.length; i++) {
-                    var tempProj = ProjectData[i]
-                    if (tempProj.project_id == plan_id) {
-                        var Description = tempProj.project_description,
-                            ProjectName = tempProj.project_name;
-                        $('#txt_projectName').val(ProjectName);
-                        $('#txt_description').val(Description);
-                    }
-                }
-            }
         }).fail(error => {
             error = error.responseJSON
             $(document).Toasts('create', {
@@ -357,7 +317,7 @@
             startDate = $('#txt_startDate').val();
         if (!plan) {
             return $(document).Toasts('create', {
-                title: 'Plan name missing',
+                title: 'Plan name is required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Plan name',
@@ -366,7 +326,7 @@
         }
         if (!amount || isNaN(amount)) {
             return $(document).Toasts('create', {
-                title: 'Amount missing',
+                title: 'Amount required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Valid Plan Amount',
@@ -384,7 +344,7 @@
         }
         if (!day || isNaN(day)) {
             return $(document).Toasts('create', {
-                title: 'Duration missing',
+                title: 'days required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Valid days',
@@ -402,14 +362,13 @@
         }
         if (!startDate) {
             return $(document).Toasts('create', {
-                title: 'Date missing',
+                title: 'Duration required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Project start date',
                 class: 'bg-danger',
             });
         }
-        $('#btn_add').attr('disabled', true)
         $.post({
             url: '/admin/v1/client/plan/add',
             data: {
@@ -439,7 +398,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_add').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
             }
         });
     });
@@ -452,7 +416,7 @@
             startDate = $('#txt_startDate').val();
         if (!amount || isNaN(amount)) {
             return $(document).Toasts('create', {
-                title: 'Amount missing',
+                title: 'Amount required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Valid Plan Amount',
@@ -472,7 +436,7 @@
         }
         if (!day || isNaN(day)) {
             return $(document).Toasts('create', {
-                title: 'Duration missing',
+                title: 'Duration required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Valid days',
@@ -492,14 +456,13 @@
         }
         if (!startDate) {
             return $(document).Toasts('create', {
-                title: 'Date missing',
+                title: 'Date required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Project start date',
                 class: 'bg-danger',
             });
         }
-        $('#btn_update').attr('disabled', true)
         $.post({
             type: 'POST',
             url: '/admin/v1/client/plan/update',
@@ -518,7 +481,6 @@
                     body: 'Plan Details Updated',
                     class: 'bg-success',
                 });
-                $('#btn_update').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -529,70 +491,15 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_update').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
             }
         });
     });
-
-    $('#btn_updateInfo').click(() => {
-        var project_id = urlParams.get('plan_id'),
-            project_name = $('#txt_projectName').val(),
-            project_description = $('#txt_description').val();
-        if (!project_name) {
-            return $(document).Toasts('create', {
-                title: 'Project Name Missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project Name',
-                class: 'bg-danger',
-            });
-        } else {
-            project_name = String(project_name)
-        }
-        if (!project_description) {
-            return $(document).Toasts('create', {
-                title: 'Description Missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project Description',
-                class: 'bg-danger',
-            });
-        } else {
-            project_description = String(project_description)
-        }
-        $('#btn_updateInfo').attr('disabled', true)
-        $.post({
-            type: 'POST',
-            url: '/admin/v1/project/update',
-            data: {
-                "project_id": project_id,
-                "project_name": project_name,
-                "project_description": project_description,
-            },
-            success: result => {
-                $(document).Toasts('create', {
-                    title: 'Updated',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Projects Info. Updated',
-                    class: 'bg-success',
-                });
-                $('#btn_updateInfo').attr('disabled', false)
-            },
-            error: error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
-                $('#btn_updateInfo').attr('disabled', false)
-            }
-        });
-    });
-
     $('#btn_remove').click(() => {
         var clientId = urlParams.get('client_id'),
             project_id = urlParams.get('plan_id');
@@ -604,7 +511,6 @@
             confirmButtonText: 'Remove'
         }).then((result) => {
             if (result.value) {
-                $('#btn_remove').attr('disabled', true)
                 $.post({
                     type: 'POST',
                     url: '/admin/v1/client/plan/remove',
@@ -631,7 +537,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
-                        $('#btn_remove').attr('disabled', false)
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
                     }
                 });
             }

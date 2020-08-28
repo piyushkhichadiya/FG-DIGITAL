@@ -98,13 +98,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Add Plan</h1>
+                            <h1 id="lbl_title">Add Plan</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/plan">Plan</a></li>
-                                <li class="breadcrumb-item active">Add Plan</li>
+                                <li class="breadcrumb-item active" id="lbl_navTitle">Add</li>
                             </ol>
                         </div>
                     </div>
@@ -137,8 +137,7 @@
                         <div class="row form-group">
                             <div class="col-md-12">
                                 <button class="btn btn-outline-primary float-right mr-2 ml-2" id="btn_add"><i class="fas fa-plus"></i> Add</button>
-                                <button class="btn btn-outline-primary float-right ml-2" id="btn_update"><i class="fas fa-pencil-alt"></i> Update</button>
-                                <button class="btn btn-outline-danger float-right" id="btn_remove"><i class="fas fa-trash-alt"></i> Remove</button>
+                                <button class="btn btn-outline-primary float-right" id="btn_update"><i class="fas fa-pencil-alt"></i> Update</button>
 
                             </div>
                         </div>
@@ -195,7 +194,7 @@
         days = $('#txt_days').val()
         if (!plan || !amount || !days) {
             return $(document).Toasts('create', {
-                title: 'Data missing',
+                title: 'All data required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please fill out all fields',
@@ -220,7 +219,6 @@
                 class: 'bg-danger',
             });
         }
-        $('#btn_add').attr('disabled', true)
         $.post({
             url: '/admin/v1/plan/add',
             data: {
@@ -247,6 +245,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
             }
         });
     });
@@ -264,6 +268,8 @@
             $('#btn_add').hide();
             $('#btn_update').show();
             $('#btn_remove').show();
+            $('#lbl_navTitle').html('Details');
+            $('#lbl_title').html('Plan Details');
             $.get('/admin/v1/plan/get?plan_id=' + urlParams.get('plan_id'), data => {
                 var data = data.data
                 $('#txt_pname').val(data.plan_name)
@@ -297,7 +303,6 @@
                     class: 'bg-danger',
                 });
             }
-            $('#btn_update').attr('disabled', true)
             $.post({
                 url: '/admin/v1/plan/update',
                 data: {
@@ -314,7 +319,6 @@
                         body: 'Plan Details update Successfully',
                         class: 'bg-success',
                     });
-                    $('#btn_update').attr('disabled', false)
                 },
                 error: error => {
                     error = error.responseJSON
@@ -325,47 +329,15 @@
                         body: error.message,
                         class: 'bg-danger',
                     });
+                },
+                beforeSend: () => {
+                    $('#btn_update').attr('disabled', true)
+                },
+                complete: () => {
+                    $('#btn_update').removeAttr('disabled')
                 }
             });
         }
-    });
-
-    $('#btn_remove').click(() => {
-        var p_id = urlParams.get('plan_id')
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You want to remove this Plan",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Remove'
-        }).then((result) => {
-            if (result.value) {
-                $('#btn_remove').attr('disabled', true)
-                $.get({
-                    url: `/admin/v1/plan/remove?plan_id=${p_id}`,
-                    success: result => {
-                        $(document).Toasts('create', {
-                            title: 'Success',
-                            autohide: true,
-                            delay: 5000,
-                            body: 'Plan removed successfully',
-                            class: 'bg-success',
-                        });
-                        window.location.href = '/admin/plan'
-                    },
-                    error: error => {
-                        error = error.responseJSON
-                        $(document).Toasts('create', {
-                            title: 'Error #' + error.code,
-                            autohide: true,
-                            delay: 5000,
-                            body: error.message,
-                            class: 'bg-danger',
-                        });
-                    }
-                });
-            }
-        });
     });
 </script>
 

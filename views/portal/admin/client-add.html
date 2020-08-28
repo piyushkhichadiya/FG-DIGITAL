@@ -246,7 +246,7 @@
             password = $('#txt_password').val();
         if (!name) {
             return $(document).Toasts('create', {
-                title: 'Name missing',
+                title: 'Name required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Client name',
@@ -255,7 +255,7 @@
         }
         if (!email) {
             return $(document).Toasts('create', {
-                title: 'Email missing',
+                title: 'Email required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Email address',
@@ -264,14 +264,13 @@
         }
         if (!password) {
             return $(document).Toasts('create', {
-                title: 'Password Missing',
+                title: 'Password required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please enter password',
                 class: 'bg-danger',
             });
         }
-        $('#btn_add').attr('disabled', true)
         $.post({
             url: '/admin/v1/client/create',
             data: {
@@ -299,7 +298,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_add').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
             }
         });
     });
@@ -330,7 +334,6 @@
         } else {
             email = String(email)
         }
-        $('#btn_update').attr('disabled', true)
         $.post({
             url: '/admin/v1/client/update',
             data: {
@@ -346,7 +349,6 @@
                     body: 'Client details Updated',
                     class: 'bg-success',
                 });
-                $('#btn_update').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -357,7 +359,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_update').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
             }
         });
     });
@@ -372,7 +379,6 @@
             confirmButtonText: 'Remove'
         }).then((result) => {
             if (result.value) {
-                $('#btn_remove').attr('disabled', true)
                 $.get({
                     url: `/admin/v1/client/remove?client_id=${client_id}`,
                     success: function() {
@@ -394,7 +400,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
-                        $('#btn_remove').attr('disabled', false)
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
                     }
                 });
             }
@@ -426,7 +437,6 @@
                 class: 'bg-danger',
             });
         }
-        $('#btn_updatePassword').attr('disabled', true)
         $.post({
             url: '/admin/v1/client/change-password',
             data: {
@@ -443,7 +453,6 @@
                 });
                 $('#txt_newPassword').val(null)
                 $('#txt_cPass').val(null)
-                $('#btn_updatePassword').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -454,7 +463,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_updatePassword').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_updatePassword').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_updatePassword').removeAttr('disabled')
             }
         });
 

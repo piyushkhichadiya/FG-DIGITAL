@@ -209,13 +209,59 @@
 
             for (var i = 0; i < dbPlan.length; i++) {
                 var tempPlan = dbPlan[i]
+                var button = `<div class='btn-group'>
+                <button class ="btn btn-info m-1" onclick="window.location.href ='/admin/plan/add?plan_id=${tempPlan.plan_id}'"><i class="fas fa-pencil-alt"></i> Edit</button>
+                <button class ="btn btn-danger m-1" id="btn_remove_${i}" onclick=removePlan(${i},'${tempPlan.plan_id}')><i class="fas fa-trash-alt"></i> Remove</button>
+                </div>`
                 tblplan.row.add([
                     `${j++}`, tempPlan.plan_name, tempPlan.price, tempPlan.days,
-                    `<button class ="btn btn-secondary w-100" onclick="window.location.href ='/admin/plan/add?plan_id=${tempPlan.plan_id}'">Open</button>`
+                    button
                 ]).draw();
             }
         });
     });
+
+    function removePlan(index, value) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Plan",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/plan/remove?plan_id=${value}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Plan removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
+                    }
+                });
+            }
+        });
+    };
 </script>
 
 </html>

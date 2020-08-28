@@ -133,7 +133,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <button class="btn btn-outline-primary float-right" id="btn_updateProfile">Update Profile</button>
+                                <button class="btn btn-outline-primary float-right" id="btn_updateProfile"><i class="fas fa-pencil-alt"></i> Update Profile</button>
                             </div>
                         </div>
                         <hr>
@@ -146,7 +146,7 @@
                                 <input type="password" class="form-control" id="txt_cpassword" placeholder="Confirm Password">
                             </div>
                             <div class="col-md-3 mt-2">
-                                <button class="btn btn-outline-primary" id="btn_update">Update Password</button>
+                                <button class="btn btn-outline-primary" id="btn_update"><i class="fas fa-pencil-alt"></i> Update Password</button>
                             </div>
                         </div>
                     </div>
@@ -239,7 +239,6 @@
         var formData = new FormData();
         formData.append('name', username);
         formData.append('profile_image', $('#file_profile')[0].files[0]);
-        $('#btn_updateProfile').attr('disabled', true)
         $.post({
             type: 'POST',
             url: '/admin/v1/profile/update',
@@ -254,7 +253,6 @@
                     body: 'Your Profile Has been Successfully Updated',
                     class: 'bg-success',
                 });
-                $('#btn_updateProfile').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -265,7 +263,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_updateProfile').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_updateProfile').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_updateProfile').removeAttr('disabled')
             },
             xhr: () => {
                 var xhr = $.ajaxSettings.xhr();
@@ -322,7 +325,6 @@
                 class: 'bg-danger',
             });
         }
-        $('#btn_update').attr('disabled', true)
         $.post({
             url: '/admin/v1/profile/password',
             data: {
@@ -338,7 +340,6 @@
                 });
                 $('#txt_password').val(null)
                 $('#txt_cpassword').val(null)
-                $('#btn_update').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -349,7 +350,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_update').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
             }
         });
 

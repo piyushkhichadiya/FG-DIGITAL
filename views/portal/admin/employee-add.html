@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Add Team Member - FG Digital</title>
+    <title>Member Information - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -103,13 +103,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Add Member</h1>
+                            <h1 id="lbl_title">Add Member</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/employee">Team Member</a></li>
-                                <li class="breadcrumb-item active">Information</li>
+                                <li class="breadcrumb-item active" id="lbl_navTitle">Add</li>
                             </ol>
                         </div>
                     </div>
@@ -181,6 +181,7 @@
                                 <div class="row">
                                     <div class="col-md-3 form-group">
                                         <select class="form-control" id='list_social'>
+                                            <option value="">Select Account</option>
                                             <option value="Stack Overflow">Stack Overflow</option>
                                             <option value="Github">Github</option>
                                             <option value="Hacker Rank">Hacker Rank</option>
@@ -193,13 +194,13 @@
                                         <input type="text" class="form-control" id="txt_link" placeholder="Link or Username">
                                     </div>
                                     <div class="col-md-4 form-group">
-                                        <button class="btn btn-outline-primary col-md-6 m-1" id="btn_addAccount" onclick="addSocialAccount()"><i class="fas fa-plus"></i> Add Account</button>
+                                        <button class="btn btn-outline-primary" id="btn_addAccount" onclick="addSocialAccount()"><i class="fas fa-plus"></i> Add Account</button>
                                     </div>
                                 </div>
                             </div>
                             <div class="row form-group">
                                 <label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
-                                <div class="col-md-4">
+                                <div class="col-md-2">
                                     <input type="text" class="form-control" id="txt_contact" placeholder="Contact Number">
                                 </div>
                             </div>
@@ -284,6 +285,8 @@
             $('#div_Update_Password').show();
             $('#div_image').show();
             $('#div_password').remove()
+            $('#lbl_navTitle').html('Information')
+            $('#lbl_title').html('Member Information')
         }
     });
 
@@ -310,6 +313,7 @@
                     var socialHTML = `<div class="row">
                 <div class="col-md-3 form-group">
                     <select class="form-control" id='list_social_${i}'>
+                        <option value="">Select Account</option>
                         <option value="Stack Overflow">Stack Overflow</option>
                         <option value="Github">Github</option>
                         <option value="Hacker Rank">Hacker Rank</option>
@@ -322,8 +326,8 @@
                         <input type="text" class="form-control" id="txt_link_${i}" value="${temp_social.reference}" placeholder="Link or Username">
                     </div>
                     <div class="col-md-4 form-group">
-                        <button class="btn btn-outline-info col-md-6 m-1" id='btn_update_${i}' onclick=updateSocial(${i},'${temp_social.account_id}')><i class="fas fa-pencil-alt"></i> Update Account</button>
-                        <button class="btn btn-outline-danger col-md-4 m-1" id='btn_remove_${i}' onclick=removeSocial(${i},'${temp_social.account_id}')><i class='fas fa-trash-alt'></i> Remove</button>
+                        <button class="btn btn-outline-info " id='btn_update_${i}' onclick=updateSocial(${i},'${temp_social.account_id}')><i class="fas fa-pencil-alt"></i> Update Account</button>
+                        <button class="btn btn-outline-danger  ml-1" id='btn_remove_${i}' onclick=removeSocial(${i},'${temp_social.account_id}')><i class='fas fa-trash-alt'></i> Remove</button>
                     </div>
                     </div>`;
                     $('#div_social').append(socialHTML);
@@ -352,7 +356,7 @@
             password = $('#txt_password').val()
         if (!name) {
             return $(document).Toasts('create', {
-                title: 'Name missing',
+                title: 'Name is required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please fill out allfields',
@@ -361,7 +365,7 @@
         }
         if (!email) {
             return $(document).Toasts('create', {
-                title: 'Email missing',
+                title: 'Email is required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please fill out all fields',
@@ -372,7 +376,7 @@
         }
         if (!password) {
             return $(document).Toasts('create', {
-                title: 'Password missing',
+                title: 'Password is required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please fill out all fields',
@@ -381,7 +385,6 @@
         } else {
             password = String(password)
         }
-        $('#btn_addEmp').attr('disabled', true)
         $.post({
             url: '/admin/v1/employee/add',
             data: {
@@ -399,7 +402,7 @@
                 });
                 $('#div_password').remove()
                 var memberId = result.data
-                window.location.href = `/admin/employee/add?emp_id=${memberId.member_id}`;
+                window.location.href = `/admin/employee/view?emp_id=${memberId.member_id}`;
             },
             error: error => {
                 error = error.responseJSON
@@ -410,7 +413,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_addEmp').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_addEmp').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_addEmp').removeAttr('disabled')
             }
         });
     });
@@ -484,7 +492,6 @@
 
             formData.append('profile_image', $('#file_profile')[0].files[0]);
         }
-        $('#btn_update').attr('disabled', true)
         $.post({
             type: 'POST',
             url: `/admin/v1/employee/update/${emp_id}`,
@@ -499,7 +506,6 @@
                     body: 'Member details has been Successfully Updated',
                     class: 'bg-success',
                 });
-                $('#btn_update').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -510,7 +516,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_update').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
             }
         });
     });
@@ -525,7 +536,6 @@
             confirmButtonText: 'Remove'
         }).then((result) => {
             if (result.value) {
-                $('#btn_remove').attr('disabled', true)
                 $.get({
                     url: `/admin/v1/employee/remove?employee_id=${emp_id}`,
                     success: result => {
@@ -547,7 +557,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
-                        $('#btn_remove').attr('disabled', false)
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
                     }
                 });
             }
@@ -578,7 +593,6 @@
                 class: 'bg-danger',
             });
         }
-        $('#btn_updatePassword').attr('disabled', true)
         $.post({
             url: '/admin/v1/profile/password',
             data: {
@@ -594,7 +608,6 @@
                 });
                 $('#txt_password').val(null)
                 $('#txt_cpassword').val(null)
-                $('#btn_updatePassword').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -605,7 +618,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_updatePassword').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_updatePassword').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_updatePassword').removeAttr('disabled')
             }
         });
 
@@ -633,7 +651,6 @@
                 class: 'bg-danger',
             });
         }
-        $('#btn_addAccount').attr('disabled', true)
         $.post({
             url: '/admin/v1/employee/social-account/add',
             data: {
@@ -653,7 +670,6 @@
                 getEmployee(emp_id);
                 $('#list_social').val('');
                 $('#txt_link').val('');
-                $('#btn_addAccount').attr('disabled', false)
             },
             error: error => {
                 error = error.responseJSON
@@ -664,7 +680,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $('#btn_addAccount').attr('disabled', false)
+            },
+            beforeSend: () => {
+                $('#btn_addAccount').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_addAccount').removeAttr('disabled')
             }
         });
     }
@@ -697,7 +718,8 @@
                     body: 'Social account details has been Successfully Updated',
                     class: 'bg-success',
                 });
-                $(`#btn_update_${index}`).attr('disabled', false)
+                $('#div_social').empty();
+                getEmployee(emp_id);
             },
             error: error => {
                 error = error.responseJSON
@@ -708,7 +730,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                $(`#btn_update_${index}`).attr('disabled', false)
+            },
+            beforeSend: () => {
+                $(`#btn_update_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_update_${index}`).removeAttr('disabled')
             }
         });
     }
@@ -723,7 +750,6 @@
             confirmButtonText: 'Remove'
         }).then((result) => {
             if (result.value) {
-                $(`#btn_remove_${index}`).attr('disabled', true)
                 $.get({
                     url: `/admin/v1/employee/social-account/remove?employee_id=${emp_id}&account_id=${account_id}`,
                     success: result => {
@@ -746,7 +772,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
-                        $(`#btn_remove_${index}`).attr('disabled', false)
+                    },
+                    beforeSend: () => {
+                        $(`btn_remove_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`btn_remove_${index}`).removeAttr('disabled')
                     }
                 });
             }
