@@ -131,7 +131,7 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
         }
     }
 
-    // Allocated Team Members
+    // Allocated Employee ID
     if (scope.includes('team')) {
         postObject.scope.push('team')
 
@@ -420,7 +420,7 @@ projectAPI.post('/team/update', async(req, res) => {
                 }
             }
         } else if (i == employeeDBKeys.length - 1) {
-            return response(res, 403, 'forbidden', 'Employee ID is not team member', undefined, 'A-6.4.6')
+            return response(res, 403, 'forbidden', 'Employee ID is not associated with  the project', undefined, 'A-6.4.6')
         }
     }
 })
@@ -447,10 +447,10 @@ projectAPI.get('/team/remove', (req, res) => {
                 tempTeam.lastModifiedOn = String(new Date())
                 tempTeam.lastModifiedBy = "ADMIN"
                 return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamDBKeys[i]}/`).update(tempTeam).then(() => {
-                    return response(res, 200, 'success', 'Team Member removed from project', undefined, 'A-6.5.3')
+                    return response(res, 200, 'success', 'Employee ID removed from project', undefined, 'A-6.5.3')
                 })
             } else if (i == teamDBKeys.length - 1) {
-                return response(res, 403, 'forbidden', 'Employee ID is not member of project team', undefined, 'A-6.5.4')
+                return response(res, 403, 'forbidden', 'Employee ID is not associated with the project', undefined, 'A-6.5.4')
             }
         }
     } else {
@@ -517,7 +517,7 @@ projectAPI.get('/team/activate', (req, res) => {
                 tempTeam.lastModifiedOn = String(new Date())
                 tempTeam.lastModifiedBy = "ADMIN"
                 return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/team/${teamDBKeys[i]}/`).update(tempTeam).then(() => {
-                    return response(res, 200, 'success', 'Team Member activated successfully for the project', undefined, 'A-6.7.4')
+                    return response(res, 200, 'success', 'Employee ID activated successfully for the project', undefined, 'A-6.7.4')
                 })
             } else if (i == teamDBKeys.length - 1) {
                 return response(res, 403, 'forbidden', 'Employee is not assigned to this project', undefined, 'A-6.7.5')
@@ -1929,7 +1929,7 @@ projectAPI.post('/activity/update', (req, res) => {
                             }
                             break;
                         } else if (k == dbClientServiceKey.length - 1) {
-                            return response(res, 404, 'notfound', 'Service ID Incorrect. Service ID is not associated with Project', undefined, 'A-6.25.16')
+                            return response(res, 404, 'notfound', 'Service ID Incorrect. Service ID is not associated with the project', undefined, 'A-6.25.16')
                         }
                     }
                 } else if (i == dbAdminServiceKeys.length - 1) {
