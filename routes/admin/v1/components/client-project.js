@@ -1215,7 +1215,12 @@ projectAPI.post('/review/update', (req, res) => {
         reviewDBKeys = Object.keys(dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review)
     for (var i = 0; i < reviewDBKeys.length; i++) {
         var tempReview = reviewDB[reviewDBKeys[i]]
-        if (tempReview.review_id == reviewID && !tempReview.closed && !tempReview.deleted) {
+        if (tempReview.review_id == reviewID && !tempReview.deleted) {
+
+            if (tempReview.closed) {
+                return response(res, 403, 'forbidden', 'Modification on Closed review are not allowed', undefined, 'A-6.21.10')
+            }
+
             if (req.body.title) {
                 var title = String(req.body.title).trim()
                 if (title == "undefined" || title == null) {
@@ -1317,7 +1322,11 @@ projectAPI.post('/review/update-post', (req, res) => {
     for (var i = 0; i < reviewDBKeys.length; i++) {
         var tempReview = reviewDB[reviewDBKeys[i]]
 
-        if (tempReview.review_id == reviewID && !tempReview.closed && !tempReview.deleted) {
+        if (tempReview.review_id == reviewID && !tempReview.deleted) {
+
+            if (tempReview.closed) {
+                return response(res, 403, 'forbidden', 'Modification on Closed review are not allowed', undefined, 'A-6.22.13')
+            }
 
             if (tempReview.post && tempReview.post[postKey] && !tempReview.post[postKey].deleted) {
 
@@ -1964,6 +1973,10 @@ projectAPI.post('/activity/remove-file', (req, res) => {
     var dbClientActivity = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity
     if (!dbClientActivity[activityKey] || dbClientActivity[activityKey].deleted || !dbClientActivity[activityKey].documents) {
         return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.26.6')
+    }
+
+    if (!dbClientActivity[activityKey].documents) {
+        return response(res, 404, 'notfound', 'Incorrect Filename', undefined, 'A-6.26.9')
     }
 
     var activityDocuments = dbClientActivity[activityKey].documents,
