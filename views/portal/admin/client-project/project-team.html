@@ -123,7 +123,7 @@
                     <div class="card card-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <h5 class="float-right">Project ID : 123</h5>
+                                <h5 class="float-right">Project ID : <span id="lbl_planId"></span></h5>
                             </div>
                             <div class="col-md-12">
                                 <div class="pull-right">
@@ -167,7 +167,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -199,11 +199,11 @@
                                 <select class="form-control" id="list_emp">
                               </select>
                             </div>
-                            <div id="div_empDetails">
-                                <p id="lbl_empId"></p>
-                                <p id="lbl_Name"></p>
-                                <p id="lbl_position"></p>
-                                <p id="lbl_email"></p>
+                            <div id="div_empDetails" style='display: none;'>
+                                <p>Employee ID: <b id="lbl_empId"></b></p>
+                                <p>Name: <b id="lbl_Name"></b></p>
+                                <p>Position: <b id="lbl_position"></b></p>
+                                <p>Email: <b id="lbl_email"></b></p>
                             </div>
                         </div>
                         <div class="col-md-6" align='center'>
@@ -213,7 +213,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary"><i class="fas fa-plus"></i> Add to Project</button>
+                    <button type="button" class="btn btn-primary" id="btn_addEmp"><i class="fas fa-plus"></i> Add to Project</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -242,13 +242,63 @@
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
     <!-- customJS -->
-    <script src="dist/js/logout.js"></script>-->
-    <script src="dist/js/profile.js"></script>-->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
 </body>
 <script>
     var tblTeam = $("#tbl_Team").DataTable({
         "responsive": true,
     });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    $('#lbl_planId').html(urlParams.get('plan_id'))
+    $(document).ready(() => {
+        if (urlParams.has('plan_id')) {
+            var planId = urlParams.get('plan_id');
+            $.get(`/admin/v1/project/fetch/${planId}?scope=team`, (data) => {
+                var data = data.data;
+                var teamData = data.team;
+                if (teamData) {
+                    for (var i = 0; i < teamData.length; i++) {
+                        var tempTeam = teamData[i],
+                            button = `<div class="btn-group">
+                                        <button type="button" class="btn btn-info">Action</button>
+                                        <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                            <div class="dropdown-menu" role="menu">
+                                                <a href='javascript:void(0);' class='dropdown-item' id="btn_activate_${i}" onclick=activate(${i},'${tempTeam.employee_id}')><i class='fas fa-hourglass-start'></i> Activate</a>
+                                                <a href='javascript:void(0);' class='dropdown-item' id="btn_deactivate_${i}" onclick=deactivate(${i},'${tempTeam.employee_id}')><i class='fas fa-ban'></i> Deactivate</a>
+                                                <a href='javascript:void(0);' class='dropdown-item' id="btn_update_${i}" onclick=update(${i},'${tempTeam.employee_id}','${tempTeam.active}')><i class='fas fa-pencil-alt' ></i> Update</a>
+                                                <a href='javascript:void(0);' class='dropdown-item' id="btn_remove_${i}" onclick=remove(${i},'${tempTeam.employee_id}')><i class='fas fa-trash-alt' ></i> Remove</a>
+                                            </div>
+                                        </button> 
+                                    </div>`,
+                            active = tempTeam.active;
+                        tblTeam.row.add([
+                            `${i+1}`, tempTeam.employee_id, tempTeam.employee_id, `${i+1}`, button
+                        ]).draw();
+                        if (active == false) {
+                            $(`#btn_deactivate_${i}`).hide();
+                            $(`#btn_activate_${i}`).show();
+                        } else {
+                            $(`#btn_deactivate_${i}`).show();
+                            $(`#btn_activate_${i}`).hide();
+                        }
+                    }
+                }
+            }).fail(error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            });
+        }
+    });
+
     var empData
     $('#btn_add').click(() => {
         $('#modal_Team').modal('show');
@@ -265,26 +315,222 @@
     });
     $('#list_emp').change(() => {
         var empId = $('#list_emp').val();
-        for (var i = 0; i < empData.length; i++) {
-            var tempEmp = empData[i];
-            if (empId == tempEmp.employee_id) {
-                var emp_id = tempEmp.employee_id,
-                    empName = tempEmp.name,
-                    position = tempEmp.position,
-                    email = tempEmp.email,
-                    image = tempEmp.profile_image;
+        $('#div_empDetails').show();
+        if (empId) {
+            for (var i = 0; i < empData.length; i++) {
+                var tempEmp = empData[i];
+                if (empId == tempEmp.employee_id) {
+                    var emp_id = tempEmp.employee_id,
+                        empName = tempEmp.name,
+                        position = tempEmp.position,
+                        email = tempEmp.email,
+                        image = tempEmp.profile_image;
+                }
             }
-        }
-        $('#lbl_empId').html(emp_id)
-        $('#lbl_Name').html(empName)
-        $('#lbl_position').html(position)
-        $('#lbl_email').html(email)
-        if (!image) {
-            $('#img_profile').attr('src', `images/logo-small.png`)
+            $('#lbl_empId').html(emp_id)
+            $('#lbl_Name').html(empName)
+            $('#lbl_position').html(position)
+            $('#lbl_email').html(email)
+            if (!image) {
+                $('#img_profile').attr('src', `images/logo-small.png`)
+            } else {
+                $('#img_profile').attr({
+                    src: `/admin/v1/profile/file/${image}`,
+                    onError: "this.onerror=null;this.src='images/logo-small.png';"
+                })
+            }
         } else {
-            $('#img_profile').attr('src', `/admin/v1/profile/file/${image}`)
+            $('#div_empDetails').hide();
+            $('#img_profile').attr('src', `images/logo-small.png`)
         }
     });
+
+    $('#btn_addEmp').click(() => {
+        var employee_id = $('#list_emp').val(),
+            project_id = urlParams.get('plan_id');
+        $.post({
+            url: '/admin/v1/project/team/add',
+            data: {
+                "employee_id": employee_id,
+                "project_id": project_id,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Member added Successfully',
+                    class: 'bg-success',
+                });
+                window.location.reload();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_addEmp').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_addEmp').removeAttr('disabled')
+            }
+        });
+    });
+
+    function activate(index, employee_id) {
+        var projectId = urlParams.get('plan_id');
+        $.get({
+            url: `/admin/v1/project/team/activate?project_id=${projectId}&employee_id=${employee_id}`,
+            success: function() {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Team Member has been activated Successfully',
+                    class: 'bg-success',
+                });
+            },
+            error: function() {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $(`#btn_activate_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_activate_${index}`).removeAttr('disabled')
+                $(`#btn_deactivate_${index}`).show();
+                $(`#btn_activate_${index}`).hide();
+            }
+        });
+    };
+
+    function deactivate(index, employee_id) {
+        var projectId = urlParams.get('plan_id');
+        $.get({
+            url: `/admin/v1/project/team/deactivate?project_id=${projectId}&employee_id=${employee_id}`,
+            success: function() {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Team Member has been deactivated Successfully',
+                    class: 'bg-success',
+                });
+            },
+            error: function() {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $(`#btn_deactivate_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_deactivate_${index}`).removeAttr('disabled')
+                $(`#btn_deactivate_${index}`).hide();
+                $(`#btn_activate_${index}`).show();
+            }
+        });
+    };
+
+    function update(index, employee_id, active) {
+        var projectId = urlParams.get('plan_id');
+        $.post({
+            url: '/admin/v1/project/team/update',
+            data: {
+                "employee_id": employee_id,
+                "project_id": projectId,
+                "active": active,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Member updated Successfully',
+                    class: 'bg-success',
+                });
+                window.location.reload();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $(`#btn_update_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_update_${index}`).removeAttr('disabled')
+            }
+        });
+    };
+
+    function remove(index, employee_id) {
+        var projectId = urlParams.get('plan_id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Team Member from Project",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/team/remove?project_id=${projectId}&employee_id=${employee_id}`,
+                    success: function() {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Team Member Successfully removed from project',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: function() {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_remove_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`#btn_remove_${index}`).removeAttr('disabled')
+                    }
+                });
+            };
+        });
+    }
 </script>
 
 </html>

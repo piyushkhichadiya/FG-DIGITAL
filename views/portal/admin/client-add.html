@@ -103,13 +103,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Add Client</h1>
+                            <h1 id="lbl_title">Add Client</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/client">Client</a></li>
-                                <li class="breadcrumb-item active">Add Client</li>
+                                <li class="breadcrumb-item active" id="lbl_navTitle">Add</li>
                             </ol>
                         </div>
                     </div>
@@ -169,7 +169,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -219,6 +219,8 @@
             $('#btn_remove').show();
             $('#div_password').hide();
             $('#div_Update_Password').show();
+            $('#lbl_navTitle').html('Details')
+            $('#lbl_title').html('Client Details')
             $.get(`/admin/v1/client/get?client_id=${client_id}`, (data) => {
                 var clientData = data.data;
                 $('#txt_name').val(clientData.name)

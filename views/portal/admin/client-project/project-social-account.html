@@ -103,14 +103,14 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Social-Accounts</h1>
+                            <h1>Social Accounts</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/client">{Client Name}</a></li>
                                 <li class="breadcrumb-item"><a href="javascript:void(0);">{project ID}</a></li>
-                                <li class="breadcrumb-item active">Social-Accounts</li>
+                                <li class="breadcrumb-item active">Social Accounts</li>
                             </ol>
                         </div>
                     </div>
@@ -123,11 +123,11 @@
                     <div class="card card-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <h5 class="float-right">Project ID : </h5>
+                                <h5 class="float-right">Project ID : <span id="lbl_planId"></span></h5>
                             </div>
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right mb-3" id="btn_add"><i class="fas fa-plus"></i> Add</button>
+                                    <button class="btn btn-outline-primary float-right mb-3" id="btn_add" onclick="$('#modal_Social').modal('show');"><i class="fas fa-plus"></i> Add</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -165,7 +165,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -194,15 +194,12 @@
                             <div class="form-group">
                                 <label>Account Name</label>
                                 <select class="form-control" id="list_emp">
-                                    <option value="Website Developer">Website Developer</option>
-                                    <option value="Marketing Specialist">Marketing Specialist</option>
-                                    <option value="Application Developer">Application Developer</option>
-                                    <option value="Content Writer">Content Writer</option>
-                                    <option value="SEO Specialist">SEO Specialist</option>
-                                    <option value="Social Media Manager">Social Media Manager</option>
-                                    <option value="Graphics Designer">Graphics Designer</option>
-                                    <option value="Videographer">Videographer</option>
-                                    <option value="Video Editor">Video Editor</option>
+                                    <option value="">Select Account</option>
+                                    <option value="Instagram">Instagram</option>
+                                    <option value="Facebook">Facebook</option>
+                                    <option value="Gmail">Gmail</option>
+                                    <option value="WhatsApp">WhatsApp</option>
+                                    <option value="Outlook">Outlook</option>
                                 </select>
                             </div>
                         </div>
@@ -248,18 +245,32 @@
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
     <!-- customJS -->
-    <script src="dist/js/logout.js"></script>-->
-    <script src="dist/js/profile.js"></script>-->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
 </body>
 <script>
     var tblSocial = $("#tbl_social").DataTable({
         "responsive": true,
     });
-
-    $('#btn_add').click(() => {
-        $('#modal_Social').modal('show');
-        $.get('')
-    })
+    const urlParams = new URLSearchParams(window.location.search);
+    $('#lbl_planId').html(urlParams.get('plan_id'))
+    $(document).ready(() => {
+        if (urlParams.has('plan_id')) {
+            var planId = urlParams.get('plan_id');
+            $.get(`/admin/v1/project/fetch/${planId}?scope=accounts`, (data) => {
+                var data = data.data;
+                var socialData = data.accounts;
+                for (var i = 0; i < socialData.length; i++) {
+                    var tempSocial = socialData[i],
+                        button = `<div class="btn-group"><button class='btn btn-info m-1'><i class='fas fa-eye'></i> View</button>`,
+                        reference = `<a href='${tempSocial.reference}' target='_blank'>${tempSocial.reference}</a>`;
+                    tblSocial.row.add([
+                        `${i+1}`, tempSocial.account_name, reference, button
+                    ]).draw();
+                }
+            });
+        }
+    });
 </script>
 
 </html>

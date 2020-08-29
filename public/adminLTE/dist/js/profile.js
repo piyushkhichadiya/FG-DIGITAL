@@ -6,30 +6,7 @@ $.get('/admin/v1/profile', (data) => {
     }
 }).fail(error => {
     error = error.responseJSON
-    if (error.status == 404) {
-        $.get({
-            url: '/admin/v1/user/logout',
-            success: function() {
-                window.location.reload()
-            },
-            error: function() {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
-            }
-        });
-    } else {
-        $(document).Toasts('create', {
-            title: 'Error!',
-            autohide: true,
-            delay: 5000,
-            body: 'Profile Not Found',
-            class: 'bg-danger',
-        });
+    if (error.status == 404 || error.status == 401) {
+        logout(true)
     }
 });

@@ -109,7 +109,7 @@
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/client">{Client Name}</a></li>
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">{project ID}</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);" id='link_project'>{project ID}</a></li>
                                 <li class="breadcrumb-item active">Services</li>
                             </ol>
                         </div>
@@ -123,7 +123,7 @@
                     <div class="card card-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <h5 class="float-right">Project ID :</h5>
+                                <h5 class="float-right">Project ID : <span id="lbl_planId"></span></h5>
                             </div>
                             <div class="col-md-12">
                                 <div class="pull-right">
@@ -165,7 +165,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -206,7 +206,7 @@
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-outline-primary"><i class="fas fa-plus"></i> Add to Project</button>
+                    <button type="button" class="btn btn-outline-primary" id="btn_addService"><i class="fas fa-plus"></i> Add to Project</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -235,12 +235,56 @@
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
     <!-- customJS -->
-    <script src="dist/js/logout.js"></script>-->
-    <script src="dist/js/profile.js"></script>-->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
 </body>
 <script>
     var tblService = $("#tbl_Service").DataTable({
         "responsive": true,
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    $('#lbl_planId').html(urlParams.get('plan_id'))
+    $('#link_project').html(urlParams.get('plan_id'))
+    $('#link_project').attr('href', `/admin/client/project-dashboard?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`)
+    $(document).ready(() => {
+        if (urlParams.has('plan_id')) {
+            var planId = urlParams.get('plan_id');
+            $.get(`/admin/v1/project/fetch/${planId}?scope=service`, (data) => {
+                var data = data.data;
+                var serviceData = data.service;
+                if (serviceData) {
+                    for (var i = 0; i < serviceData.length; i++) {
+                        var tempService = serviceData[i],
+                            button = `<div class="btn-group">
+                                        <button class='btn btn-success m-1' id="btn_activate_${i}" onclick=activate(${i},'${tempService.service_id}')><i class='fas fa-hourglass-start'></i> Activate</button>
+                                        <button class='btn btn-secondary m-1' id="btn_deactivate_${i}" onclick=deactivate(${i},'${tempService.service_id}')><i class='fas fa-ban'></i> Deactivate</button>
+                                        <button class='btn btn-danger m-1' id="btn_remove_${i}" onclick=remove(${i},'${tempService.service_id}')><i class='fas fa-trash-alt' ></i> Remove</button>
+                                    </div>`,
+                            active = tempService.active;
+                        tblService.row.add([
+                            `${i+1}`, tempService.service_id, `${i+1}`, button
+                        ]).draw();
+                        if (active == false) {
+                            $(`#btn_deactivate_${i}`).hide();
+                            $(`#btn_activate_${i}`).show();
+                        } else {
+                            $(`#btn_deactivate_${i}`).show();
+                            $(`#btn_activate_${i}`).hide();
+                        }
+                    }
+                }
+            }).fail(error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            });
+        }
     });
     var serviceData
 
@@ -254,11 +298,20 @@
                 option += `<option value='${tempService.service_id}'>${tempService.title}</option>`;
                 $('#list_service').html(option);
             }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
         });
     });
     $('#list_service').change(() => {
         $('#lbl_criteria').show()
-        ServiceId = $('#list_service').val();
+        var ServiceId = $('#list_service').val();
         for (var i = 0; i < serviceData.length; i++) {
             var tempData = serviceData[i]
             if (ServiceId == tempData.service_id) {
@@ -272,6 +325,159 @@
             }
         }
     });
+    $('#btn_addService').click(() => {
+        var projectId = urlParams.get('plan_id'),
+            serviceId = $('#list_service').val();
+        if (!serviceId) {
+            return $(document).Toasts('create', {
+                title: 'Service required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Select Service',
+                class: 'bg-danger',
+            });
+        }
+        $.get({
+            url: `/admin/v1/project/service/add?service_id=${serviceId}&project_id=${projectId}`,
+            success: function() {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Service successfully added to Project',
+                    class: 'bg-success',
+                });
+                window.location.reload();
+            },
+            error: function() {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_addService').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_addService').removeAttr('disabled')
+            }
+        });
+    });
+
+    function activate(index, service_id) {
+        var projectId = urlParams.get('plan_id');
+        $.get({
+            url: `/admin/v1/project/service/activate?service_id=${service_id}&project_id=${projectId}`,
+            success: function() {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Service has been activated Successfully',
+                    class: 'bg-success',
+                });
+            },
+            error: function() {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $(`#btn_activate_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_activate_${index}`).removeAttr('disabled')
+                $(`#btn_deactivate_${index}`).show();
+                $(`#btn_activate_${index}`).hide();
+            }
+        });
+    };
+
+    function deactivate(index, service_id) {
+        var projectId = urlParams.get('plan_id');
+        $.get({
+            url: `/admin/v1/project/service/deactivate?service_id=${service_id}&project_id=${projectId}`,
+            success: function() {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Service has been deactivated Successfully',
+                    class: 'bg-success',
+                });
+            },
+            error: function() {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $(`#btn_deactivate_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_deactivate_${index}`).removeAttr('disabled')
+                $(`#btn_deactivate_${index}`).hide();
+                $(`#btn_activate_${index}`).show();
+            }
+        });
+    };
+
+    function remove(index, service_id) {
+        var projectId = urlParams.get('plan_id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You have want to remove this Service from Project",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/service/remove?service_id=${service_id}&project_id=${projectId}`,
+                    success: function() {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Service Successfully removed from project',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: function() {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_remove_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`#btn_remove_${index}`).removeAttr('disabled')
+                    }
+                });
+            };
+        });
+    }
 </script>
 
 </html>

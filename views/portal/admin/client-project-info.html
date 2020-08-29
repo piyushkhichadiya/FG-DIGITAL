@@ -105,12 +105,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 id="lbl_project">Project info</h1>
+                            <h1 id="lbl_project">Project Information</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/client">{Client Name}</a></li>
+                                <li class="breadcrumb-item"><a href="javascript:void(0);">{Project Name or ID}</a></li>
                                 <li class="breadcrumb-item active" id="lbl_navProject">Project info</li>
                             </ol>
                         </div>
@@ -122,15 +123,20 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="card-body card">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="float-right">Project ID : <span id="lbl_planId"></span></h5>
+                            </div>
+                        </div>
                         <div class="row form-group">
                             <label for="inputEmail3" class="col-md-2 col-form-label">Project Name:</label>
-                            <div class="col-md-3">
+                            <div class="col-md-8">
                                 <input type="text" class="form-control" id="txt_projectName" placeholder="Project Name">
                             </div>
                         </div>
                         <div class="row form-group">
                             <label for="inputEmail3" class="col-md-2 col-form-label">Description:</label>
-                            <div class="col-md-3">
+                            <div class="col-md-8">
                                 <textarea class="form-control" id="txt_description" rows="4" placeholder="Description ..."></textarea>
                             </div>
                         </div>
@@ -148,7 +154,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -191,6 +197,7 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
+    $('#lbl_planId').html(urlParams.get('plan_id'))
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
@@ -201,6 +208,15 @@
                     description = projectData.description;
                 $('#txt_projectName').val(name)
                 $('#txt_description').val(description)
+            }).fail(error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
             });
         }
     });

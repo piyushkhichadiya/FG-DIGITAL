@@ -182,12 +182,11 @@
                                     <div class="col-md-3 form-group">
                                         <select class="form-control" id='list_social'>
                                             <option value="">Select Account</option>
-                                            <option value="Stack Overflow">Stack Overflow</option>
-                                            <option value="Github">Github</option>
-                                            <option value="Hacker Rank">Hacker Rank</option>
-                                            <option value="LinkedIn">LinkedIn</option>
                                             <option value="Instagram">Instagram</option>
                                             <option value="Facebook">Facebook</option>
+                                            <option value="Gmail">Gmail</option>
+                                            <option value="WhatsApp">WhatsApp</option>
+                                            <option value="Outlook">Outlook</option>
                                         </select>
                                     </div>
                                     <div class="col-md-5 form-group">
@@ -234,7 +233,7 @@
             </div>
             <!-- /.content-wrapper -->
             <footer class="main-footer">
-                <div class="float-right d-none d-sm-block">
+                <div class="float-right d-sm-block">
                     <p id="lbl_ui_version"> VERSION INFO </p>
                 </div>
                 <strong>Copyright &copy <script>
@@ -314,12 +313,11 @@
                 <div class="col-md-3 form-group">
                     <select class="form-control" id='list_social_${i}'>
                         <option value="">Select Account</option>
-                        <option value="Stack Overflow">Stack Overflow</option>
-                        <option value="Github">Github</option>
-                        <option value="Hacker Rank">Hacker Rank</option>
-                        <option value="LinkedIn">LinkedIn</option>
                         <option value="Instagram">Instagram</option>
                         <option value="Facebook">Facebook</option>
+                        <option value="Gmail">Gmail</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Outlook">Outlook</option>
                     </select>
                     </div>
                     <div class="col-md-5 form-group">
@@ -570,7 +568,8 @@
     });
 
     $('#btn_updatePassword').click(() => {
-        var password = $('#txt_newPassword').val(),
+        var emp_id = urlParams.get('emp_id')
+        password = $('#txt_newPassword').val(),
             conPassword = $('#txt_cPassword').val()
         if (!password || !conPassword) {
             return $(document).Toasts('create', {
@@ -594,8 +593,9 @@
             });
         }
         $.post({
-            url: '/admin/v1/profile/password',
+            url: '/admin/v1/employee/change-password',
             data: {
+                "employee_id": emp_id,
                 "password": password,
             },
             success: result => {

@@ -119,24 +119,24 @@
                     <div class="card-body card">
                         <div class="row">
                             <div class="col-md-12">
-                                <h5 class="float-right">Project Id : <span id="lbl_planId"></span></h5>
+                                <h5 class="float-right">Project ID : <span id="lbl_planId"></span></h5>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <h4 class="header-title">Project Management</h4>
                             </div>
-                            <a href="javascript:void(0);" class="btn btn-outline-primary m-1" onclick='window.location.href = `/admin/client/project-info?plan_id=${urlParams.get("plan_id")}`'><i class="fas fa-info-circle"></i> Info</a>
-                            <a href="javascript:void(0);" class="btn btn-outline-primary m-1"><i class="fas fa-cogs"></i> Services</a>
-                            <a href="javascript:void(0);" class="btn btn-outline-primary m-1"><i class="fas fa-users"></i> Team Members</a>
-                            <a href="javascript:void(0);" class="btn btn-outline-primary m-1"><i class="fas fa-portrait"></i> Social Accounts</a>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/admin/client/project-info?client_id=${client_id}&plan_id=${plan_id}`'><i class="fas fa-info-circle"></i> Info</button>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/admin/client/project-service?client_id=${client_id}&plan_id=${plan_id}`'><i class="fas fa-cogs"></i> Services</a>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/admin/client/project-team?client_id=${client_id}&plan_id=${plan_id}`'><i class="fas fa-users"></i> Team Members</button>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/admin/client/project-social-account?client_id=${client_id}&plan_id=${plan_id}`'><i class="fas fa-portrait"></i> Social Accounts</button>
                         </div>
                         <hr>
                         <h4 class="header-title">Reviews & Activity</h4>
                         <div class="row">
-                            <a href="javascript:void(0);" class="btn btn-outline-warning m-1"><i class="fas fa-search"></i> Review</a>
-                            <a href="javascript:void(0);" class="btn btn-outline-warning m-1"><i class="fas fa-chart-line"></i> Activity</a>
-                            <a href="javascript:void(0);" class="btn btn-outline-warning m-1"><i class="fas fa-file-alt"></i> Report</a>
+                            <button class="btn btn-outline-warning m-1" onclick='window.location.href = `/admin/client/project-review?client_id=${client_id}&plan_id=${plan_id}`'><i class="fas fa-search"></i> Review</button>
+                            <button class="btn btn-outline-warning m-1"><i class="fas fa-chart-line"></i> Activity</button>
+                            <button class="btn btn-outline-warning m-1"><i class="fas fa-file-alt"></i> Report</button>
                         </div>
                     </div>
                     <!-- Card body -->
@@ -147,7 +147,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
@@ -186,7 +186,13 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    $('#lbl_planId').html(urlParams.get('plan_id'))
+    var client_id = urlParams.get('client_id'),
+        plan_id = urlParams.get('plan_id');
+    if (!plan_id || !client_id) {
+        window.location.href = '/admin/client'
+    } else {
+        $('#lbl_planId').html(urlParams.get('plan_id'));
+    }
 </script>
 
 </html>
