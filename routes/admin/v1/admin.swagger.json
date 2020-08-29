@@ -784,7 +784,8 @@
                         "example": {
                             "employee_id": "20201",
                             "project_id": "93492065515",
-                            "active": true
+                            "review": { "type": "boolean" },
+                            "activity": { "type": "boolean" }
                         }
                     }
                 }],

@@ -135,7 +135,7 @@
                                             <th>Project Name</th>
                                             <th>Started On</th>
                                             <th>Status</th>
-                                            <th>Action</th>
+                                            <th style="width: 20%;">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -214,10 +214,8 @@
                 var dataProject = dataClient.plans
                 for (var i = 0; i < dataProject.length; i++) {
                     var tempProject = dataProject[i];
-                    button = `<div class="btn-group">
-                                <button class='btn btn-info m-1' onclick="window.location.href ='/admin/client/project-add?client_id=${urlParams.get('client_id')}&plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-eye"></i>Plan Info.</button>
-                                <button class='btn btn-warning m-1' onclick="window.location.href ='/admin/client/project-dashboard?client_id=${urlParams.get('client_id')}&plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Go To Dashboard</button>
-                            </div>`
+                    button = `<div class=row><button class='btn btn-warning m-1' onclick="window.location.href ='/admin/client/project-dashboard?client_id=${urlParams.get('client_id')}&plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Dashboard</button>
+                            <button class='btn btn-info m-1' onclick="window.location.href ='/admin/client/project-add?client_id=${urlParams.get('client_id')}&plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-eye"></i> View </button></div>`
                     var start_date = new Date(tempProject.start_date);
                     var d = start_date.getDate();
                     var m = start_date.getMonth() + 1;

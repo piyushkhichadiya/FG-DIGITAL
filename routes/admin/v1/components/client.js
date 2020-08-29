@@ -344,8 +344,8 @@ clientAPI.get('/get', (req, res) => {
                     if (!plansDB[planKeys[j]].deleted) {
                         var tempPlan = plansDB[planKeys[j]],
                             status = "expired",
-                            startDate = new Date(tempPlan.startDate),
-                            endDate = new Date(tempPlan.startDate)
+                            startDate = new Date(tempPlan.start_date),
+                            endDate = new Date(tempPlan.start_date)
                         endDate.setDate(startDate.getDate() + parseInt(tempPlan.duration))
 
                         if (startDate > new Date()) {

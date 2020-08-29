@@ -402,11 +402,6 @@ projectAPI.post('/team/update', async(req, res) => {
                         } else if (req.body.activity == false) {
                             tempTeam.activity = false
                         }
-                        if (req.body.active == true) {
-                            tempTeam.active = true
-                        } else if (req.body.active == false) {
-                            tempTeam.active = false
-                        }
 
                         tempTeam.lastModifiedOn = String(new Date())
                         tempTeam.lastModifiedBy = "ADMIN"
