@@ -245,7 +245,7 @@ clientAPI.post('/plan/update', (req, res) => {
                     tempPlan.lastModifiedOn = String(new Date())
                     tempPlan.lastModifiedBy = "ADMIN"
 
-                    firebase.database().ref(`/admin/clients/${client_id}/plans/${planDBKeys[i]}`).update(tempPlan).then(() => {
+                    return firebase.database().ref(`/admin/clients/${client_id}/plans/${planDBKeys[i]}`).update(tempPlan).then(() => {
                         return response(res, 200, 'success', 'Plan Successfully Updated', undefined, 'A-4.5.6')
                     })
                 } else if (i == planDBKeys.length - 1) {

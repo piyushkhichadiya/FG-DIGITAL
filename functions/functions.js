@@ -1,12 +1,33 @@
 const secrets = require('../config/secrets'),
     jwt = require('jsonwebtoken'),
+    fs = require('fs'),
     bcrypt = require('bcryptjs');
 
 module.exports = {
     response: (res, status, response, message, data, code) => {
+        if (!res || typeof res != 'object') {
+            return console.log('\x1b[36m\x1b[31m Function Response Error: \x1b[0m', 'Response Object is required to send response');
+        }
+
+        if (!status || isNaN(status)) {
+            return console.log('\x1b[36m\x1b[31m Function Response Error: \x1b[0m', 'Status Code is required to send response. Status must be integer number');
+        }
+
+        if (!response || typeof response == 'object') {
+            return console.log('\x1b[36m\x1b[31m Function Response Error: \x1b[0m', 'Standard Response is required to send response. Response must be string');
+        }
+
+        if (!code || typeof code == 'object') {
+            return console.log('\x1b[36m\x1b[31m Function Response Error: \x1b[0m', 'Custom Response Code is required to send response');
+        }
+
+        if (message && typeof message == 'object') {
+            return console.log('\x1b[36m\x1b[31m Function Response Error: \x1b[0m', 'Response message must be string');
+        }
+
         return res.status(status).json({
-            status: status,
-            response: response,
+            status: parseInt(status),
+            response: String(response),
             message: message,
             data: data,
             code: code
@@ -105,5 +126,33 @@ module.exports = {
             output[i.toLowerCase()] = jsonObject[i];
         }
         return output;
+    },
+    unlinkFile: (filename) => {
+        // Remove File from Storage Directory
+
+        if (!filename) { return false }
+
+        var path = module.exports.storageDirectory() + '/'
+
+        if (!fs.existsSync(path)) {
+            fs.mkdirSync(path, { recursive: true })
+        }
+
+        try {
+            var finder = finder = require('findit')(path)
+            finder.on('directory', function(dir, stat, stop) {
+                var newPath = dir + '/'
+                if (fs.existsSync(newPath + filename)) {
+                    try {
+                        fs.unlinkSync(newPath + filename)
+                    } catch {}
+                    return true
+                }
+            });
+
+            finder.on('end', function() {
+                return false
+            });
+        } catch {}
     }
 }

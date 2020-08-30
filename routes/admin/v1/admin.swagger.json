@@ -715,6 +715,30 @@
             }
 
         },
+        "/project/update": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "Update Account Info",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_name", "project_description", "project_id"],
+                        "properties": {
+                            "project_name": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "project_description": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": "93492065515",
+                            "project_name": "Social Media",
+                            "project_description": "Test description for project"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
         "/project/team/add": {
             "post": {
                 "tags": ["6. Client Project"],
@@ -930,30 +954,6 @@
                 "responses": {}
             }
         },
-        "/project/update": {
-            "post": {
-                "tags": ["6. Client Project"],
-                "summary": "Update Account Info",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["project_name", "project_description", "project_id"],
-                        "properties": {
-                            "project_name": { "type": "string" },
-                            "project_id": { "type": "string" },
-                            "project_description": { "type": "string" }
-                        },
-                        "example": {
-                            "project_id": "93492065515",
-                            "project_name": "Social Media",
-                            "project_description": "Test description for project"
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
         "/project/review/create": {
             "post": {
                 "tags": ["6. Client Project"],
@@ -1050,7 +1050,7 @@
                     },
                     {
                         "in": "query",
-                        "name": "post_id",
+                        "name": "post_key",
                         "required": true,
                         "type": "string",
                         "schema": {
@@ -1119,6 +1119,116 @@
                         "type": "string",
                         "schema": {
                             "example": "Post-251469.png"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/update": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "Update review title and description",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["review_id", "project_id"],
+                        "properties": {
+                            "review_id": { "type": "integer" },
+                            "project_id": { "type": "integer" },
+                            "title": { "type": "string" },
+                            "description": { "type": "string" }
+                        },
+                        "example": {
+                            "review_id": 688642606297,
+                            "project_id": 93492065515,
+                            "title": "Demo update",
+                            "description": "Demo description update"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/review/update-post": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "Update review post and description",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "project_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "review_id",
+                        "description": "review_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "688642606297"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "post_key",
+                        "description": "post_key",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MFI09sMQLktyYI-yYOf"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "description",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "description": "Demo description"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG \n File Size Limit: 10 MB",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/open": {
+            "get": {
+                "tags": ["6. Client Project"],
+                "summary": "Remove Service from client",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "description": "Project ID",
+                        "required": true,
+                        "type": "integer",
+                        "schema": {
+                            "example": 93492065515
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "type": "string",
+                        "required": true,
+                        "description": "Review ID",
+                        "schema": {
+                            "example": 688642606297
                         }
                     }
                 ],
@@ -1373,42 +1483,16 @@
                 "responses": {}
             }
         },
-        "/project/review/update": {
+        "/project/activity/add": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Update review title and description",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["review_id", "project_id"],
-                        "properties": {
-                            "review_id": { "type": "integer" },
-                            "project_id": { "type": "integer" },
-                            "title": { "type": "string" },
-                            "description": { "type": "string" }
-                        },
-                        "example": {
-                            "review_id": 688642606297,
-                            "project_id": 93492065515,
-                            "title": "Demo update",
-                            "description": "Demo description update"
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/project/review/update-post": {
-            "post": {
-                "tags": ["6. Client Project"],
-                "summary": "Update review post and description",
+                "summary": "Add Activity",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
                         "name": "project_id",
                         "in": "formData",
                         "description": "project_id",
-                        "required": false,
+                        "required": true,
                         "type": "number",
                         "schema": {
                             "example": "93492065515"
@@ -1416,28 +1500,42 @@
                     },
                     {
                         "in": "formData",
-                        "name": "review_id",
-                        "description": "review_id",
-                        "required": false,
-                        "type": "number",
+                        "name": "type",
+                        "description": "Valid Type: Service, Activity",
+                        "required": true,
+                        "type": "string",
                         "schema": {
-                            "example": "688642606297"
+                            "example": "Service"
                         }
                     },
                     {
                         "in": "formData",
-                        "name": "post_key",
-                        "description": "post_key",
+                        "name": "service_id",
+                        "description": "Service ID. Required for Type Service",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "371889110187"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "criteria",
+                        "description": "JSON Object of Criteria",
                         "required": false,
                         "type": "string",
                         "schema": {
-                            "example": "-MFI09sMQLktyYI-yYOf"
+                            "example": {
+                                "0": { "criteria_id": 390441675983, "value": 50 },
+                                "1": { "criteria_id": 1386407953254, "value": 55 },
+                                "2": { "criteria_id": 547034266151, "value": 55 }
+                            }
                         }
                     },
                     {
                         "in": "formData",
                         "name": "description",
-                        "description": "description",
+                        "description": "Describe Activity",
                         "required": false,
                         "type": "string",
                         "schema": {
@@ -1445,16 +1543,140 @@
                         }
                     },
                     {
+                        "in": "formData",
+                        "name": "title",
+                        "description": "Give title to activity. Required for type 'Activity'",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "title": "Demo Title"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "date",
+                        "description": "Date: YYYY/MM/DD HH:MM:SS AM/PM \n Use AM/PM for 12 Hour format",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "date": "2021/08/21 12:25:25 PM"
+                        }
+                    },
+                    {
                         "name": "file",
                         "in": "formData",
-                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG \n File Size Limit: 10 MB",
+                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG, PDF \n File Size Limit: 15 MB",
                         "required": false,
                         "type": "file"
                     }
                 ],
                 "responses": {}
             }
+        },
+        "/project/activity/update": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "6.25 Update Activity",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "project_id",
+                        "required": true,
+                        "type": "number",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "activity_key",
+                        "description": "Activity key",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MFczT6LlexGP91a2_AS"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "criteria",
+                        "description": "JSON Object of Criteria",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": {
+                                "0": { "criteria_id": 390441675983, "value": 50 },
+                                "1": { "criteria_id": 1386407953254, "value": 55 },
+                                "2": { "criteria_id": 547034266151, "value": 55 },
+                                "3": { "criteria_id": 1418785503560, "value": 55 }
+                            }
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "Describe Activity",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "description": "Demo description"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "title",
+                        "description": "Give title to activity. Required for type 'Activity'",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "title": "Demo Title"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "date",
+                        "description": "Date: YYYY/MM/DD HH:MM:SS AM/PM \n Use AM/PM for 12 Hour format",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "date": "2021/08/21 12:25:25 PM"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG, PDF \n File Size Limit: 15 MB",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/activity/remove-file": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "6.26 Remove File from Activity",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "activity_key", "filename"],
+                        "properties": {
+                            "project_id": { "type": "integer" },
+                            "activity_key": { "type": "string" },
+                            "filename": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": 93492065515,
+                            "activity_key": "-MFd17vs4xBhgRPtEbrh",
+                            "filename": "Post-374085231658.png"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
         }
-
     }
 }
