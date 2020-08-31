@@ -297,8 +297,139 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
         }
     }
 
+    // Activity
+    if (scope.includes('activity')) {
+        postObject.scope.push('activity');
+
+        if (dbProject.activity) {
+            var dbActivity = dbProject.activity,
+                dbActivityKey = Object.keys(dbActivity)
+
+            postObject.activity = []
+
+            for (var i = 0; i < dbActivityKey.length; i++) {
+                var tempActivity = dbActivity[dbActivityKey[i]];
+
+                var tempObj = {
+                    activity_key: dbActivityKey[i],
+                    type: tempActivity.type,
+                    createdBy: tempActivity.createdBy,
+                    createdOn: tempActivity.createdOn,
+                    date: tempActivity.date,
+                    title: tempActivity.title,
+                    description: tempActivity.description,
+                    service_id: tempActivity.service_id,
+                    lastModifiedBy: tempActivity.lastModifiedBy,
+                    lastModifiedOn: tempActivity.lastModifiedOn
+                }
+
+
+                // Append Service Criteria for Type Service
+                if (tempActivity.type = 'SERVICE' && tempActivity.criteria) {
+                    var dbActivityCriteria = tempActivity.criteria,
+                        dbActivityCriteriaKey = Object.keys(dbActivityCriteria),
+                        postCriteriaObj = []
+
+                    for (var j = 0; j < dbActivityCriteriaKey.length; j++) {
+                        var validate = validateCriteria(tempActivity.service_id, dbActivityCriteria[dbActivityCriteriaKey[j]].criteria_id)
+                        if (validate) {
+
+                            var tempCriteria = dbActivityCriteria[dbActivityCriteriaKey[j]];
+
+                            var tempCriteriaObj = {
+                                criteria_id: tempCriteria.criteria_id,
+                                criteria: validate.criteria,
+                                value: tempCriteria.value,
+                                deleted: validate.deleted,
+                                createdOn: tempCriteria.createdOn || tempActivity.createdOn,
+                                createdBy: tempCriteria.createdBy || tempActivity.createdBy,
+                                lastModifiedBy: tempCriteria.lastModifiedBy,
+                                lastModifiedOn: tempCriteria.lastModifiedOn
+                            }
+
+                            postCriteriaObj.push(tempCriteriaObj);
+                        }
+                    }
+
+                    if (postCriteriaObj.length != 0) {
+                        tempObj.criteria = postCriteriaObj
+                    }
+                }
+
+                // Append Documents
+                if (tempActivity.documents) {
+                    var dbActivityDocuments = tempActivity.documents,
+                        dbActivityDocumentsKeys = Object.keys(dbActivityDocuments),
+                        postDocuments = []
+
+                    for (var j = 0; j < dbActivityDocumentsKeys.length; j++) {
+                        var tempDocument = dbActivityDocuments[dbActivityDocumentsKeys[j]];
+
+                        if (!tempDocument.deleted) {
+                            postDocuments.push({
+                                document_id: dbActivityDocumentsKeys[j],
+                                filename: tempDocument.filename,
+                                createdOn: tempDocument.createdOn || tempActivity.createdOn,
+                                createdBy: tempDocument.createdBy || tempActivity.createdBy,
+                                lastModifiedBy: tempDocument.lastModifiedBy,
+                                lastModifiedOn: tempDocument.lastModifiedOn,
+                            })
+                        }
+                    }
+
+                    if (postDocuments.length != 0) {
+                        tempObj.documents = postDocuments
+                    }
+                }
+
+                postObject.activity.push(tempObj)
+            }
+
+            if (postObject.activity.length == 0) {
+                delete postObject.activity;
+            }
+        }
+    }
+
     return response(res, 200, 'success', undefined, postObject, 'A-6.2.3')
 
+
+    // Function Check Criteria Exist
+    function validateCriteria(service_id, criteria_id) {
+        if (!service_id || !criteria_id) {
+            return false;
+        }
+
+        if (dbAdminSnapshot.services) {
+            var dbServices = dbAdminSnapshot.services,
+                dbServicesKey = Object.keys(dbServices)
+
+            for (var i = 0; i < dbServicesKey.length; i++) {
+
+                if (!dbServices[dbServicesKey[i]].deleted && dbServices[dbServicesKey[i]].service_id == service_id) {
+                    if (dbServices[dbServicesKey[i]].criteria) {
+                        var dbServiceCriteria = dbServices[dbServicesKey[i]].criteria,
+                            dbServiceCriteriaKeys = Object.keys(dbServiceCriteria)
+
+                        for (var j = 0; j < dbServiceCriteriaKeys.length; j++) {
+                            if (dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria_id == criteria_id) {
+                                return {
+                                    criteria_id: dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria_id,
+                                    criteria: dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria,
+                                    deleted: dbServiceCriteria[dbServiceCriteriaKeys[j]].deleted
+                                }
+                            }
+                        }
+                    } else {
+                        return false;
+                    }
+
+                } else if (i == dbServicesKey.length - 1) {
+                    return false;
+                }
+            }
+        }
+    }
 })
 
 // 6.3 ASSIGN EMPLOYEE TO PROJECT
