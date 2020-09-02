@@ -144,6 +144,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="6"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -219,13 +227,26 @@
             $.get(`/admin/v1/project/fetch/${planId}?scope=review`, (data) => {
                 var data = data.data;
                 var reviewData = data.review;
-                for (var i = 0; i < reviewData.length; i++) {
-                    var tempReview = reviewData[i],
-                        button = `<div class="btn-group"><button class='btn btn-info m-1'><i class='fas fa-eye'></i> View</button>`;
-                    tblReview.row.add([
-                        `${i+1}`, tempReview.review_id, tempReview.title, tempReview.description, `${i+1}`, button
-                    ]).draw();
+                tblReview.clear().draw();
+                if (reviewData) {
+                    for (var i = 0; i < reviewData.length; i++) {
+                        var tempReview = reviewData[i],
+                            button = `<div class="btn-group"><button class='btn btn-info m-1'><i class='fas fa-eye'></i> View</button>`;
+                        tblReview.row.add([
+                            `${i+1}`, tempReview.review_id, tempReview.title, tempReview.description, `${i+1}`, button
+                        ]).draw();
+                    }
                 }
+            }).fail(error => {
+                tblReview.clear().draw();
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
             });
         }
     });

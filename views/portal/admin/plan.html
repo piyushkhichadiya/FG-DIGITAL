@@ -133,7 +133,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-
+                                        <tr align="center">
+                                            <td colspan="5"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -206,18 +212,30 @@
             dbPlan = data.data;
             index = 0;
             j = 1;
-
-            for (var i = 0; i < dbPlan.length; i++) {
-                var tempPlan = dbPlan[i]
-                var button = `<div class='btn-group'>
+            tblplan.clear().draw();
+            if (dbPlan) {
+                for (var i = 0; i < dbPlan.length; i++) {
+                    var tempPlan = dbPlan[i]
+                    var button = `<div class='btn-group'>
                 <button class ="btn btn-info m-1" onclick="window.location.href ='/admin/plan/add?plan_id=${tempPlan.plan_id}'"><i class="fas fa-pencil-alt"></i> Edit</button>
                 <button class ="btn btn-danger m-1" id="btn_remove_${i}" onclick=removePlan(${i},'${tempPlan.plan_id}')><i class="fas fa-trash-alt"></i> Remove</button>
-                </div>`
-                tblplan.row.add([
-                    `${j++}`, tempPlan.plan_name, tempPlan.price, tempPlan.days,
-                    button
-                ]).draw();
+                </div>`;
+                    tblplan.row.add([
+                        `${j++}`, tempPlan.plan_name, tempPlan.price, tempPlan.days,
+                        button
+                    ]).draw();
+                }
             }
+        }).fail(error => {
+            tblplan.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
         });
     });
 

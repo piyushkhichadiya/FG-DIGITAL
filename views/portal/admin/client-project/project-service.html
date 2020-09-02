@@ -142,6 +142,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="4"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -197,8 +203,8 @@
                                 <select class="form-control" id="list_service">
                               </select>
                             </div>
-                            <div class="form-group">
-                                <label for="list_data" id="lbl_criteria" style="display: none;">Criteria</label>
+                            <div class="form-group" id="div_criteria" style="display:none;">
+                                <label for="list_data" id="lbl_criteria">Criteria</label>
                                 <ul id="list_data"></ul>
                             </div>
                         </div>
@@ -250,9 +256,10 @@
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
-            $.get(`/admin/v1/project/fetch/${planId}?scope=service`, (data) => {
+            $.get(`/admin/v1/project/fetch/${planId}?scope=service`, async(data) => {
                 var data = data.data;
                 var serviceData = data.service;
+                tblService.clear().draw();
                 if (serviceData) {
                     for (var i = 0; i < serviceData.length; i++) {
                         var tempService = serviceData[i],
@@ -263,7 +270,7 @@
                                     </div>`,
                             active = tempService.active;
                         tblService.row.add([
-                            `${i+1}`, tempService.service_id, `${i+1}`, button
+                            `${i+1}`, await getServiceByID(tempService.service_id), tempService.service_id, button
                         ]).draw();
                         if (active == false) {
                             $(`#btn_deactivate_${i}`).hide();
@@ -275,6 +282,7 @@
                     }
                 }
             }).fail(error => {
+                tblService.clear().draw();
                 error = error.responseJSON
                 $(document).Toasts('create', {
                     title: 'Error #' + error.code,
@@ -310,20 +318,26 @@
         });
     });
     $('#list_service').change(() => {
-        $('#lbl_criteria').show()
+        $('#div_criteria').show()
         var ServiceId = $('#list_service').val();
-        for (var i = 0; i < serviceData.length; i++) {
-            var tempData = serviceData[i]
-            if (ServiceId == tempData.service_id) {
-                var criteria = tempData.criteria,
-                    list = '';
-                for (var j = 0; j < criteria.length; j++) {
-                    var tempCriteria = criteria[j];
-                    list += `<li>${tempCriteria.criteria}</li>`
+        if (ServiceId) {
+            for (var i = 0; i < serviceData.length; i++) {
+                var tempData = serviceData[i]
+                if (ServiceId == tempData.service_id) {
+                    var criteria = tempData.criteria,
+                        list = '';
+                    for (var j = 0; j < criteria.length; j++) {
+                        var tempCriteria = criteria[j];
+                        list += `<li>${tempCriteria.criteria}</li>`
+                    }
+                    $('#list_data').html(list)
                 }
-                $('#list_data').html(list)
             }
+        } else {
+
+            $('#div_criteria').hide()
         }
+
     });
     $('#btn_addService').click(() => {
         var projectId = urlParams.get('plan_id'),
@@ -477,6 +491,13 @@
                 });
             };
         });
+    }
+
+    async function getServiceByID(service_id) {
+        var result = await $.getJSON('/admin/v1/service/get?service_id=' + service_id)
+        if (result) {
+            return result.data.title;
+        }
     }
 </script>
 

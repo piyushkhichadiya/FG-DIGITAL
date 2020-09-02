@@ -389,7 +389,7 @@
             criteria = $('#txt_Criteria').val()
         if (!criteria) {
             return $(document).Toasts('create', {
-                title: 'Criteria missing',
+                title: 'Criteria required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Criteria',
@@ -438,7 +438,7 @@
             criteria = $(`#txt_Criteria_${index}`).val()
         if (!criteria) {
             return $(document).Toasts('create', {
-                title: 'Criteria missing',
+                title: 'Criteria required',
                 autohide: true,
                 delay: 5000,
                 body: 'Enter Criteria for Update',

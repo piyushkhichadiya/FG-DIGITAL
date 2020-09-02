@@ -134,6 +134,7 @@
                                 <div class="form-group row" id="div_position" style="display: none;">
                                     <label class="col-md-3 col-form-label">Position:</label>
                                     <select class="col-md-7 form-control" id="list_position">
+                                        <option value="">Select Position</option>
                                         <option value="Website Developer">Website Developer</option>
                                         <option value="Marketing Specialist">Marketing Specialist</option>
                                         <option value="Application Developer">Application Developer</option>
@@ -153,7 +154,11 @@
                                 </div>
                                 <div class="form-group row" id="div_password">
                                     <label class="col-md-3 col-form-label">Password:</label>
-                                    <input type="password" class="col-md-7 form-control mr-1 mt-1" id="txt_password" placeholder="Password">
+                                    <input type="password" class="col-md-7 form-control mr-1" id="txt_password" placeholder="Password">
+                                </div>
+                                <div class="form-group row" id="div_contact" style="display:none;">
+                                    <label class="col-md-3 col-form-label">Contact:</label>
+                                    <input type="text" class="form-control col-md-7" id="txt_contact" placeholder="Contact Number">
                                 </div>
                             </div>
                             <div class="col-md-2" align="center" id="div_image" style="display: none;">
@@ -199,12 +204,6 @@
                                     <div class="col-md-4 form-group">
                                         <button class="btn btn-outline-primary" id="btn_addAccount" onclick="addSocialAccount()"><i class="fas fa-plus"></i> Add Account</button>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row form-group">
-                                <label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
-                                <div class="col-md-2">
-                                    <input type="text" class="form-control" id="txt_contact" placeholder="Contact Number">
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -285,6 +284,7 @@
             $('#btn_addEmp').hide();
             $('#div_position').show();
             $('#div_other_details').show();
+            $('#div_contact').show();
             $('#div_Update_Password').show();
             $('#div_image').show();
             $('#div_password').remove()

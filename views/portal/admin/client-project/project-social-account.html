@@ -127,7 +127,7 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right mb-3" id="btn_add" onclick="$('#modal_Social').modal('show');"><i class="fas fa-plus"></i> Add</button>
+                                    <button class="btn btn-outline-primary float-right mb-3" id="btn_add"><i class="fas fa-plus"></i> Add</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -142,6 +142,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="4"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -193,15 +199,21 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Account Name</label>
-                                <select class="form-control" id="list_emp">
+                                <select class="form-control" id="list_social">
                                     <option value="">Select Account</option>
+                                    <option value="Stack Overflow">Stack Overflow</option>
+                                    <option value="Github">Github</option>
+                                    <option value="Hacker Rank">Hacker Rank</option>
+                                    <option value="LinkedIn">LinkedIn</option>
                                     <option value="Instagram">Instagram</option>
                                     <option value="Facebook">Facebook</option>
                                     <option value="Gmail">Gmail</option>
                                     <option value="WhatsApp">WhatsApp</option>
                                     <option value="Outlook">Outlook</option>
                                 </select>
+                                <input type="text" class="form-control" id="txt_social" placeholder="Account Name" disabled style="display: none;">
                             </div>
+
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
@@ -214,9 +226,8 @@
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <div>
-                        <button type="button" class="btn btn-outline-primary"><i class="fas fa-plus"></i> Add</button>
-                        <button type="button" class="btn btn-outline-info"><i class="fas fa-check"></i> Save Changes</button>
-                        <button type="button" class="btn btn-outline-danger"><i class="fas fa-trash-alt"></i> Remove</button>
+                        <button type="button" class="btn btn-outline-primary" id="btn_addAccount"><i class="fas fa-plus"></i> Add</button>
+                        <button type="button" class="btn btn-outline-info" id="btn_update" style="display: none;"><i class="fas fa-check"></i> Save Changes</button>
                     </div>
                 </div>
             </div>
@@ -260,17 +271,225 @@
             $.get(`/admin/v1/project/fetch/${planId}?scope=accounts`, (data) => {
                 var data = data.data;
                 var socialData = data.accounts;
-                for (var i = 0; i < socialData.length; i++) {
-                    var tempSocial = socialData[i],
-                        button = `<div class="btn-group"><button class='btn btn-info m-1'><i class='fas fa-eye'></i> View</button>`,
-                        reference = `<a href='${tempSocial.reference}' target='_blank'>${tempSocial.reference}</a>`;
-                    tblSocial.row.add([
-                        `${i+1}`, tempSocial.account_name, reference, button
-                    ]).draw();
+                tblSocial.clear().draw();
+                if (socialData) {
+                    for (var i = 0; i < socialData.length; i++) {
+                        var tempSocial = socialData[i],
+                            button = `<div class="btn-group">
+                                        <button class='btn btn-info m-1' id="btn_view_${i}" onclick=view(${i},'${tempSocial.account_id}')><i class='fas fa-pencil-alt'></i> View</button>
+                                        <button class='btn btn-danger m-1' id="btn_remove_${i}" onclick=remove(${i},'${tempSocial.account_id}')><i class='fas fa-trash-alt'></i> Remove</button>
+                                    </div>`;
+                        tblSocial.row.add([
+                            `${i+1}`, tempSocial.account_name, tempSocial.reference, button
+                        ]).draw();
+                    }
                 }
+            }).fail(error => {
+                tblSocial.clear().draw();
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
             });
         }
     });
+
+    $('#btn_add').click(() => {
+        $('#list_social').show();
+        $('#list_social').val('');
+        $('#txt_reference').val('');
+        $('#txt_social').hide();
+        $('#btn_addAccount').show();
+        $('#btn_update').hide();
+        $('#modal_Social').modal('show');
+    });
+
+    $('#btn_addAccount').click(() => {
+        var name = $('#list_social').val(),
+            reference = $('#txt_reference').val(),
+            project_id = urlParams.get('plan_id');
+        if (!name) {
+            return $(document).Toasts('create', {
+                title: 'Account name Required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Select Account Name',
+                class: 'bg-danger',
+            });
+        }
+        if (!reference) {
+            return $(document).Toasts('create', {
+                title: 'Reference Required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Referenve',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/social-account/add',
+            data: {
+                "project_id": project_id,
+                "account_name": name,
+                "reference": reference,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Account Added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Social Account Added Successfully',
+                    class: 'bg-success',
+                });
+                window.location.reload();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_addAccount').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_addAccount').removeAttr('disabled')
+            }
+        });
+    });
+
+    function view(index, account_id) {
+        project_id = urlParams.get('plan_id')
+        $('#btn_addAccount').hide();
+        $('#list_social').hide();
+        $('#txt_social').show();
+        $('#btn_update').show();
+        $('#modal_Social').modal('show');
+        $.get(`/admin/v1/project/fetch/${project_id}?scope=accounts`, (data) => {
+            var data = data.data;
+            accountData = data.accounts;
+            if (accountData) {
+                for (var i = 0; i < accountData.length; i++) {
+                    tempAccount = accountData[i]
+                    if (tempAccount.account_id == account_id) {
+                        $('#txt_social').val(tempAccount.account_name);
+                        $('#txt_reference').val(tempAccount.reference);
+                        $('#btn_update').attr('onClick', update(account_id))
+                    }
+                }
+            }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+    }
+
+    function update(account_id) {
+        console.log(account_id)
+            // var reference = $('#txt_reference').val()
+            // if (!reference) {
+            //     return $(document).Toasts('create', {
+            //         title: 'Reference Required',
+            //         autohide: true,
+            //         delay: 5000,
+            //         body: 'Please Enter Reference',
+            //         class: 'bg-danger',
+            //     });
+            // }
+            // $.post({
+            //     type: 'POST',
+            //     url: '/admin/v1/project/social-account/update',
+            //     data: {
+            //         "project_id": project_id,
+            //         "account_key": account_id,
+            //         "reference": reference,
+            //     },
+            //     success: result => {
+            //         $(document).Toasts('create', {
+            //             title: 'Account updated',
+            //             autohide: true,
+            //             delay: 5000,
+            //             body: 'Social Account updated Successfully',
+            //             class: 'bg-success',
+            //         });
+            //         window.location.reload();
+            //     },
+            //     error: error => {
+            //         error = error.responseJSON
+            //         $(document).Toasts('create', {
+            //             title: 'Error #' + error.code,
+            //             autohide: true,
+            //             delay: 5000,
+            //             body: error.message,
+            //             class: 'bg-danger',
+            //         });
+            //     },
+            //     beforeSend: () => {
+            //         $('#btn_update').attr('disabled', true)
+            //     },
+            //     complete: () => {
+            //         $('#btn_update').removeAttr('disabled')
+            //     }
+            // });
+    };
+
+    function remove(index, account_id) {
+        var projectId = urlParams.get('plan_id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You have want to remove this Account from Project",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/social-account/remove?project_id=${projectId}&account_key=${account_id}`,
+                    success: function() {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Account Successfully removed from project',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: function() {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_remove_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`#btn_remove_${index}`).removeAttr('disabled')
+                    }
+                });
+            };
+        });
+    }
 </script>
 
 </html>

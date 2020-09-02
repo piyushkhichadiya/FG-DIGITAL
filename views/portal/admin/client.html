@@ -137,6 +137,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="4"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -205,14 +211,18 @@
     $(document).ready(() => {
         $.getJSON('/admin/v1/client/get', (data) => {
             var dataClient = data.data
-            for (var i = 0; i < dataClient.length; i++) {
-                var tempClient = dataClient[i];
-                button = `<div class="btn-group"><button class='btn btn-info m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'"><i class='fas fa-eye'></i> View</button><button class='btn btn-warning m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'"><i class='fas fa-passport'></i> Projects</button></div>`
-                tblClient.row.add([
-                    `${i+1}`, tempClient.name, tempClient.email, button
-                ]).draw();
+            tblClient.clear().draw();
+            if (dataClient) {
+                for (var i = 0; i < dataClient.length; i++) {
+                    var tempClient = dataClient[i];
+                    button = `<div class="btn-group"><button class='btn btn-info m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'"><i class='fas fa-eye'></i> View</button><button class='btn btn-warning m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'"><i class='fas fa-passport'></i> Projects</button></div>`
+                    tblClient.row.add([
+                        `${i+1}`, tempClient.name, tempClient.email, button
+                    ]).draw();
+                }
             }
         }).fail(error => {
+            tblClient.clear().draw();
             error = error.responseJSON
             $(document).Toasts('create', {
                 title: 'Error #' + error.code,

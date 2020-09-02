@@ -143,6 +143,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="5"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -222,6 +229,42 @@
     </div>
     <!-- /.modal -->
 
+    <div class="modal fade" id="modal_update">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Permission</h4>
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close"> -->
+                    <!-- <span aria-hidden="true">&times;</span> -->
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="icheck-primary">
+                                <input type="checkbox" id="chk_review" checked="checked">
+                                <label for="chk_review">Review</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="icheck-primary">
+                                <input type="checkbox" id="chk_activity" checked="checked">
+                                <label for="chk_activity">Activity</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btn_update"><i class="fas fa-check"></i> Save Changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
     <!-- jQuery -->
     <script src="plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -255,27 +298,28 @@
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
-            $.get(`/admin/v1/project/fetch/${planId}?scope=team`, (data) => {
+            $.get(`/admin/v1/project/fetch/${planId}?scope=team`, async(data) => {
                 var data = data.data;
                 var teamData = data.team;
                 if (teamData) {
+                    tblTeam.clear().draw();
                     for (var i = 0; i < teamData.length; i++) {
                         var tempTeam = teamData[i],
                             button = `<div class="btn-group">
-                                        <button type="button" class="btn btn-info">Action</button>
+                                        <button type="button" class="btn btn-info">Open</button>
                                         <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
                                             <span class="sr-only">Toggle Dropdown</span>
                                             <div class="dropdown-menu" role="menu">
                                                 <a href='javascript:void(0);' class='dropdown-item' id="btn_activate_${i}" onclick=activate(${i},'${tempTeam.employee_id}')><i class='fas fa-hourglass-start'></i> Activate</a>
                                                 <a href='javascript:void(0);' class='dropdown-item' id="btn_deactivate_${i}" onclick=deactivate(${i},'${tempTeam.employee_id}')><i class='fas fa-ban'></i> Deactivate</a>
-                                                <a href='javascript:void(0);' class='dropdown-item' id="btn_update_${i}" onclick=update(${i},'${tempTeam.employee_id}','${tempTeam.active}')><i class='fas fa-pencil-alt' ></i> Update</a>
+                                                <a href='javascript:void(0);' class='dropdown-item' id="btn_update_${i}" onclick=update(${i},'${tempTeam.employee_id}')><i class='fas fa-pencil-alt' ></i> Update Permission</a>
                                                 <a href='javascript:void(0);' class='dropdown-item' id="btn_remove_${i}" onclick=remove(${i},'${tempTeam.employee_id}')><i class='fas fa-trash-alt' ></i> Remove</a>
                                             </div>
                                         </button> 
                                     </div>`,
                             active = tempTeam.active;
                         tblTeam.row.add([
-                            `${i+1}`, tempTeam.employee_id, tempTeam.employee_id, `${i+1}`, button
+                            `${i+1}`, tempTeam.employee_id, await getEmployeeByID(tempTeam.employee_id), `${i+1}`, button
                         ]).draw();
                         if (active == false) {
                             $(`#btn_deactivate_${i}`).hide();
@@ -287,6 +331,7 @@
                     }
                 }
             }).fail(error => {
+                tblTeam.clear().draw();
                 error = error.responseJSON
                 $(document).Toasts('create', {
                     title: 'Error #' + error.code,
@@ -451,41 +496,46 @@
         });
     };
 
-    function update(index, employee_id, active) {
-        var projectId = urlParams.get('plan_id');
-        $.post({
-            url: '/admin/v1/project/team/update',
-            data: {
-                "employee_id": employee_id,
-                "project_id": projectId,
-                "active": active,
-            },
-            success: result => {
-                $(document).Toasts('create', {
-                    title: 'Success',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Member updated Successfully',
-                    class: 'bg-success',
-                });
-                window.location.reload();
-            },
-            error: error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
-            },
-            beforeSend: () => {
-                $(`#btn_update_${index}`).attr('disabled', true)
-            },
-            complete: () => {
-                $(`#btn_update_${index}`).removeAttr('disabled')
-            }
+    function update(index, employee_id) {
+        var projectId = urlParams.get('plan_id'),
+            review = $('#chk_review').prop('checked'),
+            activity = $('#chk_activity').prop('checked');
+        $('#modal_update').modal('show');
+        $('#btn_update').click(() => {
+            $.post({
+                url: '/admin/v1/project/team/update',
+                data: {
+                    "employee_id": employee_id,
+                    "project_id": projectId,
+                    "review": review,
+                    "activity": activity,
+                },
+                success: result => {
+                    $(document).Toasts('create', {
+                        title: 'Success',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Permission given Successfully',
+                        class: 'bg-success',
+                    });
+                },
+                error: error => {
+                    error = error.responseJSON
+                    $(document).Toasts('create', {
+                        title: 'Error #' + error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                    });
+                },
+                beforeSend: () => {
+                    $('#btn_update').attr('disabled', true)
+                },
+                complete: () => {
+                    $('#btn_update').removeAttr('disabled')
+                }
+            });
         });
     };
 
@@ -531,6 +581,15 @@
             };
         });
     }
+
+    async function getEmployeeByID(emp_id) {
+        var result = await $.getJSON('/admin/v1/employee/get?employee_id=' + emp_id)
+        if (result) {
+            return result.data.name;
+        }
+    }
 </script>
+
+</html>
 
 </html>

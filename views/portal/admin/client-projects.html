@@ -139,6 +139,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="5"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -210,6 +217,7 @@
     $(document).ready(() => {
         $.getJSON(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
             var dataClient = data.data;
+            tblProject.clear().draw();
             if (dataClient.plans) {
                 var dataProject = dataClient.plans
                 for (var i = 0; i < dataProject.length; i++) {
@@ -235,6 +243,16 @@
                     ]).draw();
                 }
             }
+        }).fail(error => {
+            tblProject.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
         });
     });
 </script>
