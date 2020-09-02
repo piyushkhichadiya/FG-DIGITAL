@@ -1,0 +1,126 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "FG Digital",
+        "description": "Employee APIs - Project Management Portal",
+        "version": "1.0.0"
+    },
+    "host": "localhost",
+    "basePath": "/employee/v1",
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "tags": [{
+        "name": "1. User",
+        "description": "Operations regarding unauthorized user"
+    }, {
+        "name": "2. Profile",
+        "description": "Authenticated user management"
+    }],
+    "paths": {
+        "/user/login": {
+            "post": {
+                "tags": ["1. User"],
+                "summary": "Login into Portal",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "Email or Employee ID any one is allowed as username",
+                    "schema": {
+                        "required": ["email", "password"],
+                        "properties": {
+                            "username": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "username": "20201",
+                            "password": "Aa@123456",
+                            "remember": true
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/user/logout": {
+            "get": {
+                "tags": ["1. User"],
+                "summary": "To logout or expire session from portal",
+                "responses": {}
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": ["2. Profile"],
+                "summary": "Get Profile",
+                "responses": {}
+            }
+        },
+        "/profile/update": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "Update Profile Details",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "name",
+                        "in": "formData",
+                        "description": "Username",
+                        "required": false,
+                        "type": "string",
+                        "example": "Enter Your Name",
+                        "schema": {
+                            "example": "Jenil Narola"
+                        }
+                    },
+                    {
+                        "name": "profile_image",
+                        "in": "formData",
+                        "description": "file to upload",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/profile/password": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "Change Password",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["password"],
+                        "properties": {
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/profile/file/{filename}": {
+            "get": {
+                "tags": ["2. Profile"],
+                "summary": "To Get Any file from storage",
+                "parameters": [{
+                    "in": "path",
+                    "name": "filename",
+                    "required": true,
+                    "description": "Specify File Name"
+                }],
+                "responses": {}
+            }
+        }
+    }
+}

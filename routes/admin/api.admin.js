@@ -9,12 +9,7 @@ var express = require('express'),
 
 //------------------------------ MIDDLEWARE ---------------------------------
 adminAPI.use(/^(?!\/user).*/, async(req, res, next) => {
-    var adminAuthToken = await middleware.adminAuthToken(req, res)
-    if (adminAuthToken) {
-        next();
-    } else {
-        return;
-    }
+    await middleware.adminAuthToken(req, res, next)
 });
 
 //------------------------------ ADMIN APIs ---------------------------------

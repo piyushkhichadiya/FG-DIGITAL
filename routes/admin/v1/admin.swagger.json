@@ -67,7 +67,6 @@
         },
         "/user/login": {
             "post": {
-
                 "tags": ["1. User Account"],
                 "summary": "Authentication for Access admin panel",
                 "parameters": [{
@@ -772,11 +771,10 @@
                     "in": "body",
                     "name": "body",
                     "schema": {
-                        "required": ["project_id", "client_id"],
+                        "required": ["project_id", "employee_id"],
                         "properties": {
                             "employee_id": { "type": "string" },
                             "project_id": { "type": "string" },
-                            "active": { "type": "boolean" },
                             "review": { "type": "boolean" },
                             "activity": { "type": "boolean" }
 
@@ -784,8 +782,8 @@
                         "example": {
                             "employee_id": "20201",
                             "project_id": "93492065515",
-                            "review": { "type": "boolean" },
-                            "activity": { "type": "boolean" }
+                            "review": true,
+                            "activity": false
                         }
                     }
                 }],
