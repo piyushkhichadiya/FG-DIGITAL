@@ -231,7 +231,8 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                     createdOn: tempReview.createdOn,
                     createdBy: tempReview.createdBy,
                     lastModifiedBy: tempReview.lastModifiedBy,
-                    lastModifiedOn: tempReview.lastModifiedOn
+                    lastModifiedOn: tempReview.lastModifiedOn,
+                    closed: tempReview.closed
                 }
 
                 if (tempReview.post) {
@@ -1525,10 +1526,11 @@ projectAPI.get('/review/open', (req, res) => {
             if (!tempReview.closed) {
                 return response(res, 409, 'conflict', 'Review is already open', undefined, 'A-6.23.5')
             }
-            tempReview.closed = false
+
+            delete tempReview.closed
             tempReview.lastModifiedOn = String(new Date())
             tempReview.lastModifiedBy = "ADMIN"
-            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/`).update(tempReview).then(() => {
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/`).set(tempReview).then(() => {
                 return response(res, 200, 'success', 'Review activated successfully', undefined, 'A-6.23.6')
             })
         } else if (i == reviewDBKeys.length - 1) {
