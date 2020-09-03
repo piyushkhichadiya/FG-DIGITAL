@@ -61,6 +61,15 @@
             }
         },
         "/profile/update": {
+            "get": {
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
             "post": {
                 "tags": ["2. Profile"],
                 "summary": "Update Profile Details",
@@ -88,6 +97,15 @@
             }
         },
         "/profile/password": {
+            "get": {
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
             "post": {
                 "tags": ["2. Profile"],
                 "summary": "Change Password",
