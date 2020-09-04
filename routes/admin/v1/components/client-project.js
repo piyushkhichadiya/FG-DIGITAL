@@ -524,20 +524,15 @@ projectAPI.post('/team/update', async(req, res) => {
                     var tempTeam = teamDB[teamKeys[j]]
                     if (tempTeam.employee_id == employeeID && !tempTeam.deleted) {
 
-                        if (req.body.review == true) {
+                        if (req.body.review == true || req.body.review == 'true') {
                             tempTeam.review = true
-                        } else if (req.body.review == false) {
+                        } else if (req.body.review == false || req.body.review == 'false') {
                             tempTeam.review = false
                         }
-                        if (req.body.activity == true) {
+                        if (req.body.activity == true || req.body.activity == 'true') {
                             tempTeam.activity = true
-                        } else if (req.body.activity == false) {
+                        } else if (req.body.activity == false || req.body.activity == 'false') {
                             tempTeam.activity = false
-                        }
-                        if (req.body.active == true) {
-                            tempTeam.active = true
-                        } else if (req.body.active == false) {
-                            tempTeam.active = false
                         }
 
                         tempTeam.lastModifiedOn = String(new Date())
@@ -2164,7 +2159,6 @@ projectAPI.post('/activity/remove-file', (req, res) => {
 
         if (!tempDocument.deleted && tempDocument.filename == filename) {
 
-            console.log(unlinkFile(filename), filename)
             tempDocument.deleted = true
             tempDocument.lastModifiedBy = "ADMIN"
             tempDocument.lastModifiedOn = String(new Date())
