@@ -496,6 +496,25 @@
         var files = [];
         for (var i = 0; i < $(this).get(0).files.length; ++i) {
             files.push($(this).get(0).files[i]);
+            var type = files[i].type.split('/').pop().toLowerCase();
+            if (type != "jpeg" && type != "jpg" && type != "png") {
+                return $(document).Toasts('create', {
+                    title: 'File Formate not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Formate',
+                    class: 'bg-danger',
+                });
+            }
+            if (files[i].size / 1024 / 1024 > 10) {
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 10 MB',
+                    class: 'bg-danger',
+                });
+            }
             const objectURL = URL.createObjectURL(files[i])
             image = `<div class="col-md-2 img_container form-group">
                         <div class='' href='${objectURL}' data-toggle="lightbox">
@@ -513,6 +532,25 @@
         var files = [];
         for (var i = 0; i < $('#file_post_' + index).get(0).files.length; ++i) {
             files.push($('#file_post_' + index).get(0).files[i]);
+            var type = files[i].type.split('/').pop().toLowerCase();
+            if (type != "jpeg" && type != "jpg" && type != "png") {
+                return $(document).Toasts('create', {
+                    title: 'File Formate not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Formate',
+                    class: 'bg-danger',
+                });
+            }
+            if (files[i].size / 1024 / 1024 > 10) {
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 10 MB',
+                    class: 'bg-danger',
+                });
+            }
             const objectURL = URL.createObjectURL(files[i])
             image = `<div class="col-md-2 img_container form-group">
                         <div class='' href='${objectURL}' data-toggle="lightbox">
