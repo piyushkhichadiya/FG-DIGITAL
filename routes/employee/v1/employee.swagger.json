@@ -16,6 +16,9 @@
     }, {
         "name": "2. Profile",
         "description": "Authenticated user management"
+    }, {
+        "name": "3. Client Project",
+        "description": "Project Management APIs"
     }],
     "paths": {
         "/user/login": {
@@ -61,15 +64,6 @@
             }
         },
         "/profile/update": {
-            "get": {
-                "description": "",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            },
             "post": {
                 "tags": ["2. Profile"],
                 "summary": "Update Profile Details",
@@ -97,15 +91,6 @@
             }
         },
         "/profile/password": {
-            "get": {
-                "description": "",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            },
             "post": {
                 "tags": ["2. Profile"],
                 "summary": "Change Password",
@@ -139,6 +124,31 @@
                 }],
                 "responses": {}
             }
+        },
+        "/client-project/fetch": {
+            "get": {
+                "tags": ["3. Client Project"],
+                "summary": "3.1 Fetch All or Individual Project and related resources",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "type": "string",
+                    "description": "Project to Fetch related resources",
+                    "example": "93492065515",
+                    "schema": {
+                        "example": 93492065515
+                    }
+                }, {
+                    "in": "query",
+                    "name": "scope",
+                    "description": "Scope can help out to get related resource. Separate with space. \n 1. client - Get Client Information \n 2. info - Project Information \n 3. team - Team Members \n 4. service - Allocated Services \n 5. accounts - All Social Account \n 6. review - Reviews \n 7. Activity - Activity",
+                    "schema": {
+                        "example": "client info service"
+                    }
+                }],
+                "responses": {}
+            }
+
         }
     }
 }
