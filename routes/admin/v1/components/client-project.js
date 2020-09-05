@@ -1454,7 +1454,7 @@ projectAPI.post('/review/update-post', (req, res) => {
             }
             if (tempReview.post && tempReview.post[postKey] && !tempReview.post[postKey].deleted) {
 
-                var tempPost = postDB[postKey]
+                var tempPost = tempReview.post[postKey]
 
                 if (req.body.description) {
                     tempPost.description = String(req.body.description).trim()
@@ -1471,19 +1471,22 @@ projectAPI.post('/review/update-post', (req, res) => {
                 }
 
                 // Move files to directory 
-                var file = req.files.file
-                if (!Array.isArray(file)) {
-                    var file = [req.files.file]
+                if (req.files && req.files.file) {
+                    var file = req.files.file
+                    if (!Array.isArray(file)) {
+                        var file = [req.files.file]
+                    }
+                    for (var j = 0; j < file.length; j++) {
+                        var tempFile = file[j],
+                            tempName = fileNameData[j]
+                        tempFile.mv(directory + tempName, (error) => {
+                            if (error) {
+                                return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.22.9')
+                            }
+                        })
+                    }
                 }
-                for (var j = 0; j < file.length; j++) {
-                    var tempFile = file[j],
-                        tempName = fileNameData[j]
-                    tempFile.mv(directory + tempName, (error) => {
-                        if (error) {
-                            return response(res, 500, 'internalError', 'The request failed due to an internal error. File Upload Error', undefined, 'A-6.22.9')
-                        }
-                    })
-                }
+
 
                 return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/post/${postKey}/`).update(tempPost).then(() => {
                     return response(res, 200, 'success', 'Post has been updated successfully', undefined, 'A-6.22.10')
