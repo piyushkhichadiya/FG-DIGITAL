@@ -227,7 +227,7 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <div>
                         <button type="button" class="btn btn-outline-primary" id="btn_addAccount"><i class="fas fa-plus"></i> Add</button>
-                        <button type="button" class="btn btn-outline-info" id="btn_update" style="display: none;"><i class="fas fa-check"></i> Save Changes</button>
+                        <div id="div_button"></div>
                     </div>
                 </div>
             </div>
@@ -306,6 +306,7 @@
         $('#btn_addAccount').show();
         $('#btn_update').hide();
         $('#modal_Social').modal('show');
+        $('#div_button').empty();
     });
 
     $('#btn_addAccount').click(() => {
@@ -370,6 +371,7 @@
     function view(index, account_id) {
         project_id = urlParams.get('plan_id')
         $('#btn_addAccount').hide();
+        $('#div_button').empty();
         $('#list_social').hide();
         $('#txt_social').show();
         $('#btn_update').show();
@@ -379,11 +381,12 @@
             accountData = data.accounts;
             if (accountData) {
                 for (var i = 0; i < accountData.length; i++) {
-                    tempAccount = accountData[i]
+                    var tempAccount = accountData[i],
+                        button = `<button type="button" class="btn btn-outline-info" id="btn_update_${i}" onclick=update(${i},'${account_id}')><i class="fas fa-check"></i> Save Changes</button>`
                     if (tempAccount.account_id == account_id) {
                         $('#txt_social').val(tempAccount.account_name);
                         $('#txt_reference').val(tempAccount.reference);
-                        $('#btn_update').attr('onClick', update(account_id))
+                        $('#div_button').append(button);
                     }
                 }
             }
@@ -399,53 +402,52 @@
         });
     }
 
-    function update(account_id) {
-        console.log(account_id)
-            // var reference = $('#txt_reference').val()
-            // if (!reference) {
-            //     return $(document).Toasts('create', {
-            //         title: 'Reference Required',
-            //         autohide: true,
-            //         delay: 5000,
-            //         body: 'Please Enter Reference',
-            //         class: 'bg-danger',
-            //     });
-            // }
-            // $.post({
-            //     type: 'POST',
-            //     url: '/admin/v1/project/social-account/update',
-            //     data: {
-            //         "project_id": project_id,
-            //         "account_key": account_id,
-            //         "reference": reference,
-            //     },
-            //     success: result => {
-            //         $(document).Toasts('create', {
-            //             title: 'Account updated',
-            //             autohide: true,
-            //             delay: 5000,
-            //             body: 'Social Account updated Successfully',
-            //             class: 'bg-success',
-            //         });
-            //         window.location.reload();
-            //     },
-            //     error: error => {
-            //         error = error.responseJSON
-            //         $(document).Toasts('create', {
-            //             title: 'Error #' + error.code,
-            //             autohide: true,
-            //             delay: 5000,
-            //             body: error.message,
-            //             class: 'bg-danger',
-            //         });
-            //     },
-            //     beforeSend: () => {
-            //         $('#btn_update').attr('disabled', true)
-            //     },
-            //     complete: () => {
-            //         $('#btn_update').removeAttr('disabled')
-            //     }
-            // });
+    function update(index, account_id) {
+        var reference = $('#txt_reference').val()
+        if (!reference) {
+            return $(document).Toasts('create', {
+                title: 'Reference Required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Reference',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/social-account/update',
+            data: {
+                "project_id": project_id,
+                "account_key": account_id,
+                "reference": reference,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Account updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Social Account updated Successfully',
+                    class: 'bg-success',
+                });
+                window.location.reload();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $(`#btn_update_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_update_${index}`).removeAttr('disabled')
+            }
+        });
     };
 
     function remove(index, account_id) {

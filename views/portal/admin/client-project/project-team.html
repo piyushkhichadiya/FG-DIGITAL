@@ -243,20 +243,20 @@
                         <div class="col-md-12">
                             <div class="icheck-primary">
                                 <input type="checkbox" id="chk_review" checked="checked">
-                                <label for="chk_review">Review</label>
+                                <label>Review</label>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="icheck-primary">
                                 <input type="checkbox" id="chk_activity" checked="checked">
-                                <label for="chk_activity">Activity</label>
+                                <label>Activity</label>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="btn_update"><i class="fas fa-check"></i> Save Changes</button>
+                    <div id="div_btn"></div>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -306,7 +306,7 @@
                     for (var i = 0; i < teamData.length; i++) {
                         var tempTeam = teamData[i],
                             button = `<div class="btn-group">
-                                        <button type="button" class="btn btn-info">Open</button>
+                                        <button type="button" class="btn btn-info" data-toggle="dropdown">Open</button>
                                         <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
                                             <span class="sr-only">Toggle Dropdown</span>
                                             <div class="dropdown-menu" role="menu">
@@ -358,6 +358,7 @@
 
         });
     });
+
     $('#list_emp').change(() => {
         var empId = $('#list_emp').val();
         $('#div_empDetails').show();
@@ -497,47 +498,64 @@
     };
 
     function update(index, employee_id) {
-        var projectId = urlParams.get('plan_id'),
-            review = $('#chk_review').prop('checked'),
-            activity = $('#chk_activity').prop('checked');
+        planId = urlParams.get('plan_id');
         $('#modal_update').modal('show');
-        $('#btn_update').click(() => {
-            $.post({
-                url: '/admin/v1/project/team/update',
-                data: {
-                    "employee_id": employee_id,
-                    "project_id": projectId,
-                    "review": review,
-                    "activity": activity,
-                },
-                success: result => {
-                    $(document).Toasts('create', {
-                        title: 'Success',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Permission given Successfully',
-                        class: 'bg-success',
-                    });
-                },
-                error: error => {
-                    error = error.responseJSON
-                    $(document).Toasts('create', {
-                        title: 'Error #' + error.code,
-                        autohide: true,
-                        delay: 5000,
-                        body: error.message,
-                        class: 'bg-danger',
-                    });
-                },
-                beforeSend: () => {
-                    $('#btn_update').attr('disabled', true)
-                },
-                complete: () => {
-                    $('#btn_update').removeAttr('disabled')
+        $('#div_btn').empty()
+        var button = `<button type="button" class="btn btn-primary" id="btn_update_${index}" onclick=updatePermission(${index},'${employee_id}')><i class="fas fa-check"></i> Save Changes</button>`
+        $('#div_btn').append(button)
+        $.get(`/admin/v1/project/fetch/${planId}?scope=team`, (data) => {
+            var data = data.data;
+            var teamData = data.team;
+            if (teamData) {
+                for (var i = 0; i < teamData.length; i++) {
+                    var tempTeam = teamData[i];
+                    if (tempTeam.employee_id == employee_id) {
+                        $('#chk_review').prop('checked', tempTeam.permission.review);
+                        $('#chk_activity').prop('checked', tempTeam.permission.activity);
+                    }
                 }
-            });
+            }
         });
     };
+
+    function updatePermission(index, employee_id) {
+        var projectId = urlParams.get('plan_id');
+        $.post({
+            url: '/admin/v1/project/team/update',
+            data: {
+                "employee_id": employee_id,
+                "project_id": projectId,
+                "review": $('#chk_review').prop('checked'),
+                "activity": $('#chk_activity').prop('checked')
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Permission given Successfully',
+                    class: 'bg-success',
+                });
+                $('#modal_update').modal('hide');
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $(`#btn_update_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_update_${index}`).removeAttr('disabled')
+            }
+        });
+    }
 
     function remove(index, employee_id) {
         var projectId = urlParams.get('plan_id');
