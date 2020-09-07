@@ -256,44 +256,55 @@
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
-            $.get(`/admin/v1/project/fetch/${planId}?scope=service`, async(data) => {
-                var data = data.data;
-                var serviceData = data.service;
-                tblService.clear().draw();
-                if (serviceData) {
-                    for (var i = 0; i < serviceData.length; i++) {
-                        var tempService = serviceData[i],
-                            button = `<div class="btn-group">
+            getService(planId)
+        }
+    });
+
+    function getService(planId) {
+        $.get(`/admin/v1/project/fetch/${planId}?scope=service`, async(data) => {
+            var data = data.data;
+            var serviceData = data.service;
+            tblService.clear().draw();
+            if (serviceData) {
+                for (var i = 0; i < serviceData.length; i++) {
+                    var tempService = serviceData[i],
+                        button = `<div class="btn-group">
                                         <button class='btn btn-success m-1' id="btn_activate_${i}" onclick=activate(${i},'${tempService.service_id}')><i class='fas fa-hourglass-start'></i> Activate</button>
                                         <button class='btn btn-secondary m-1' id="btn_deactivate_${i}" onclick=deactivate(${i},'${tempService.service_id}')><i class='fas fa-ban'></i> Deactivate</button>
                                         <button class='btn btn-danger m-1' id="btn_remove_${i}" onclick=remove(${i},'${tempService.service_id}')><i class='fas fa-trash-alt' ></i> Remove</button>
                                     </div>`,
-                            active = tempService.active;
-                        tblService.row.add([
-                            `${i+1}`, await getServiceByID(tempService.service_id), tempService.service_id, button
-                        ]).draw();
-                        if (active == false) {
-                            $(`#btn_deactivate_${i}`).hide();
-                            $(`#btn_activate_${i}`).show();
-                        } else {
-                            $(`#btn_deactivate_${i}`).show();
-                            $(`#btn_activate_${i}`).hide();
-                        }
+                        active = tempService.active;
+                    if (active == true) {
+                        var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-hourglass-start'></i> Active</p>`
+                    } else {
+                        status = `<p style='color:#ff0000; font-size:17px;'><i class='fas fa-ban'></i> Deactivated</p>`
+                    }
+                    tblService.row.add([
+                        `${i+1}`, await getServiceByID(tempService.service_id), status, button
+                    ]).draw();
+                    if (active == false) {
+                        $(`#btn_deactivate_${i}`).hide();
+                        $(`#btn_activate_${i}`).show();
+                    } else {
+                        $(`#btn_deactivate_${i}`).show();
+                        $(`#btn_activate_${i}`).hide();
                     }
                 }
-            }).fail(error => {
-                tblService.clear().draw();
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
+            }
+        }).fail(error => {
+            tblService.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
             });
-        }
-    });
+        });
+    }
+
+
     var serviceData
 
     $('#btn_add').click(() => {
@@ -361,9 +372,11 @@
                     body: 'Service successfully added to Project',
                     class: 'bg-success',
                 });
-                window.location.reload();
+                $('#modal_Service').modal('hide');
+                tblService.clear().draw();
+                getService(projectId);
             },
-            error: function() {
+            error: function(error) {
                 error = error.responseJSON
                 $(document).Toasts('create', {
                     title: 'Error #' + error.code,
@@ -395,7 +408,7 @@
                     class: 'bg-success',
                 });
             },
-            error: function() {
+            error: function(error) {
                 error = error.responseJSON
                 $(document).Toasts('create', {
                     title: 'Error #' + error.code,
@@ -429,7 +442,7 @@
                     class: 'bg-success',
                 });
             },
-            error: function() {
+            error: function(error) {
                 error = error.responseJSON
                 $(document).Toasts('create', {
                     title: 'Error #' + error.code,
@@ -451,7 +464,6 @@
     };
 
     function remove(index, service_id) {
-        var projectId = urlParams.get('plan_id');
         Swal.fire({
             title: 'Are you sure?',
             text: "You have want to remove this Service from Project",
@@ -461,7 +473,7 @@
         }).then((result) => {
             if (result.value) {
                 $.get({
-                    url: `/admin/v1/project/service/remove?service_id=${service_id}&project_id=${projectId}`,
+                    url: `/admin/v1/project/service/remove?service_id=${service_id}&project_id=${urlParams.get('plan_id')}`,
                     success: function() {
                         $(document).Toasts('create', {
                             title: 'Success',
@@ -470,9 +482,10 @@
                             body: 'Service Successfully removed from project',
                             class: 'bg-success',
                         });
-                        window.location.reload();
+                        tblService.clear().draw();
+                        getService(urlParams.get('plan_id'))
                     },
-                    error: function() {
+                    error: function(error) {
                         error = error.responseJSON
                         $(document).Toasts('create', {
                             title: 'Error #' + error.code,

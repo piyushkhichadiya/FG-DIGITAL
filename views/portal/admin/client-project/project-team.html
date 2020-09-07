@@ -298,14 +298,19 @@
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
-            $.get(`/admin/v1/project/fetch/${planId}?scope=team`, async(data) => {
-                var data = data.data;
-                var teamData = data.team;
-                if (teamData) {
-                    tblTeam.clear().draw();
-                    for (var i = 0; i < teamData.length; i++) {
-                        var tempTeam = teamData[i],
-                            button = `<div class="btn-group">
+            getEmployee(planId);
+        }
+    });
+
+    function getEmployee(planId) {
+        $.get(`/admin/v1/project/fetch/${planId}?scope=team`, async(data) => {
+            var data = data.data;
+            var teamData = data.team;
+            if (teamData) {
+                tblTeam.clear().draw();
+                for (var i = 0; i < teamData.length; i++) {
+                    var tempTeam = teamData[i],
+                        button = `<div class="btn-group">
                                         <button type="button" class="btn btn-info" data-toggle="dropdown">Open</button>
                                         <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
                                             <span class="sr-only">Toggle Dropdown</span>
@@ -317,32 +322,36 @@
                                             </div>
                                         </button> 
                                     </div>`,
-                            active = tempTeam.active;
-                        tblTeam.row.add([
-                            `${i+1}`, tempTeam.employee_id, await getEmployeeByID(tempTeam.employee_id), `${i+1}`, button
-                        ]).draw();
-                        if (active == false) {
-                            $(`#btn_deactivate_${i}`).hide();
-                            $(`#btn_activate_${i}`).show();
-                        } else {
-                            $(`#btn_deactivate_${i}`).show();
-                            $(`#btn_activate_${i}`).hide();
-                        }
+                        active = tempTeam.active;
+                    if (active == true) {
+                        var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-hourglass-start'></i> Active</p>`
+                    } else {
+                        status = `<p style='color:#ff0000; font-size:17px;'><i class='fas fa-ban'></i> Deactivated</p>`
+                    }
+                    tblTeam.row.add([
+                        `${i+1}`, tempTeam.employee_id, await getEmployeeByID(tempTeam.employee_id), status, button
+                    ]).draw();
+                    if (active == false) {
+                        $(`#btn_deactivate_${i}`).hide();
+                        $(`#btn_activate_${i}`).show();
+                    } else {
+                        $(`#btn_deactivate_${i}`).show();
+                        $(`#btn_activate_${i}`).hide();
                     }
                 }
-            }).fail(error => {
-                tblTeam.clear().draw();
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
+            }
+        }).fail(error => {
+            tblTeam.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
             });
-        }
-    });
+        });
+    }
 
     var empData
     $('#btn_add').click(() => {
@@ -392,13 +401,11 @@
     });
 
     $('#btn_addEmp').click(() => {
-        var employee_id = $('#list_emp').val(),
-            project_id = urlParams.get('plan_id');
         $.post({
             url: '/admin/v1/project/team/add',
             data: {
-                "employee_id": employee_id,
-                "project_id": project_id,
+                "employee_id": $('#list_emp').val(),
+                "project_id": urlParams.get('plan_id'),
             },
             success: result => {
                 $(document).Toasts('create', {
@@ -408,7 +415,9 @@
                     body: 'Member added Successfully',
                     class: 'bg-success',
                 });
-                window.location.reload();
+                $('#modal_Team').modal('hide');
+                tblTeam.clear().draw();
+                getEmployee(urlParams.get('plan_id'))
             },
             error: error => {
                 error = error.responseJSON
@@ -442,7 +451,7 @@
                     class: 'bg-success',
                 });
             },
-            error: function() {
+            error: function(error) {
                 error = error.responseJSON
                 $(document).Toasts('create', {
                     title: 'Error #' + error.code,
@@ -476,7 +485,7 @@
                     class: 'bg-success',
                 });
             },
-            error: function() {
+            error: function(error) {
                 error = error.responseJSON
                 $(document).Toasts('create', {
                     title: 'Error #' + error.code,
@@ -498,12 +507,11 @@
     };
 
     function update(index, employee_id) {
-        planId = urlParams.get('plan_id');
         $('#modal_update').modal('show');
         $('#div_btn').empty()
         var button = `<button type="button" class="btn btn-primary" id="btn_update_${index}" onclick=updatePermission(${index},'${employee_id}')><i class="fas fa-check"></i> Save Changes</button>`
         $('#div_btn').append(button)
-        $.get(`/admin/v1/project/fetch/${planId}?scope=team`, (data) => {
+        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=team`, (data) => {
             var data = data.data;
             var teamData = data.team;
             if (teamData) {
@@ -558,7 +566,6 @@
     }
 
     function remove(index, employee_id) {
-        var projectId = urlParams.get('plan_id');
         Swal.fire({
             title: 'Are you sure?',
             text: "You want to remove this Team Member from Project",
@@ -568,7 +575,7 @@
         }).then((result) => {
             if (result.value) {
                 $.get({
-                    url: `/admin/v1/project/team/remove?project_id=${projectId}&employee_id=${employee_id}`,
+                    url: `/admin/v1/project/team/remove?project_id=${urlParams.get('plan_id')}&employee_id=${employee_id}`,
                     success: function() {
                         $(document).Toasts('create', {
                             title: 'Success',
@@ -577,9 +584,10 @@
                             body: 'Team Member Successfully removed from project',
                             class: 'bg-success',
                         });
-                        window.location.reload();
+                        tblTeam.clear().draw();
+                        getEmployee(urlParams.get('plan_id'))
                     },
-                    error: function() {
+                    error: function(error) {
                         error = error.responseJSON
                         $(document).Toasts('create', {
                             title: 'Error #' + error.code,

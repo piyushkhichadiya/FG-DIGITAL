@@ -363,7 +363,7 @@
                         });
                         window.location.href = '/admin/services'
                     },
-                    error: function() {
+                    error: function(error) {
                         error = error.responseJSON
                         $(document).Toasts('create', {
                             title: 'Error #' + error.code,

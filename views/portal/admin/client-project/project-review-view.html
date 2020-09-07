@@ -255,7 +255,7 @@
     });
     const urlParams = new URLSearchParams(window.location.search);
     $('#lbl_planId').html(urlParams.get('plan_id'))
-
+    var postData;
     if (urlParams.has('review_id')) {
         if (urlParams.get('review_id') == '') {
             window.location.href = `http://localhost/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`
@@ -269,11 +269,11 @@
             var reviewData = data.review;
             if (reviewData) {
                 for (var i = 0; i < reviewData.length; i++) {
-                    tempReview = reviewData[i];
+                    var tempReview = reviewData[i];
                     if (tempReview.review_id == urlParams.get('review_id')) {
                         $('#txt_title').val(tempReview.title);
                         $('#txt_description').val(tempReview.description);
-                        getPost(tempReview.posts)
+                        getPost(urlParams.get('review_id'))
                     }
                 }
             }
@@ -283,40 +283,61 @@
                 title: 'Error!',
                 autohide: true,
                 delay: 5000,
-                body: 'Service Not Found',
+                body: 'Review Not Found',
                 class: 'bg-danger',
             });
         });
     }
 
-    function getPost(postData) {
-        if (postData) {
-            for (var i = 0; i < postData.length; i++) {
-                var tempPost = postData[i];
-                var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
-                            <label id="lbl_post_${i}">${tempPost.description}</label>
-                            <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
-                            <div class="row" id="div_doc_${i}">
-                                ${getDocument(i , tempPost.documents)}
-                                <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
-                                <div class="col-md-2" id="div_post_${tempPost.post_key}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
-                                    <div class="plus">
-                                        <ion-icon name="add-circle-outline"></ion-icon>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row form-group">
-                                <div class="col-md-12">
-                                    <button class="btn btn-outline-danger float-right m-1" id="btn_removePost_${i}" onclick=removePost(${i},'${tempPost.post_key}')><i class="fas fa-trash-alt"></i> Remove Post</button>
-                                    <button class="btn btn-outline-primary float-right m-1" id="btn_edit_${tempPost.post_key}" onclick=editPost(${i},'${tempPost.post_key}')><i class="fas fa-pencil-alt"></i> Edit Post</button>
-                                    <button class="btn btn-outline-info float-right m-1" id="btn_update_${tempPost.post_key}" onclick=updatePost(${i},'${tempPost.post_key}') style="display:none;"><i class="fas fa-check"></i> Save Changes</button>
-                                </div>
-                            </div>
-                            </div>
-                            <hr>`;
-                $('#div_posts').append(postHtml);
+    function getPost(review_id) {
+        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=review`, (data) => {
+            var data = data.data;
+            var reviewData = data.review;
+            if (reviewData) {
+                for (var k = 0; k < reviewData.length; k++) {
+                    var tempReview = reviewData[k];
+                    if (tempReview.review_id == review_id) {
+                        var postData = tempReview.posts
+                        if (postData) {
+                            for (var i = 0; i < postData.length; i++) {
+                                var tempPost = postData[i];
+                                var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+                                                <label id="lbl_post_${i}">${tempPost.description}</label>
+                                                <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
+                                                <div class="row" id="div_doc_${i}">
+                                                    ${getDocument(i , tempPost.documents)}
+                                                    <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                                                    <div class="col-md-2" id="div_post_${tempPost.post_key}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                        <div class="plus">
+                                                            <ion-icon name="add-circle-outline"></ion-icon>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-md-12">
+                                                        <button class="btn btn-outline-danger float-right m-1" id="btn_removePost_${i}" onclick=removePost(${i},'${tempPost.post_key}')><i class="fas fa-trash-alt"></i> Remove Post</button>
+                                                        <button class="btn btn-outline-primary float-right m-1" id="btn_edit_${tempPost.post_key}" onclick=editPost(${i},'${tempPost.post_key}')><i class="fas fa-pencil-alt"></i> Edit Post</button>
+                                                        <button class="btn btn-outline-info float-right m-1" id="btn_update_${tempPost.post_key}" onclick=updatePost(${i},'${tempPost.post_key}') style="display:none;"><i class="fas fa-check"></i> Save Changes</button>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <hr>`;
+                                $('#div_posts').append(postHtml);
+                            }
+                        }
+                    }
+                }
             }
-        }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Review Not Found',
+                class: 'bg-danger',
+            });
+        });
 
     }
 
@@ -419,7 +440,6 @@
                     body: 'Review updated Successfully',
                     class: 'bg-success',
                 });
-                window.location.reload();
             },
             error: error => {
                 error = error.responseJSON
@@ -483,7 +503,6 @@
     });
 
     function editPost(index, post_id) {
-        console.log(index, post_id)
         $(`#txt_post_${index}`).val($(`#lbl_post_${index}`).text());
         $(`#lbl_post_${index}`).hide();
         $(`#txt_post_${index}`).show();
@@ -592,7 +611,8 @@
                     body: 'Post updated Successfully',
                     class: 'bg-success',
                 });
-                window.location.reload();
+                $('#div_posts').empty();
+                getPost(urlParams.get('review_id'))
             },
             error: error => {
                 error = error.responseJSON
@@ -642,7 +662,8 @@
                     body: 'Post added Successfully',
                     class: 'bg-success',
                 });
-                window.location.reload();
+                $('#div_posts').empty();
+                getPost(urlParams.get('review_id'))
             },
             error: error => {
                 error = error.responseJSON
@@ -682,7 +703,8 @@
                             body: 'file removed successfully',
                             class: 'bg-success',
                         });
-                        window.location.reload();
+                        $('#div_posts').empty();
+                        getPost(urlParams.get('review_id'))
                     },
                     error: error => {
                         error = error.responseJSON
@@ -724,7 +746,8 @@
                             body: 'post removed successfully',
                             class: 'bg-success',
                         });
-                        window.location.reload();
+                        $('#div_posts').empty();
+                        getPost(urlParams.get('review_id'))
                     },
                     error: error => {
                         error = error.responseJSON

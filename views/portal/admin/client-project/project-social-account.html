@@ -268,35 +268,39 @@
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
-            $.get(`/admin/v1/project/fetch/${planId}?scope=accounts`, (data) => {
-                var data = data.data;
-                var socialData = data.accounts;
-                tblSocial.clear().draw();
-                if (socialData) {
-                    for (var i = 0; i < socialData.length; i++) {
-                        var tempSocial = socialData[i],
-                            button = `<div class="btn-group">
+            getSocialAccount(planId);
+        }
+    });
+
+    function getSocialAccount(planId) {
+        $.get(`/admin/v1/project/fetch/${planId}?scope=accounts`, (data) => {
+            var data = data.data;
+            var socialData = data.accounts;
+            tblSocial.clear().draw();
+            if (socialData) {
+                for (var i = 0; i < socialData.length; i++) {
+                    var tempSocial = socialData[i],
+                        button = `<div class="btn-group">
                                         <button class='btn btn-info m-1' id="btn_view_${i}" onclick=view(${i},'${tempSocial.account_id}')><i class='fas fa-pencil-alt'></i> View</button>
                                         <button class='btn btn-danger m-1' id="btn_remove_${i}" onclick=remove(${i},'${tempSocial.account_id}')><i class='fas fa-trash-alt'></i> Remove</button>
                                     </div>`;
-                        tblSocial.row.add([
-                            `${i+1}`, tempSocial.account_name, tempSocial.reference, button
-                        ]).draw();
-                    }
+                    tblSocial.row.add([
+                        `${i+1}`, tempSocial.account_name, tempSocial.reference, button
+                    ]).draw();
                 }
-            }).fail(error => {
-                tblSocial.clear().draw();
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
+            }
+        }).fail(error => {
+            tblSocial.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
             });
-        }
-    });
+        });
+    }
 
     $('#btn_add').click(() => {
         $('#list_social').show();
@@ -311,8 +315,7 @@
 
     $('#btn_addAccount').click(() => {
         var name = $('#list_social').val(),
-            reference = $('#txt_reference').val(),
-            project_id = urlParams.get('plan_id');
+            reference = $('#txt_reference').val();
         if (!name) {
             return $(document).Toasts('create', {
                 title: 'Account name Required',
@@ -327,7 +330,7 @@
                 title: 'Reference Required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please Enter Referenve',
+                body: 'Please Enter Reference',
                 class: 'bg-danger',
             });
         }
@@ -335,7 +338,7 @@
             type: 'POST',
             url: '/admin/v1/project/social-account/add',
             data: {
-                "project_id": project_id,
+                "project_id": urlParams.get('plan_id'),
                 "account_name": name,
                 "reference": reference,
             },
@@ -347,7 +350,8 @@
                     body: 'Social Account Added Successfully',
                     class: 'bg-success',
                 });
-                window.location.reload();
+                $('#modal_Social').modal('hide');
+                getSocialAccount(urlParams.get('plan_id'))
             },
             error: error => {
                 error = error.responseJSON
@@ -369,14 +373,13 @@
     });
 
     function view(index, account_id) {
-        project_id = urlParams.get('plan_id')
         $('#btn_addAccount').hide();
         $('#div_button').empty();
         $('#list_social').hide();
         $('#txt_social').show();
         $('#btn_update').show();
         $('#modal_Social').modal('show');
-        $.get(`/admin/v1/project/fetch/${project_id}?scope=accounts`, (data) => {
+        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=accounts`, (data) => {
             var data = data.data;
             accountData = data.accounts;
             if (accountData) {
@@ -417,7 +420,7 @@
             type: 'POST',
             url: '/admin/v1/project/social-account/update',
             data: {
-                "project_id": project_id,
+                "project_id": urlParams.get('plan_id'),
                 "account_key": account_id,
                 "reference": reference,
             },
@@ -429,7 +432,8 @@
                     body: 'Social Account updated Successfully',
                     class: 'bg-success',
                 });
-                window.location.reload();
+                $('#modal_Social').modal('hide');
+                getSocialAccount(urlParams.get('plan_id'))
             },
             error: error => {
                 error = error.responseJSON
@@ -451,7 +455,6 @@
     };
 
     function remove(index, account_id) {
-        var projectId = urlParams.get('plan_id');
         Swal.fire({
             title: 'Are you sure?',
             text: "You have want to remove this Account from Project",
@@ -461,7 +464,7 @@
         }).then((result) => {
             if (result.value) {
                 $.get({
-                    url: `/admin/v1/project/social-account/remove?project_id=${projectId}&account_key=${account_id}`,
+                    url: `/admin/v1/project/social-account/remove?project_id=${urlParams.get('plan_id')}&account_key=${account_id}`,
                     success: function() {
                         $(document).Toasts('create', {
                             title: 'Success',
@@ -470,9 +473,9 @@
                             body: 'Account Successfully removed from project',
                             class: 'bg-success',
                         });
-                        window.location.reload();
+                        getSocialAccount(urlParams.get('plan_id'))
                     },
-                    error: function() {
+                    error: function(error) {
                         error = error.responseJSON
                         $(document).Toasts('create', {
                             title: 'Error #' + error.code,

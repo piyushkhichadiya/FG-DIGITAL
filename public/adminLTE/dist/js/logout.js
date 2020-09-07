@@ -21,7 +21,7 @@ function session_expire() {
         success: function() {
             window.location.reload()
         },
-        error: function() {
+        error: function(error) {
             error = error.responseJSON
             $(document).Toasts('create', {
                 title: 'Error #' + error.code,
