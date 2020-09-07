@@ -10,6 +10,7 @@ var express = require('express'),
 //------------------------------ MIDDLEWARE ---------------------------------
 employeeAPI.use(/^(?!\/user).*/, async(req, res, next) => {
     await middleware.employeeAuthToken(req, res, next)
+
 });
 
 //------------------------------ ADMIN APIs ---------------------------------

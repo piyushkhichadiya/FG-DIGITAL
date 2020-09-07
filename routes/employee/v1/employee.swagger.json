@@ -11,12 +11,17 @@
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "tags": [{
-        "name": "1. User",
-        "description": "Operations regarding unauthorized user"
-    }, {
-        "name": "2. Profile",
-        "description": "Authenticated user management"
-    }],
+            "name": "1. User",
+            "description": "Operations regarding unauthorized user"
+        }, {
+            "name": "2. Profile",
+            "description": "Authenticated user management"
+        },
+        {
+            "name": "3. Client Project",
+            "description": "Employee Functionalities"
+        }
+    ],
     "paths": {
         "/user/login": {
             "post": {
@@ -61,15 +66,6 @@
             }
         },
         "/profile/update": {
-            "get": {
-                "description": "",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            },
             "post": {
                 "tags": ["2. Profile"],
                 "summary": "Update Profile Details",
@@ -97,15 +93,6 @@
             }
         },
         "/profile/password": {
-            "get": {
-                "description": "",
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
-            },
             "post": {
                 "tags": ["2. Profile"],
                 "summary": "Change Password",
@@ -136,6 +123,254 @@
                     "name": "filename",
                     "required": true,
                     "description": "Specify File Name"
+                }],
+                "responses": {}
+            }
+        },
+        "/client-project/activity/add": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.2 Add activity",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "Enter project ID",
+                        "required": true,
+                        "type": "string",
+                        "example": "93492065515",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "formData",
+                        "description": "Enter type of service",
+                        "required": true,
+                        "type": "string",
+                        "example": "activity",
+                        "schema": {
+                            "example": "activity"
+                        }
+                    },
+                    {
+                        "name": "title",
+                        "in": "formData",
+                        "description": "Enter Title of activity",
+                        "required": true,
+                        "type": "string",
+                        "example": "activity title",
+                        "schema": {
+                            "example": "test activity title"
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "formData",
+                        "description": "Enter Description of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "description",
+                        "schema": {
+                            "example": "test description title"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "formData",
+                        "description": "Enter date of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "date",
+                        "schema": {
+                            "example": "23/05/2009"
+                        }
+                    },
+                    {
+                        "name": "service_id",
+                        "in": "formData",
+                        "description": "Enter service_id of activity (if type is service)",
+                        "required": false,
+                        "type": "string",
+                        "example": "service_id",
+                        "schema": {
+                            "example": "371889110187"
+                        }
+                    },
+                    {
+                        "name": "criteria",
+                        "in": "formData",
+                        "description": "Enter criteria - JSON Object only (if type is service)",
+                        "required": false,
+                        "type": "string",
+                        "example": "criteria",
+                        "schema": {
+                            "example": {
+                                "0": { "criteria_id": 390441675983, "value": 50 },
+                                "1": { "criteria_id": 1386407953254, "value": 55 },
+                                "2": { "criteria_id": 547034266151, "value": 55 }
+                            }
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file to upload",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/client-project/activity/update": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.3 Update activity",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "Enter project ID",
+                        "required": true,
+                        "type": "number",
+                        "example": "project_id",
+                        "schema": {
+                            "example": "898165516362"
+                        }
+                    },
+                    {
+                        "name": "activity_key",
+                        "in": "formData",
+                        "description": "Enter activity key",
+                        "required": true,
+                        "type": "string",
+                        "example": "Activity_key",
+                        "schema": {
+                            "example": "-MG_acQhhIaxr_z-5BVD"
+                        }
+
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "type": "file",
+                        "required": false,
+                        "description": "Upload file ( it can be multiple)"
+                    },
+                    {
+                        "name": "title",
+                        "in": "formData",
+                        "description": "Enter Title of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "activity title",
+                        "schema": {
+                            "example": "test activity title"
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "formData",
+                        "description": "Enter Description of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "description",
+                        "schema": {
+                            "example": "test description title"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "formData",
+                        "description": "Enter date of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "date",
+                        "schema": {
+                            "example": "23/05/2009"
+                        }
+                    },
+                    {
+                        "name": "service_id",
+                        "in": "formData",
+                        "description": "Enter service_id of activity (if type is service)",
+                        "required": false,
+                        "type": "string",
+                        "example": "service_id",
+                        "schema": {
+                            "example": "371889110187"
+                        }
+                    },
+                    {
+                        "name": "criteria",
+                        "in": "formData",
+                        "description": "Enter criteria - JSON Object only (if type is service)",
+                        "required": false,
+                        "type": "string",
+                        "example": "criteria",
+                        "schema": {
+                            "example": {
+                                "0": { "criteria_id": 390441675983, "value": 50 },
+                                "1": { "criteria_id": 1386407953254, "value": 55 },
+                                "2": { "criteria_id": 547034266151, "value": 55 }
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/client-project/activity/remove-file": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.4 Remove file",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "Remove file from activity",
+                    "schema": {
+                        "required": ["project_id", "activity_key", "filename"],
+                        "properties": {
+                            "project_id": {
+                                "type": "number"
+                            },
+                            "activity_key": {
+                                "type": "string"
+                            },
+                            "filename": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "project_id": "898165516362",
+                            "activity_key": "-MGaBTSBnD6q1I3zJQDz",
+                            "filename": "Post-591432618775.png"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/client-project/activity/remove": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.5 Remove Activity",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "activity_key"],
+                        "properties": {
+                            "project_id": { "type": "integer" },
+                            "activity_key": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": 898165516362,
+                            "activity_key": "-MGaBTSBnD6q1I3zJQDz"
+                        }
+                    }
                 }],
                 "responses": {}
             }
