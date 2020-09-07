@@ -302,7 +302,7 @@
                             for (var i = 0; i < postData.length; i++) {
                                 var tempPost = postData[i];
                                 var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
-                                                <label id="lbl_post_${i}">${tempPost.description}</label>
+                                                <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
                                                 <div class="row" id="div_doc_${i}">
                                                     ${getDocument(i , tempPost.documents)}
@@ -341,8 +341,16 @@
 
     }
 
+    function getDescription(description) {
+        if (description) {
+            return description
+        } else {
+            return 'This Post does not have Description'
+        }
+    }
+
     function getDocument(index, document) {
-        if (document) {
+        if (document || '') {
             var docHtml = '';
             for (var j = 0; j < document.length; j++) {
                 tempDoc = document[j];
@@ -359,6 +367,8 @@
                         </div>`;
             }
             return (docHtml)
+        } else {
+            return 'This Post does not have any File'
         }
     };
 
