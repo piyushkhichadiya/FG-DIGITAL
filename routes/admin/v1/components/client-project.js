@@ -1161,7 +1161,7 @@ projectAPI.get('/service/add', (req, res) => {
                     for (var j = 0; j < serviceDBClientKey.length; j++) {
                         var tempServiceClient = serviceDBClient[serviceDBClientKey[j]]
 
-                        if (tempServiceClient.service_id == serviceID) {
+                        if (tempServiceClient.service_id == serviceID && !tempServiceClient.deleted) {
                             return response(res, 409, 'duplicate', 'Service already added', undefined, 'A-6.17.4')
                         } else if (j == serviceDBClientKey.length - 1) {
                             var pushData = {
