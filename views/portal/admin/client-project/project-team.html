@@ -450,6 +450,8 @@
                     body: 'Team Member has been activated Successfully',
                     class: 'bg-success',
                 });
+                tblTeam.clear().draw();
+                getEmployee(urlParams.get('plan_id'))
             },
             error: function(error) {
                 error = error.responseJSON
@@ -484,6 +486,8 @@
                     body: 'Team Member has been deactivated Successfully',
                     class: 'bg-success',
                 });
+                tblTeam.clear().draw();
+                getEmployee(urlParams.get('plan_id'))
             },
             error: function(error) {
                 error = error.responseJSON

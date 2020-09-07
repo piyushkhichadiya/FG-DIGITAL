@@ -407,6 +407,8 @@
                     body: 'Service has been activated Successfully',
                     class: 'bg-success',
                 });
+                tblService.clear().draw();
+                getService(projectId);
             },
             error: function(error) {
                 error = error.responseJSON
@@ -441,6 +443,8 @@
                     body: 'Service has been deactivated Successfully',
                     class: 'bg-success',
                 });
+                tblService.clear().draw();
+                getService(projectId);
             },
             error: function(error) {
                 error = error.responseJSON
