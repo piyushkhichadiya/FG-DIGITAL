@@ -1,5 +1,3 @@
-const { query } = require('express');
-
 const clientProjectAPI = require('express').Router(),
     firebase = require('firebase-admin').database(),
     fs = require('fs'),
@@ -48,17 +46,13 @@ clientProjectAPI.get('/fetch', (req, res) => {
     if (dbAdminSnapshot.clients) {
         var dbClients = dbAdminSnapshot.clients,
             dbClientsKey = Object.keys(dbClients),
-            projectObject = []
+            projectObject = [],
+            scope = [],
+            permissionDeny = []
 
         for (var i = 0; i < dbClientsKey.length; i++) {
             var tempClient = dbClients[dbClientsKey[i]]
             if (tempClient.deleted) { continue }
-
-            // Client Info
-            var tempClientObject = {
-                client_key: dbClientsKey[i],
-                name: tempClient.name
-            }
 
             // Projects
             if (tempClient.plans) {
@@ -71,17 +65,36 @@ clientProjectAPI.get('/fetch', (req, res) => {
                     if (tempProject.deleted) { continue }
 
                     var tempProjectObj = {
-                        project_id: tempProject.project_id,
-                        project_name: tempProject.project_name,
-                        project_description: tempProject.project_description
+                        project_id: tempProject.project_id
                     }
 
+                    // Project Information
+                    if (query_scope.includes('info')) {
+
+                        scope.push('info')
+
+                        tempProjectObj.name = tempProject.project_name
+                        tempProjectObj.description = tempProject.project_description
+                    }
+
+                    // Client Information
+                    if (query_scope.includes('client')) {
+
+                        scope.push('client')
+
+                        var tempClientObject = {
+                            client_key: dbClientsKey[i],
+                            name: tempClient.name
+                        }
+                        tempProjectObj.client = tempClientObject
+                    }
 
                     // Team
                     var tempEmployeePermission = {},
                         authorized = false // To Check Employee is associated with project
 
                     if (tempProject.team) {
+
                         var dbProjectTeam = tempProject.team,
                             dbProjectTeamKeys = Object.keys(dbProjectTeam)
 
@@ -136,41 +149,53 @@ clientProjectAPI.get('/fetch', (req, res) => {
                         if (tempProjectObj.team.length == 0) {
                             delete tempProjectObj.team
                         }
+
+                        // Filter for Scope Team
+                        if (!query_scope.includes('team')) {
+                            delete tempProjectObj.team
+                        } else {
+                            scope.push('team')
+                        }
                     }
 
                     // If Employee ID is not associated with project
                     if (!authorized || !query_ProjectID) { continue }
 
                     // Social Accounts
-                    if (tempProject.social_account && query_scope.includes('account')) {
-                        var dbProjectAccount = tempProject.social_account,
-                            dbProjectAccountKey = Object.keys(dbProjectAccount)
+                    if (query_scope.includes('account')) {
+                        scope.push('account')
 
-                        tempProjectObj.accounts = []
+                        if (tempProject.social_account) {
+                            var dbProjectAccount = tempProject.social_account,
+                                dbProjectAccountKey = Object.keys(dbProjectAccount)
 
-                        for (k = 0; k < dbProjectAccountKey.length; k++) {
-                            var tempAccount = dbProjectAccount[dbProjectAccountKey[k]]
+                            tempProjectObj.accounts = []
 
-                            if (tempAccount.deleted) { continue }
+                            for (k = 0; k < dbProjectAccountKey.length; k++) {
+                                var tempAccount = dbProjectAccount[dbProjectAccountKey[k]]
 
-                            var tempObj = {
-                                account_key: dbProjectAccountKey[k],
-                                account_name: tempAccount.account_name,
-                                reference: tempAccount.reference
+                                if (tempAccount.deleted) { continue }
+
+                                var tempObj = {
+                                    account_key: dbProjectAccountKey[k],
+                                    account_name: tempAccount.account_name,
+                                    reference: tempAccount.reference
+                                }
+
+                                tempProjectObj.accounts.push(tempObj)
                             }
 
-                            tempProjectObj.accounts.push(tempObj)
-                        }
-
-                        if (tempProjectObj.accounts.length == 0) {
-                            delete tempProjectObj.accounts
+                            if (tempProjectObj.accounts.length == 0) {
+                                delete tempProjectObj.accounts
+                            }
                         }
                     }
 
                     // Service
                     var activeCriteria = [] // To validate in Activity Data
 
-                    if (tempProject.service && query_scope.includes('service')) {
+                    if (tempProject.service) {
+
                         var dbProjectService = tempProject.service,
                             dbProjectServiceKey = Object.keys(dbProjectService)
 
@@ -201,8 +226,8 @@ clientProjectAPI.get('/fetch', (req, res) => {
 
                                         tempServiceObj.criteria = []
 
-                                        for (var k = 0; k < dbServiceCriteriaKey.length; k++) {
-                                            var tempCriteria = dbServiceCriteria[dbServiceCriteriaKey[k]]
+                                        for (var m = 0; m < dbServiceCriteriaKey.length; m++) {
+                                            var tempCriteria = dbServiceCriteria[dbServiceCriteriaKey[m]]
 
                                             if (tempCriteria.deleted) { continue }
 
@@ -219,100 +244,227 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                 }
                             }
                         }
+
+                        if (!query_scope.includes('service')) {
+                            delete tempProjectObj.services
+                        } else {
+                            scope.push('service')
+                        }
+
                     }
 
                     // Review
-                    if (tempEmployeePermission.review && query_scope.includes('review') && tempProject.review) {
-                        var dbProjectReview = tempProject.review,
-                            dbProjectReviewKey = Object.keys(dbProjectReview)
+                    if (tempEmployeePermission.review && query_scope.includes('review')) {
 
-                        tempProjectObj.review = []
+                        scope.push('review')
 
-                        for (var k = 0; k < dbProjectReviewKey.length; k++) {
-                            var tempReview = dbProjectReview[dbProjectReviewKey[k]];
+                        if (tempProject.review) {
+                            var dbProjectReview = tempProject.review,
+                                dbProjectReviewKey = Object.keys(dbProjectReview)
 
-                            if (tempReview.deleted) { continue }
+                            tempProjectObj.review = []
 
-                            var tempReviewObj = {
-                                review_id: tempReview.review_id,
-                                title: tempReview.title,
-                                description: tempReview.description,
-                                closed: tempReview.closed,
-                                createdOn: tempReview.createdOn,
-                                createdBy: tempReview.createdBy
-                            }
+                            for (var k = 0; k < dbProjectReviewKey.length; k++) {
+                                var tempReview = dbProjectReview[dbProjectReviewKey[k]];
 
-                            if (tempReview.post) {
-                                var dbReviewPost = tempReview.post,
-                                    dbReviewPostKey = Object.keys(dbReviewPost)
+                                if (tempReview.deleted) { continue }
 
-                                tempReviewObj.post = []
+                                var tempReviewObj = {
+                                    review_id: tempReview.review_id,
+                                    title: tempReview.title,
+                                    description: tempReview.description,
+                                    closed: tempReview.closed,
+                                    createdOn: tempReview.createdOn,
+                                    createdBy: tempReview.createdBy,
+                                    createdById: tempReview.createdById,
+                                    lastModifiedOn: tempReview.lastModifiedOn,
+                                    lastModifiedBy: tempReview.lastModifiedBy,
+                                    lastModifiedById: tempReview.lastModifiedById,
+                                }
 
-                                for (var m = 0; m < dbReviewPostKey.length; m++) {
-                                    var tempReviewPost = dbReviewPost[dbReviewPostKey[m]]
+                                if (tempReview.post) {
+                                    var dbReviewPost = tempReview.post,
+                                        dbReviewPostKey = Object.keys(dbReviewPost)
 
-                                    if (tempReviewPost.deleted) { continue }
+                                    tempReviewObj.post = []
 
-                                    var tempPostObj = {
-                                        description: tempReviewPost.description,
-                                        createdOn: tempReviewPost.createdOn,
-                                        createdBy: tempReviewPost.createdBy
-                                    }
+                                    for (var m = 0; m < dbReviewPostKey.length; m++) {
+                                        var tempReviewPost = dbReviewPost[dbReviewPostKey[m]]
 
-                                    if (tempReviewPost.documents) {
-                                        var dbReviewDocument = tempReviewPost.documents,
-                                            dbReviewDocumentKey = Object.keys(dbReviewDocument)
+                                        if (tempReviewPost.deleted) { continue }
 
-                                        tempPostObj.documents = []
+                                        var tempPostObj = {
+                                            description: tempReviewPost.description,
+                                            createdOn: tempReviewPost.createdOn,
+                                            createdBy: tempReviewPost.createdBy,
+                                            createdById: tempReviewPost.createdById,
+                                            lastModifiedOn: tempReviewPost.lastModifiedOn,
+                                            lastModifiedBy: tempReviewPost.lastModifiedBy,
+                                            lastModifiedById: tempReviewPost.lastModifiedById,
+                                        }
 
-                                        for (var l = 0; l < dbReviewDocumentKey.length; l++) {
-                                            var tempDocument = dbReviewDocument[dbReviewDocumentKey[l]]
+                                        if (tempReviewPost.documents) {
+                                            var dbReviewDocument = tempReviewPost.documents,
+                                                dbReviewDocumentKey = Object.keys(dbReviewDocument)
 
-                                            if (tempDocument.deleted) { continue }
+                                            tempPostObj.documents = []
 
-                                            var tempReviewPostDocObj = {
-                                                filename: tempDocument.filename,
-                                                createdOn: tempDocument.createdOn || tempReview.createdOn,
-                                                createdBy: tempDocument.createdBy || tempReview.createdBy
+                                            for (var l = 0; l < dbReviewDocumentKey.length; l++) {
+                                                var tempDocument = dbReviewDocument[dbReviewDocumentKey[l]]
+
+                                                if (tempDocument.deleted) { continue }
+
+                                                var tempReviewPostDocObj = {
+                                                    filename: tempDocument.filename,
+                                                    createdOn: tempDocument.createdOn || tempReview.createdOn,
+                                                    createdBy: tempDocument.createdBy || tempReview.createdBy,
+                                                    createdById: tempDocument.createdById || tempReview.createdById,
+                                                    lastModifiedOn: tempDocument.lastModifiedOn,
+                                                    lastModifiedBy: tempDocument.lastModifiedBy,
+                                                    lastModifiedById: tempDocument.lastModifiedById
+                                                }
+
+                                                tempPostObj.documents.push(tempReviewPostDocObj)
                                             }
 
-                                            tempPostObj.documents.push(tempReviewPostDocObj)
+                                            if (tempPostObj.documents.length == 0) {
+                                                delete tempPostObj.documents
+                                            }
                                         }
 
-                                        if (tempPostObj.documents.length == 0) {
-                                            delete tempPostObj.documents
-                                        }
+                                        tempReviewObj.post.push(tempPostObj)
                                     }
 
-                                    tempReviewObj.post.push(tempPostObj)
+                                    if (tempReviewObj.post.length == 0) {
+                                        delete tempReviewObj.post
+                                    }
                                 }
 
-                                if (tempReviewObj.post.length == 0) {
-                                    delete tempReviewObj.post
-                                }
+                                tempProjectObj.review.push(tempReviewObj)
                             }
 
-                            tempProjectObj.review.push(tempReviewObj)
+                            if (tempProjectObj.review.length == 0) {
+                                delete tempProjectObj.review
+                            }
                         }
-
-                        if (tempProjectObj.review.length == 0) {
-                            delete tempProjectObj.review
-                        }
+                    } else if (!tempEmployeePermission.review && query_scope.includes('review')) {
+                        permissionDeny.push('review')
                     }
 
                     // Activity
                     if (tempEmployeePermission.activity && query_scope.includes('activity')) {
-                        // Pending
-                    }
 
-                    // Filter for Scope Team
-                    if (!query_scope.includes('team')) {
-                        delete tempProjectObj.team
+                        scope.push('activity')
+
+                        if (tempProject.activity) {
+                            var dbProjectActivity = tempProject.activity,
+                                dbProjectActivityKey = Object.keys(dbProjectActivity)
+
+                            tempProjectObj.activity = []
+
+                            for (var k = 0; k < dbProjectActivityKey.length; k++) {
+                                var tempProjectActivity = dbProjectActivity[dbProjectActivityKey[k]]
+
+                                if (tempProjectActivity.deleted) { continue }
+
+                                var tempObj = {
+                                    activity_key: dbProjectActivityKey[k],
+                                    createdOn: tempProjectActivity.createdOn,
+                                    createdBy: tempProjectActivity.createdBy,
+                                    createdById: tempProjectActivity.createdById,
+                                    lastModifiedOn: tempProjectActivity.lastModifiedOn,
+                                    lastModifiedBy: tempProjectActivity.lastModifiedBy,
+                                    lastModifiedById: tempProjectActivity.lastModifiedById,
+                                    description: tempProjectActivity.description,
+                                    date: tempProjectActivity.date,
+                                    service_id: tempProjectActivity.service_id,
+                                    title: tempProjectActivity.title,
+                                    type: tempProjectActivity.type
+                                }
+
+                                if (tempObj.type == 'SERVICE') {
+
+                                    if (tempProjectActivity.criteria) {
+                                        var dbActivityCriteria = tempProjectActivity.criteria,
+                                            dbActivityCriteriaKey = Object.keys(dbActivityCriteria)
+
+                                        tempObj.criteria = []
+
+                                        for (var l = 0; l < dbActivityCriteriaKey.length; l++) {
+                                            var tempActivityCriteria = dbActivityCriteria[dbActivityCriteriaKey[l]];
+
+                                            if (tempActivityCriteria.deleted) { continue }
+
+                                            var tempCriteriaObj = {
+                                                criteria_id: tempActivityCriteria.criteria_id,
+                                                value: tempActivityCriteria.value,
+                                                createdOn: tempActivityCriteria.createdOn,
+                                                createdBy: tempActivityCriteria.createdBy,
+                                                createdById: tempActivityCriteria.createdById,
+                                                lastModifiedOn: tempActivityCriteria.lastModifiedOn,
+                                                lastModifiedBy: tempActivityCriteria.lastModifiedBy,
+                                                lastModifiedById: tempActivityCriteria.lastModifiedById,
+                                            }
+
+                                            if (!activeCriteria.includes(tempActivityCriteria.criteria_id)) {
+                                                tempCriteriaObj.deleted = true
+                                            }
+
+                                            // Push Criteria to Temp. Object
+                                            tempObj.criteria.push(tempCriteriaObj);
+                                        }
+
+                                        if (tempObj.criteria.length == 0) {
+                                            delete tempObj.criteria
+                                        }
+                                    }
+                                }
+
+                                if (tempProjectActivity.documents) {
+                                    var dbActivityDocuments = tempProjectActivity.documents,
+                                        dbActivityDocumentsKey = Object.keys(dbActivityDocuments)
+
+                                    tempObj.documents = []
+
+                                    for (var l = 0; l < dbActivityDocumentsKey.length; l++) {
+                                        var tempActivityDoc = dbActivityDocuments[dbActivityDocumentsKey[l]];
+
+                                        if (tempActivityDoc.deleted) { continue }
+
+                                        var tempDocObj = {
+                                            document_id: dbActivityDocumentsKey[l],
+                                            filename: tempActivityDoc.filename,
+                                            createdOn: tempActivityDoc.createdOn,
+                                            createdBy: tempActivityDoc.createdBy,
+                                            createdById: tempActivityDoc.createdById,
+                                            lastModifiedOn: tempActivityDoc.lastModifiedOn,
+                                            lastModifiedBy: tempActivityDoc.lastModifiedBy,
+                                            lastModifiedById: tempActivityDoc.lastModifiedById,
+                                        }
+
+                                        // Push to Temp Doc array
+                                        tempObj.documents.push(tempDocObj)
+                                    }
+
+                                    if (tempObj.documents.length == 0) {
+                                        delete tempObj.documents
+                                    }
+                                }
+
+                                // Push to Object
+                                tempProjectObj.activity.push(tempObj)
+                            }
+
+                            if (tempProjectObj.activity.length == 0) {
+                                delete tempProjectObj.activity
+                            }
+                        }
+                    } else if (!tempEmployeePermission.activity && query_scope.includes('activity')) {
+                        permissionDeny.push('activity')
                     }
 
                     if (query_ProjectID == tempProjectObj.project_id) {
-                        tempClientObject.project = tempProjectObj
-                        return response(res, 200, 'success', undefined, tempClientObject, 'E-3.1-1')
+                        return response(res, 200, 'success', undefined, { scope: scope, project: tempProjectObj, permission_denied: permissionDeny }, 'E-3.1-1')
                     }
                 }
             }
@@ -328,9 +480,14 @@ clientProjectAPI.get('/fetch', (req, res) => {
 })
 
 module.exports = clientProjectAPI;
+
 // Function
 function getKeys(project_id) {
     if (!dbAdminSnapshot.clients) {
+        return false
+    }
+
+    if (!project_id) {
         return false
     }
 
