@@ -1931,9 +1931,7 @@ projectAPI.post('/activity/update', (req, res) => {
 
         tempActivity.lastModifiedBy = "ADMIN"
         tempActivity.lastModifiedOn = String(new Date())
-        if (tempActivity.lastModifiedById) {
-            delete tempActivity.lastModifiedById
-        }
+        delete tempActivity.lastModifiedById
 
         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}`).set(tempActivity).then(() => {
             return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.25.10')
@@ -2036,9 +2034,8 @@ projectAPI.post('/activity/update', (req, res) => {
                                                         tempClientCriteria.value = parseInt(tempCriteria.value)
                                                         tempClientCriteria.lastModifiedOn = String(new Date())
                                                         tempClientCriteria.lastModifiedBy = 'ADMIN'
-                                                        if (tempClientCriteria.lastModifiedById) {
-                                                            delete tempClientCriteria.lastModifiedById
-                                                        }
+                                                        delete tempClientCriteria.lastModifiedById
+
                                                     }
                                                     break;
                                                 } else if (c == tempActivityCriteriaKey.length - 1 && !newPushCriteria.includes(tempCriteria.criteria_id)) {
@@ -2118,9 +2115,8 @@ projectAPI.post('/activity/update', (req, res) => {
 
         tempActivity.lastModifiedOn = String(new Date())
         tempActivity.lastModifiedBy = "ADMIN"
-        if (tempActivity.lastModifiedById) {
-            delete tempActivity.lastModifiedById
-        }
+        delete tempActivity.lastModifiedById
+
         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).set(tempActivity).then(() => {
             return response(res, 200, 'success', 'Activity has been updated successfully', undefined, 'A-6.25.20')
         })
