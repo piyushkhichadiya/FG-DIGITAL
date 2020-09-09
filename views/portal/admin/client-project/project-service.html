@@ -251,6 +251,10 @@
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+    var dbService;
+    $.getJSON('/admin/v1/service/get', (result) => {
+        dbService = result.data;
+    });
     $('#lbl_planId').html(urlParams.get('plan_id'))
     $('#link_project').html(urlParams.get('plan_id'))
     $('#link_project').attr('href', `/admin/client/project-dashboard?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`)
@@ -283,16 +287,9 @@
                     } else {
                         status = `<p style='color:#ff0000; font-size:17px;'><i class='fas fa-ban'></i> Deactivated</p>`
                     }
-                    var serviceTitle;
-                    serviceTitle = $.get('/admin/v1/service/get?service_id=' + tempService.service_id, (result) => {
-
-                        // console.log(serviceTitle)
-                    });
-                    console.log(serviceTitle)
-                        // console.log(getServiceTitle(tempService.service_id))
-                        // tblService.row.add([
-                        //     `${i+1}`, serviceTitle, status, button
-                        // ]).draw();
+                    tblService.row.add([
+                        `${i+1}`, getServiceTitle(tempService.service_id), status, button
+                    ]).draw();
                     if (active == false) {
                         $(`#btn_deactivate_${i}`).hide();
                         $(`#btn_activate_${i}`).show();
@@ -316,14 +313,14 @@
     }
 
     function getServiceTitle(service_id) {
-        var result = $.get('/admin/v1/service/get?service_id=' + service_id, (data) => {
-            return data.data
-        })
-        return result
-            // console.log(result)
-            // if (result) {
-            //     // return result.data.title;
-            // }
+        if (dbService) {
+            for (var i = 0; i < dbService.length; i++) {
+                tempService = dbService[i];
+                if (tempService.service_id == service_id) {
+                    return tempService.title
+                }
+            }
+        }
     }
 
     var serviceData

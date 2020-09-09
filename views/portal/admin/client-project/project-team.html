@@ -295,6 +295,10 @@
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+    var dbEmp;
+    $.getJSON('/admin/v1/employee/get', (result) => {
+        dbEmp = result.data;
+    });
     $('#lbl_planId').html(urlParams.get('plan_id'))
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
@@ -307,7 +311,7 @@
     });
 
     function getEmployee(planId) {
-        $.get(`/admin/v1/project/fetch/${planId}?scope=team`, async(data) => {
+        $.get(`/admin/v1/project/fetch/${planId}?scope=team`, (data) => {
             var data = data.data;
             var teamData = data.team;
             if (teamData) {
@@ -327,13 +331,14 @@
                                         </button> 
                                     </div>`,
                         active = tempTeam.active;
+                    // console.log(getEmployeeName(tempTeam.employee_id));
                     if (active == true) {
                         var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-hourglass-start'></i> Active</p>`
                     } else {
                         status = `<p style='color:#ff0000; font-size:17px;'><i class='fas fa-ban'></i> Deactivated</p>`
                     }
                     tblTeam.row.add([
-                        `${i+1}`, tempTeam.employee_id, await getEmployeeByID(tempTeam.employee_id), status, button
+                        `${i+1}`, tempTeam.employee_id, getEmployeeName(tempTeam.employee_id), status, button
                     ]).draw();
                     if (active == false) {
                         $(`#btn_deactivate_${i}`).hide();
@@ -355,6 +360,17 @@
                 class: 'bg-danger',
             });
         });
+    }
+
+    function getEmployeeName(employee_id) {
+        if (dbEmp) {
+            for (var i = 0; i < dbEmp.length; i++) {
+                tempEmployee = dbEmp[i];
+                if (tempEmployee.employee_id == employee_id) {
+                    return tempEmployee.name
+                }
+            }
+        }
     }
 
     var empData
@@ -614,13 +630,6 @@
                 });
             };
         });
-    }
-
-    async function getEmployeeByID(emp_id) {
-        var result = await $.getJSON('/admin/v1/employee/get?employee_id=' + emp_id)
-        if (result) {
-            return result.data.name;
-        }
     }
 </script>
 

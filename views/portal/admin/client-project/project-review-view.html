@@ -141,7 +141,7 @@
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a id="lbl_navClient" href="">{Client Name}</a></li>
                                 <li class="breadcrumb-item"><a id="lbl_navProjectId" href="">{project ID}</a></li>
-                                <li class="breadcrumb-item"><a id="lbl_navReview" href="">Review</a></li>
+                                <li class="breadcrumb-item"><a id="lbl_navReview" href="">Reviews</a></li>
                                 <li class="breadcrumb-item active">View</li>
                             </ol>
                         </div>
@@ -256,7 +256,6 @@
     });
     const urlParams = new URLSearchParams(window.location.search);
     $('#lbl_planId').html(urlParams.get('plan_id'))
-    $('#lbl_navReview').html(urlParams.get('review_id'))
     $('#lbl_navReview').attr('href', `/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`)
     var postData;
     if (urlParams.has('review_id')) {
