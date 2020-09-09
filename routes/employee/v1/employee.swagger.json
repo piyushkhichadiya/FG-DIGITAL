@@ -125,7 +125,7 @@
                 "responses": {}
             }
         },
-        "/client-project/fetch": {
+        "/project/fetch": {
             "get": {
                 "tags": ["3. Client Project"],
                 "summary": "3.1 Fetch All or Individual Project and related resources",
@@ -148,7 +148,533 @@
                 }],
                 "responses": {}
             }
+        },
+        "/project/activity/add": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.2 Add activity",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "Enter project ID",
+                        "required": true,
+                        "type": "string",
+                        "example": "93492065515",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "formData",
+                        "description": "Enter type of service",
+                        "required": true,
+                        "type": "string",
+                        "example": "activity",
+                        "schema": {
+                            "example": "activity"
+                        }
+                    },
+                    {
+                        "name": "title",
+                        "in": "formData",
+                        "description": "Enter Title of activity",
+                        "required": true,
+                        "type": "string",
+                        "example": "activity title",
+                        "schema": {
+                            "example": "test activity title"
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "formData",
+                        "description": "Enter Description of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "description",
+                        "schema": {
+                            "example": "test description title"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "formData",
+                        "description": "Enter date of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "date",
+                        "schema": {
+                            "example": "23/05/2009"
+                        }
+                    },
+                    {
+                        "name": "service_id",
+                        "in": "formData",
+                        "description": "Enter service_id of activity (if type is service)",
+                        "required": false,
+                        "type": "string",
+                        "example": "service_id",
+                        "schema": {
+                            "example": "371889110187"
+                        }
+                    },
+                    {
+                        "name": "criteria",
+                        "in": "formData",
+                        "description": "Enter criteria - JSON Object only (if type is service)",
+                        "required": false,
+                        "type": "string",
+                        "example": "criteria",
+                        "schema": {
+                            "example": {
+                                "0": { "criteria_id": 390441675983, "value": 50 },
+                                "1": { "criteria_id": 1386407953254, "value": 55 },
+                                "2": { "criteria_id": 547034266151, "value": 55 }
+                            }
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file to upload",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/activity/update": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.3 Update activity",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "Enter project ID",
+                        "required": true,
+                        "type": "number",
+                        "example": "project_id",
+                        "schema": {
+                            "example": "898165516362"
+                        }
+                    },
+                    {
+                        "name": "activity_key",
+                        "in": "formData",
+                        "description": "Enter activity key",
+                        "required": true,
+                        "type": "string",
+                        "example": "Activity_key",
+                        "schema": {
+                            "example": "-MG_acQhhIaxr_z-5BVD"
+                        }
 
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "type": "file",
+                        "required": false,
+                        "description": "Upload file ( it can be multiple)"
+                    },
+                    {
+                        "name": "title",
+                        "in": "formData",
+                        "description": "Enter Title of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "activity title",
+                        "schema": {
+                            "example": "test activity title"
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "formData",
+                        "description": "Enter Description of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "description",
+                        "schema": {
+                            "example": "test description title"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "formData",
+                        "description": "Enter date of activity",
+                        "required": false,
+                        "type": "string",
+                        "example": "date",
+                        "schema": {
+                            "example": "23/05/2009"
+                        }
+                    },
+                    {
+                        "name": "service_id",
+                        "in": "formData",
+                        "description": "Enter service_id of activity (if type is service)",
+                        "required": false,
+                        "type": "string",
+                        "example": "service_id",
+                        "schema": {
+                            "example": "371889110187"
+                        }
+                    },
+                    {
+                        "name": "criteria",
+                        "in": "formData",
+                        "description": "Enter criteria - JSON Object only (if type is service)",
+                        "required": false,
+                        "type": "string",
+                        "example": "criteria",
+                        "schema": {
+                            "example": {
+                                "0": { "criteria_id": 390441675983, "value": 50 },
+                                "1": { "criteria_id": 1386407953254, "value": 55 },
+                                "2": { "criteria_id": 547034266151, "value": 55 }
+                            }
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/activity/remove-file": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.4 Remove file",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "Remove file from activity",
+                    "schema": {
+                        "required": ["project_id", "activity_key", "filename"],
+                        "properties": {
+                            "project_id": {
+                                "type": "number"
+                            },
+                            "activity_key": {
+                                "type": "string"
+                            },
+                            "filename": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "project_id": "898165516362",
+                            "activity_key": "-MGaBTSBnD6q1I3zJQDz",
+                            "filename": "Post-591432618775.png"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/activity/remove": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.5 Remove Activity",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "activity_key"],
+                        "properties": {
+                            "project_id": { "type": "integer" },
+                            "activity_key": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": 898165516362,
+                            "activity_key": "-MGaBTSBnD6q1I3zJQDz"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/review/create": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.6 Create a new Review",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "title"],
+                        "properties": {
+                            "project_id": { "type": "integer" },
+                            "title": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": 93492065515,
+                            "title": "Review for Instagram Post"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/review/update": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.7 Update review title and description",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["review_id", "project_id"],
+                        "properties": {
+                            "review_id": { "type": "integer" },
+                            "project_id": { "type": "integer" },
+                            "title": { "type": "string" },
+                            "description": { "type": "string" }
+                        },
+                        "example": {
+                            "review_id": 688642606297,
+                            "project_id": 93492065515,
+                            "title": "Demo update",
+                            "description": "Demo description update"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/review/add-post": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.8 Add Post to Review",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "description",
+                        "in": "formData",
+                        "description": "Description",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "Test Description"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "project_id",
+                        "description": "Project ID",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "review_id",
+                        "description": "Review ID",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "688642606297"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "SUPPORT MULTIPLE FILES",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/update-post": {
+            "post": {
+                "tags": ["3. Client Project"],
+                "summary": "3.9 Update review post",
+                "consumes": ["multipart/form-data"],
+                "parameters": [{
+                        "name": "project_id",
+                        "in": "formData",
+                        "description": "project_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "review_id",
+                        "description": "review_id",
+                        "required": false,
+                        "type": "number",
+                        "schema": {
+                            "example": "688642606297"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "post_key",
+                        "description": "post_key",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MFI09sMQLktyYI-yYOf"
+                        }
+                    },
+                    {
+                        "in": "formData",
+                        "name": "description",
+                        "description": "description",
+                        "required": false,
+                        "type": "string",
+                        "schema": {
+                            "description": "Demo description"
+                        }
+                    },
+                    {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "Multiple File Supported \n Valid File Type: JPEG, JPG, PNG \n File Size Limit: 10 MB",
+                        "required": false,
+                        "type": "file"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/remove-post": {
+            "get": {
+                "tags": ["3. Client Project"],
+                "summary": "3.10 Remove Post",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "93492065515"
+
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "688642606297"
+
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "post_key",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "-MECMEfkwU2d3ghacnt-"
+
+                        }
+                    }
+                ],
+                "responses": {}
+
+            }
+        },
+        "/project/review/close": {
+            "get": {
+                "tags": ["3. Client Project"],
+                "summary": "3.11 Close Review",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "688642606297"
+                        }
+
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/open": {
+            "get": {
+                "tags": ["3. Client Project"],
+                "summary": "3.12 Reopen Closed Review",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "description": "Project ID",
+                        "required": true,
+                        "type": "integer",
+                        "schema": {
+                            "example": 93492065515
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "type": "string",
+                        "required": true,
+                        "description": "Review ID",
+                        "schema": {
+                            "example": 688642606297
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/remove-file": {
+            "get": {
+                "tags": ["3. Client Project"],
+                "summary": "3.13 Remove File from Review Post",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "93492065515"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "688642606297"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "filename",
+                        "required": true,
+                        "type": "string",
+                        "schema": {
+                            "example": "Post-251469.png"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
         }
     }
 }
