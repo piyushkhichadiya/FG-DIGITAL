@@ -1677,6 +1677,28 @@
                 }],
                 "responses": {}
             }
+        },
+        "/project/activity/remove": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "6.27 Remove Activity",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_id", "activity_key"],
+                        "properties": {
+                            "project_id": { "type": "integer" },
+                            "activity_key": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": 93492065515,
+                            "activity_key": "-MFd17vs4xBhgRPtEbrh"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
         }
     }
 }

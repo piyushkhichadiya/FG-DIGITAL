@@ -1778,7 +1778,7 @@ projectAPI.post('/activity/add', (req, res) => {
         }
 
         if (req.body.date) {
-            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) > new Date()) {
+            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) < new Date()) {
                 return response(res, 400, 'invalid', 'Invalid Date.Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.24.20')
             }
             pushData.date = String(new Date(req.body.date))
@@ -1931,8 +1931,9 @@ projectAPI.post('/activity/update', (req, res) => {
 
         tempActivity.lastModifiedBy = "ADMIN"
         tempActivity.lastModifiedOn = String(new Date())
+        delete tempActivity.lastModifiedById
 
-        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}`).update(tempActivity).then(() => {
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}`).set(tempActivity).then(() => {
             return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.25.10')
         })
     }
@@ -2033,6 +2034,8 @@ projectAPI.post('/activity/update', (req, res) => {
                                                         tempClientCriteria.value = parseInt(tempCriteria.value)
                                                         tempClientCriteria.lastModifiedOn = String(new Date())
                                                         tempClientCriteria.lastModifiedBy = 'ADMIN'
+                                                        delete tempClientCriteria.lastModifiedById
+
                                                     }
                                                     break;
                                                 } else if (c == tempActivityCriteriaKey.length - 1 && !newPushCriteria.includes(tempCriteria.criteria_id)) {
@@ -2040,8 +2043,8 @@ projectAPI.post('/activity/update', (req, res) => {
                                                     newCriteria.push({
                                                         criteria_id: tempCriteria.criteria_id,
                                                         value: parseInt(tempCriteria.value),
-                                                        createdOnOn: String(new Date()),
-                                                        createdOnBy: 'ADMIN'
+                                                        createdOn: String(new Date()),
+                                                        createdBy: 'ADMIN'
                                                     });
 
                                                     // For Checking, New Criteria Repeat or not
@@ -2112,7 +2115,9 @@ projectAPI.post('/activity/update', (req, res) => {
 
         tempActivity.lastModifiedOn = String(new Date())
         tempActivity.lastModifiedBy = "ADMIN"
-        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).update(tempActivity).then(() => {
+        delete tempActivity.lastModifiedById
+
+        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).set(tempActivity).then(() => {
             return response(res, 200, 'success', 'Activity has been updated successfully', undefined, 'A-6.25.20')
         })
     }
@@ -2165,7 +2170,7 @@ projectAPI.post('/activity/remove-file', (req, res) => {
             tempDocument.deleted = true
             tempDocument.lastModifiedBy = "ADMIN"
             tempDocument.lastModifiedOn = String(new Date())
-
+            unlinkFile(tempDocument.filename);
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/documents/${activityDocumentsKeys[i]}/`).update(tempDocument).then(() => {
                 return response(res, 200, 'success', 'File has been removed successfully', undefined, 'A-6.26.7')
             })
@@ -2174,6 +2179,59 @@ projectAPI.post('/activity/remove-file', (req, res) => {
             return response(res, 404, 'notfound', 'Incorrect filename', undefined, 'A-6.26.8')
         }
     }
+
+})
+
+// 6.27 Remove Activity
+projectAPI.post('/activity/remove', (req, res) => {
+    if (!req.body.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.27.1')
+    }
+
+    if (!req.body.activity_key) {
+        return response(res, 400, 'required', 'Activity key is required', undefined, 'A-6.27.2')
+    }
+    var projectID = String(req.body.project_id).trim(),
+        activityKey = String(req.body.activity_key).trim(),
+        getKeyDB = getKeys(projectID)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.27.4') }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity) {
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.27.5')
+    }
+
+    var dbClientActivity = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity
+    if (!dbClientActivity[activityKey] || dbClientActivity[activityKey].deleted) {
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.27.6')
+    }
+    var tempActivity = dbClientActivity[activityKey]
+    if (tempActivity.documents) {
+        var activityDocuments = tempActivity.documents,
+            activityDocumentsKeys = Object.keys(activityDocuments)
+        for (var i = 0; i < activityDocumentsKeys.length; i++) {
+
+            var tempDocument = activityDocuments[activityDocumentsKeys[i]]
+
+            if (!tempDocument.deleted) {
+
+                tempDocument.deleted = true
+                tempDocument.lastModifiedBy = "Admin"
+                tempDocument.lastModifiedOn = String(new Date())
+                unlinkFile(tempDocument.filename);
+
+            } else if (i == activityDocumentsKeys.length - 1) {
+                break;
+            }
+        }
+    }
+    tempDocument.lastModifiedBy = "Admin"
+    tempDocument.lastModifiedOn = String(new Date())
+    tempActivity.deleted = true
+    return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).update(tempActivity).then(() => {
+        return response(res, 200, 'success', 'File has been removed successfully', undefined, 'A-6.27.7')
+    })
+
 
 })
 
