@@ -8,8 +8,8 @@ var express = require('express'),
 //---------------------------- GLOBAL VARIABLE ------------------------------
 
 //------------------------------ MIDDLEWARE ---------------------------------
-employeeAPI.use(/^(?!\/user).*/, async(req, res, next) => {
-    await middleware.employeeAuthToken(req, res, next)
+employeeAPI.use(/^(?!\/user).*/, (req, res, next) => {
+    middleware.employeeAuthToken(req, res, next)
 });
 
 //------------------------------ ADMIN APIs ---------------------------------
