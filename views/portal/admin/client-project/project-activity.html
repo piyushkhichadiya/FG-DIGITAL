@@ -158,26 +158,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <!-- The time line -->
-                            <div class="timeline">
-                                <div id="div_activity" style="display: none;"></div>
-                                <div class="time-label">
-                                    <span class="bg-red">10 Feb. 2014</span>
-                                </div>
-                                <div>
-                                    <i class="fas fa-envelope bg-blue"></i>
-                                    <div class="timeline-item">
-                                        <span class="time"><i class="fas fa-clock"></i> 12:05</span>
-                                        <h3 class="timeline-header"><a href="#">Support Team</a> sent you an email</h3>
-
-                                        <div class="timeline-body">
-                                            Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles, weebly ning heekya handango imeem plugg dopplr jibjab, movity jajah plickers sifteo edmodo ifttt zimbra. Babblely odeo kaboodle quora plaxo ideeli hulu weebly balihoo...
-                                        </div>
-                                        <div class="timeline-footer">
-                                            <a class="btn btn-primary btn-sm">Read more</a>
-                                            <a class="btn btn-danger btn-sm">Delete</a>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="timeline" id="div_activity">
+                                <!-- <div id="div_activity" style="display: none;"></div> -->
                                 <div>
                                     <i class="fa fa-plus"></i>
                                     <div class="timeline-item">
@@ -236,8 +218,6 @@
                                         </div>
                                         <div class="row" id="div_post"></div>
                                         <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
-                                            <div class="row form-group" id="div_image">
-                                            </div>
                                             <div class="row form-group" id="div_pdf">
                                                 <input type="file" id="file_post" accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
                                                 <div class="col-md-2" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
@@ -249,9 +229,7 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-md-12">
-                                                <button class="btn btn-outline-primary float-right m-2"><i class="fas fa-plus"></i> Add</button>
-                                                <button class="btn btn-outline-danger float-right m-2"><i class="fas fa-trash-alt"></i> Remove</button>
-                                                <button class="btn btn-outline-info float-right m-2"><i class="fas fa-pencil-alt"></i> Update</button>
+                                                <button class="btn btn-outline-primary float-right m-2" id="btn_add"><i class="fas fa-plus"></i> Add</button>
                                             </div>
                                         </div>
                                     </div>
@@ -323,7 +301,11 @@
     });
 
     const urlParams = new URLSearchParams(window.location.search);
-    plan_id = urlParams.get('plan_id')
+    var dbService
+    $.getJSON('/admin/v1/service/get', (result) => {
+        dbService = result.data
+    });
+    var plan_id = urlParams.get('plan_id')
     if (urlParams.has('plan_id')) {
         if (plan_id == '') {
             window.location.href = `/admin/client/project?client_id=${urlParams.get('client_id')}`
@@ -345,18 +327,234 @@
                             d = dateData.getDate(),
                             m = dateData.getMonth() + 1,
                             y = dateData.getFullYear();
-                        var serviceHtml = `<div class="time-label">
-                                    <span class="bg-green">${y + "/" + m + "/" + d}</span>
-                                </div>`;
-                        $('#div_activity').append(serviceHtml)
+                        var serviceHtml = `<div>
+                                                    <i class="fa fa-cogs"></i>
+                                                    <div class="timeline-item">
+                                                        <h3 class="timeline-header">${tempActivity.title}</h3>
+                                                        <div class="timeline-body">
+                                                            <div class="row form-group">
+                                                                <div class="col-md-6">
+                                                                    <label class="col-md-1">Type</label>
+                                                                    <input type="text" id="txt_type_${i}" class="form-control col-md-8" value="${tempActivity.type}" placeholder="Type" disabled>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <div class="row form-group">
+                                                                    <div class="col-md-6">
+                                                                        <label class="col-md-1" id="">Services</label>
+                                                                        <input type="text" id="txt_service_${i}" value="${getServiceName(tempActivity.service_id)}" class="form-control col-md-8" placeholder="Service Name" disabled>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="div_criteria_${i}">
+                                                                ${getCriteria(tempActivity.criteria)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-3">
+                                                                <label class="col-md-1" id="lbl_criteria">Date</label>
+                                                                <div class="col-md-12">
+                                                                    <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                                                        <input type="text" class="form-control datetimepicker-input" id="txt_date_${i}" data-target="#reservationdate" placeholder="YYYY/MM/DD" />
+                                                                        <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                                                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-6">
+                                                                <label class="col-md-1">Title</label>
+                                                                <div class="col-md-10">
+                                                                    <input type="text" class="form-control" value="${tempActivity.title}" id="txt_title_${i}" placeholder="Enter Title">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-6">
+                                                                <label class="col-md-1">Description</label>
+                                                                <div class="col-md-10">
+                                                                    <textarea type="text" class="form-control" rows="2" id="txt_description_${i}" placeholder="Description...."></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
+                                                            <div class="row form-group" id="div_image_${i}">
+                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key)}
+                                                                <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
+                                                                <div class="col-md-2" id="div_post_${tempActivity.activity_key}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                                    <div class="plus">
+                                                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-12">
+                                                                <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    </div>`;
+                        $('#div_activity').prepend(serviceHtml);
+                        $(`#txt_description_${i}`).val(tempActivity.description)
+                        var date = tempActivity.date
+                        var date = new Date(date),
+                            d = date.getDate(),
+                            m = date.getMonth() + 1,
+                            y = date.getFullYear();
+                        $(`#txt_date_${i}`).val((y + "/" + m + "/" + d))
                     }
                     if (tempActivity.type == 'ACTIVITY') {
-                        var activityHtml = ``;
+                        var activityHtml = `<div>
+                                            <i class="fa fa-chart-line"></i>
+                                                    <div class="timeline-item">
+                                                        <h3 class="timeline-header">${tempActivity.title}</h3>
+                                                        <div class="timeline-body">
+                                                            <div class="row form-group">
+                                                                <div class="col-md-6">
+                                                                    <label class="col-md-1">Type</label>
+                                                                    <input type="text" id="txt_type_${i}" class="form-control col-md-8" value="${tempActivity.type}" placeholder="Type" disabled>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-3">
+                                                                <label class="col-md-1" id="lbl_criteria">Date</label>
+                                                                <div class="col-md-12">
+                                                                    <div class="input-group date" id="reservationdate_${i}" data-target-input="nearest">
+                                                                        <input type="text" class="form-control datetimepicker-input" id="txt_date_${i}" data-target="#reservationdate" placeholder="YYYY/MM/DD" />
+                                                                        <div class="input-group-append" data-target="#reservationdate_${i}" data-toggle="datetimepicker">
+                                                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-6">
+                                                                <label class="col-md-1">Title</label>
+                                                                <div class="col-md-10">
+                                                                    <input type="text" class="form-control" value="${tempActivity.title}" id="txt_title_${i}" placeholder="Enter Title">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-6">
+                                                                <label class="col-md-1">Description</label>
+                                                                <div class="col-md-10">
+                                                                    <textarea type="text" class="form-control" rows="2" id="txt_description_${i}" placeholder="Description...."></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
+                                                            <div class="row form-group" id="div_image_${i}">
+                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key)}
+                                                                <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
+                                                                <div class="col-md-2" id="div_post_${tempActivity.activity_key}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                                    <div class="plus">
+                                                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-12">
+                                                                <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                   </div> `;
+                        $('#div_activity').prepend(activityHtml);
+                        $(`#txt_description_${i}`).val(tempActivity.description)
+                        var date = tempActivity.date
+                        var date = new Date(date),
+                            d = date.getDate(),
+                            m = date.getMonth() + 1,
+                            y = date.getFullYear();
+                        $(`#txt_date_${i}`).val((y + "/" + m + "/" + d))
                     }
                 }
             }
         });
     }
+
+    function getServiceName(service_id) {
+        if (dbService) {
+            for (var i = 0; i < dbService.length; i++) {
+                var tempService = dbService[i];
+                if (tempService.service_id == service_id) {
+                    return tempService.title
+                }
+            }
+        }
+    }
+
+    function getCriteria(criteria) {
+        if (criteria) {
+            var criteriaHtml = '';
+            for (var i = 0; i < criteria.length; i++) {
+                tempCriteria = criteria[i];
+                criteriaHtml += `<div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label id="" class="ml-3">${tempCriteria.criteria}</label>
+                                        <div class="col-md-1">
+                                            <input type="text" id="txt_criteria_${tempCriteria.criteria_id}" class="form-control" value="${tempCriteria.value}" placeholder="Value">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+            }
+            return (criteriaHtml)
+        }
+    };
+
+    function getDocument(document, activity_id) {
+        if (document) {
+            var docHtml = '';
+            for (var i = 0; i < document.length; i++) {
+                var tempDoc = document[i];
+                var file = tempDoc.filename;
+                var ext = file.substring(file.lastIndexOf('.') + 1);
+                if (ext != 'pdf') {
+                    docHtml += `<div class="col-md-2 img_container form-group">
+                                    <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                        <img src="/admin/v1/profile/file/${tempDoc.filename}" id='img_post' class="image" style="height: 150px; width: 100%">
+                                        <div class="middle">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                    </div>
+                                </div>`;
+                } else {
+                    docHtml += `<div class="col-md-2">
+                                    <div>
+                                        <iframe src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"></iframe>
+                                        <div class="middle">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="display:none;">
+                                        <a class="col-md-6 btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                        <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-sm col-md-6" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                    </div>
+                                </div>`
+                }
+
+            }
+            return (docHtml)
+        } else {
+            return '';
+        }
+    };
 
     $('#list_type').change(() => {
         if ($('#list_type').val() == 'Service') {
@@ -402,7 +600,7 @@
                                         <div class="form-group row">
                                             <label id="" class="ml-3">${tempCriteria.criteria}</label>
                                             <div class="col-md-1">
-                                                <input type="text" id="txt_criteria_${tempCriteria.criteria_id}" class="form-control" id="" placeholder="Value">
+                                                <input type="text" id="txt_criteria_${tempCriteria.criteria_id}" class="form-control" placeholder="Value">
                                             </div>
                                         </div>
                                     </div>
@@ -472,6 +670,129 @@
             }
         }
     });
+
+    $('#btn_add').click(() => {
+        // /admin/v1/project/activity/add
+        var type = $('#list_type').val(),
+            service_id = $('#list_service').val(),
+            description = $('#txt_description').val(),
+            title = $('#txt_title').val(),
+            date = $('#txt_date').val();
+
+        formData = new FormData();
+        formData.append('project_id ', plan_id)
+        if (!type) {
+            return $(document).Toasts('create', {
+                title: 'Activity type Required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please select Activity Type',
+                class: 'bg-danger',
+            });
+        } else {
+            formData.append('type', type)
+        }
+        if (service_id) {
+            formData.append('service_id', service_id)
+        }
+        if (description) {
+            formData.append('description', description)
+        }
+        if (title) {
+            formData.append('title', title)
+        }
+        if (date) {
+            formData.append('date', date)
+        }
+        for (var i = 0; i < $('#file_post')[0].files.length; ++i) {
+            formData.append('file', $('#file_post')[0].files[i]);
+        }
+        for (var pair of formData.entries()) {
+            console.log(pair[1]);
+        }
+        return
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/activity/add',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Activity Added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Activity added Successfully',
+                    class: 'bg-success',
+                });
+                window.location.reload();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
+            }
+        });
+    });
+
+    function removeFile(filename, activity_id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this File",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.post({
+                    type: 'POST',
+                    url: '/admin/v1/project/activity/remove-file',
+                    data: {
+                        "project_id": plan_id,
+                        "activity_key": activity_id,
+                        "filename": filename
+                    },
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Post Added',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'File removed Successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_removeDoc_${filename}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`#btn_removeDoc_${filename}`).removeAttr('disabled')
+                    }
+                });
+            }
+        });
+    };
 </script>
 
 </html>
