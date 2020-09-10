@@ -193,7 +193,8 @@ clientProjectAPI.get('/fetch', (req, res) => {
                     }
 
                     // Service
-                    var activeCriteria = [] // To validate in Activity Data
+                    var activeCriteria = [], // To validate in Activity Data
+                        activeServices = []
 
                     if (tempProject.service) {
 
@@ -215,7 +216,11 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                 for (var l = 0; l < dbServicesKey.length; l++) {
                                     var tempService = dbServices[dbServicesKey[l]]
 
-                                    if (tempService.deleted || tempService.service_id != tempProjectService.service_id) { continue }
+                                    if (tempService.deleted || tempService.service_id != tempProjectService.service_id) {
+                                        continue
+                                    }
+
+                                    activeServices.push(tempService.service_id)
 
                                     var tempServiceObj = {
                                         service_id: tempProjectService.service_id
@@ -383,7 +388,13 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                     type: tempProjectActivity.type
                                 }
 
+
+
                                 if (tempObj.type == 'SERVICE') {
+
+                                    if (!activeServices.includes(tempObj.service_id)) {
+                                        tempObj.service_deleted = true
+                                    }
 
                                     if (tempProjectActivity.criteria) {
                                         var dbActivityCriteria = tempProjectActivity.criteria,

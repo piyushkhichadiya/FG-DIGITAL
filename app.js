@@ -57,10 +57,7 @@ directory_gen('/employee')
 // Console Clear
 console.clear();
 console.log(`npm start: ${packageInfo.scripts.start}
-
-Port: \x1b[36m\x1b[1m${process.env.PORT || 80}\x1b[0m
-Environment: \x1b[36m\x1b[1m${process.env.NODE_ENV||''}\x1b[0m
-App Version: \x1b[33m\x1b[1m${packageInfo.version}\x1b[0m`)
+Port: \x1b[36m\x1b[1m${process.env.PORT || 80}\x1b[0m | Environment: \x1b[36m\x1b[1m${process.env.NODE_ENV||''}\x1b[0m | App Version: \x1b[33m\x1b[1m${packageInfo.version}\x1b[0m`)
 
 //----------------------------- DATABASE ------------------------------
 var firebase = require('./config/database')
@@ -106,7 +103,7 @@ if ((process.env.NODE_ENV == 'dev' || process.env.NODE_ENV == 'development') && 
     }));
 
     // CLIENT
-    app.use('/api/client', swaggerUI.serve, swaggerUI.setup(require('./routes/admin/v1/admin.swagger.json'), {
+    app.use('/api/client', swaggerUI.serve, swaggerUI.setup(require('./routes/client/v1/client.swagger.json'), {
         explorer: false,
         customCss: '.swagger-ui .topbar { display: none }',
         customSiteTitle: "Client APIs v1.0",
@@ -136,9 +133,9 @@ exec('git rev-parse --abbrev-ref HEAD', (err, stdout, stderr) => {
 // APIs
 
 // v1
-app.use('/admin/v1', require('./routes/admin/api.admin'))
-app.use('/employee/v1', require('./routes/employee/api.employee'))
-app.use('/client/v1', (req, res) => { return res.status(400).send('UNKNOWN-APIS') })
+app.use('/admin/v1', require('./routes/admin/v1/api.admin'))
+app.use('/employee/v1', require('./routes/employee/v1/api.employee'))
+app.use('/client/v1', require('./routes/client/v1/api.client'))
 
 // Views
 app.use('/', require('./routes/static.view'))

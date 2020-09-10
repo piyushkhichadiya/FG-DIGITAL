@@ -16,7 +16,6 @@ module.exports = {
 
                     // Verify Admin Account 
                     if (dbEmployee) {
-                        var dbEmployee;
                         if (!dbEmployee.deleted) {
                             if (dbEmployee.authToken != token.authToken) {
                                 response(res, 401, 'expired', 'Token Expired', undefined, 'E-MW-5');

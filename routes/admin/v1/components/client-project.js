@@ -341,7 +341,7 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                 criteria_id: tempCriteria.criteria_id,
                                 criteria: validate.criteria,
                                 value: tempCriteria.value,
-                                deleted: validate.deleted,
+                                deleted: validate.deleted || validate.service_deleted,
                                 createdOn: tempCriteria.createdOn || tempActivity.createdOn,
                                 createdBy: tempCriteria.createdBy || tempActivity.createdBy,
                                 lastModifiedBy: tempCriteria.lastModifiedBy,
@@ -349,6 +349,9 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                             }
 
                             postCriteriaObj.push(tempCriteriaObj);
+                        }
+                        if (!tempObj.service_deleted && validate.service_deleted) {
+                            tempObj.service_deleted = true
                         }
                     }
 
@@ -407,7 +410,7 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
 
             for (var i = 0; i < dbServicesKey.length; i++) {
 
-                if (!dbServices[dbServicesKey[i]].deleted && dbServices[dbServicesKey[i]].service_id == service_id) {
+                if (dbServices[dbServicesKey[i]].service_id == service_id) {
                     if (dbServices[dbServicesKey[i]].criteria) {
                         var dbServiceCriteria = dbServices[dbServicesKey[i]].criteria,
                             dbServiceCriteriaKeys = Object.keys(dbServiceCriteria)
@@ -417,7 +420,8 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                 return {
                                     criteria_id: dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria_id,
                                     criteria: dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria,
-                                    deleted: dbServiceCriteria[dbServiceCriteriaKeys[j]].deleted
+                                    deleted: dbServiceCriteria[dbServiceCriteriaKeys[j]].deleted,
+                                    service_deleted: dbServices[dbServicesKey[i]].deleted
                                 }
                             }
                         }

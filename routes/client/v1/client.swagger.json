@@ -1,0 +1,125 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "FG Digital",
+        "description": "ADMIN APIs - Project Management Portal",
+        "version": "1.0.0"
+    },
+    "host": "localhost",
+    "basePath": "/client/v1",
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "tags": [{
+        "name": "1. User Account",
+        "description": "APIs for user related functionality before get authenticated"
+    }, {
+        "name": "2. Profile",
+        "description": "Admin Profile & Account details"
+    }, {
+        "name": "3. Project",
+        "description": "Setting up plans to allocate client"
+    }],
+    "paths": {
+        "/user/login": {
+            "post": {
+                "tags": ["1. User Account"],
+                "summary": "1.1 Authentication for Access admin panel",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "Email Address and Password",
+                    "schema": {
+                        "required": ["email", "password"],
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "password": {
+                                "type": "string"
+                            },
+                            "remember": {
+                                "type": "boolean"
+                            }
+                        },
+                        "example": {
+                            "email": "test@gmail.com",
+                            "password": "Aa@123456",
+                            "remember": true
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/user/logout": {
+            "get": {
+                "tags": ["1. User Account"],
+                "summary": "1.2 To logout or expire session from portal",
+                "responses": {}
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": ["2. Profile"],
+                "summary": "2.1 Get Profile",
+                "responses": {}
+            }
+        },
+        "/profile/password": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "2.2 Change Password",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["password"],
+                        "properties": {
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/profile/update": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "Update Profile Details",
+                "parameters": [{
+                    "name": "body",
+                    "in": "body",
+                    "schema": {
+                        "required": ["name"],
+                        "properties": {
+                            "name": { "type": "string" }
+                        },
+                        "example": {
+                            "name": "API Testing Client Update Profile"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/profile/file/{filename}": {
+            "get": {
+                "tags": ["2. Profile"],
+                "summary": "To Get Any file from storage",
+                "parameters": [{
+                    "in": "path",
+                    "name": "filename",
+                    "required": true,
+                    "description": "Specify File Name"
+                }],
+                "responses": {}
+            }
+        }
+    }
+}
