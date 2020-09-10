@@ -148,7 +148,7 @@ profileAPI.post('/update', (req, res) => {
 
     // DB
     firebase.database().ref('/admin/employees/' + employeeAuthToken.employee_key).update(dbEmployeeAccount);
-    return response(res, 200, 'success', undefined, 'E-2.3.4');
+    return response(res, 200, 'success', undefined, undefined, 'E-2.3.4');
 
 })
 
