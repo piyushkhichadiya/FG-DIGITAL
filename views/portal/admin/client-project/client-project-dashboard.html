@@ -103,7 +103,9 @@
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                                <li class="breadcrumb-item"><a id="lbl_navClient" href="">{Client Name}</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navClient" href=""></a>
+                                </li>
                                 <li class="breadcrumb-item"><a id="lbl_navProjectId" href="">{Project Name or ID}</a></li>
                                 <li class="breadcrumb-item active">Dashboard</li>
                             </ol>
@@ -117,11 +119,6 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="card-body card">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h5 class="float-right">Project ID : <span id="lbl_planId"></span></h5>
-                            </div>
-                        </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <h4 class="header-title">Project Management</h4>
@@ -191,8 +188,6 @@
         plan_id = urlParams.get('plan_id');
     if (!plan_id || !client_id) {
         window.location.href = '/admin/client'
-    } else {
-        $('#lbl_planId').html(urlParams.get('plan_id'));
     }
 </script>
 

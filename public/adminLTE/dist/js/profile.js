@@ -10,3 +10,8 @@ $.get('/admin/v1/profile', (data) => {
         logout(true)
     }
 });
+
+// Table Error Disable
+if ($.fn.dataTable && $.fn.dataTable.ext && $.fn.dataTable.ext.errMode) {
+    $.fn.dataTable.ext.errMode = 'none';
+}

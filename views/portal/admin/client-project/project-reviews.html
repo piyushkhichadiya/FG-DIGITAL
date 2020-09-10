@@ -108,8 +108,12 @@
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                                <li class="breadcrumb-item"><a id="lbl_navClient" href="">{Client Name}</a></li>
-                                <li class="breadcrumb-item"><a id="lbl_navProjectId" href="">{project ID}</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navClient" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navProjectId" href=""> </a>
+                                </li>
                                 <li class="breadcrumb-item active">Reviews</li>
                             </ol>
                         </div>
@@ -122,9 +126,6 @@
                 <div class="container-fluid">
                     <div class="card card-body">
                         <div class="row">
-                            <div class="col-md-12">
-                                <h5 class="float-right">Project ID : <span id="lbl_planId"></span></h5>
-                            </div>
                             <div class="col-md-12">
                                 <div class="pull-right">
                                     <button class="btn btn-outline-primary float-right mb-3" id="btn_create" onclick="window.location.href = `/admin/client/project-review-view?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`"><i class="fas fa-plus"></i> Create</button>
@@ -221,7 +222,6 @@
         "responsive": true,
     });
     const urlParams = new URLSearchParams(window.location.search);
-    $('#lbl_planId').html(urlParams.get('plan_id'))
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
