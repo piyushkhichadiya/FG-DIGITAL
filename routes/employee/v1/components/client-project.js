@@ -573,8 +573,8 @@ clientProjectAPI.post('/activity/add', (req, res) => {
             }
 
         if (req.body.date) {
-            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) < new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date.Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'E-3.2.8')
+            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) > new Date()) {
+                return response(res, 400, 'invalid', 'Date Time must not be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is required for 12-Hour Timestamp', undefined, 'E-3.2.8')
             }
             pushData.date = String(new Date(req.body.date))
         }
@@ -731,8 +731,8 @@ clientProjectAPI.post('/activity/add', (req, res) => {
 
         if (req.body.date) {
             var date = new Date(req.body.date)
-            if (date == "Invalid Date" || date < new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date. Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'E-3.2.23')
+            if (date == "Invalid Date" || date > new Date()) {
+                return response(res, 400, 'invalid', 'Date Time must not be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is required for 12-Hour Timestamp', undefined, 'E-3.2.23')
             }
             pushData.date = String(date)
         }
@@ -849,8 +849,8 @@ clientProjectAPI.post('/activity/update', (req, res) => {
         }
 
         if (req.body.date) {
-            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) < new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date.Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'E-3.3.9')
+            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) > new Date(tempActivity.createdOn)) {
+                return response(res, 400, 'invalid', 'Date Time must not be greater than creation time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is required for 12-Hour Timestamp', undefined, 'E-3.3.9')
             }
             tempActivity.date = String(new Date(req.body.date))
         }
@@ -1037,8 +1037,8 @@ clientProjectAPI.post('/activity/update', (req, res) => {
 
         if (req.body.date) {
             var date = new Date(req.body.date)
-            if (date == "Invalid Date" || date < new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date. Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'E-3.3.19')
+            if (date == "Invalid Date" || date > new Date(tempActivity.createdOn)) {
+                return response(res, 400, 'invalid', 'Date Time must not be greater than creation time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is required for 12-Hour Timestamp', undefined, 'E-3.3.19')
             }
             tempActivity.date = String(date)
         }
