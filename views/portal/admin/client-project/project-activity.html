@@ -164,7 +164,7 @@
                             <div class="timeline" id="div_activity">
                                 <!-- <div id="div_activity" style="display: none;"></div> -->
                                 <div>
-                                    <i class="fa fa-plus"></i>
+                                    <i class="fa fa-plus bg-info"></i>
                                     <div class="timeline-item">
                                         <h3 class="timeline-header">Add Activity</h3>
                                         <div class="timeline-body">
@@ -307,6 +307,15 @@
     var dbService
     $.getJSON('/admin/v1/service/get', (result) => {
         dbService = result.data
+    }).fail(error => {
+        error = error.responseJSON
+        $(document).Toasts('create', {
+            title: 'Error!',
+            autohide: true,
+            delay: 5000,
+            body: 'Service Not Found',
+            class: 'bg-danger',
+        });
     });
     var plan_id = urlParams.get('plan_id')
     if (urlParams.has('plan_id')) {
@@ -488,6 +497,15 @@
                     }
                 }
             }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Activity Not Found',
+                class: 'bg-danger',
+            });
         });
     }
 

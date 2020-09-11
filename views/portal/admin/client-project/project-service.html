@@ -253,9 +253,20 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     var dbService;
+
     $.getJSON('/admin/v1/service/get', (result) => {
         dbService = result.data;
+    }).fail(error => {
+        error = error.responseJSON
+        $(document).Toasts('create', {
+            title: 'Error #' + error.code,
+            autohide: true,
+            delay: 5000,
+            body: error.message,
+            class: 'bg-danger',
+        });
     });
+
     $('#link_project').html(urlParams.get('plan_id'))
     $('#link_project').attr('href', `/admin/client/project-dashboard?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`)
     $(document).ready(() => {
@@ -275,8 +286,9 @@
             tblService.clear().draw();
             if (serviceData) {
                 for (var i = 0; i < serviceData.length; i++) {
-                    var tempService = serviceData[i],
-                        button = `<div class="btn-group">
+                    var tempService = serviceData[i];
+                    getServiceTitle(tempService.service_id)
+                    var button = `<div class="btn-group">
                                         <button class='btn btn-success m-1' id="btn_activate_${i}" onclick=activate(${i},'${tempService.service_id}')><i class='fas fa-hourglass-start'></i> Activate</button>
                                         <button class='btn btn-secondary m-1' id="btn_deactivate_${i}" onclick=deactivate(${i},'${tempService.service_id}')><i class='fas fa-ban'></i> Deactivate</button>
                                         <button class='btn btn-danger m-1' id="btn_remove_${i}" onclick=remove(${i},'${tempService.service_id}')><i class='fas fa-trash-alt' ></i> Remove</button>

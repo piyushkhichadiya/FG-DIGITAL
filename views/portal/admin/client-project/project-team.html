@@ -297,9 +297,20 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     var dbEmp;
+
     $.getJSON('/admin/v1/employee/get', (result) => {
         dbEmp = result.data;
+    }).fail(error => {
+        error = error.responseJSON
+        $(document).Toasts('create', {
+            title: 'Error #' + error.code,
+            autohide: true,
+            delay: 5000,
+            body: error.message,
+            class: 'bg-danger',
+        });
     });
+
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
@@ -317,8 +328,9 @@
             if (teamData) {
                 tblTeam.clear().draw();
                 for (var i = 0; i < teamData.length; i++) {
-                    var tempTeam = teamData[i],
-                        button = `<div class="btn-group">
+                    var tempTeam = teamData[i];
+                    getEmployeeName(tempTeam.employee_id);
+                    var button = `<div class="btn-group">
                                         <button type="button" class="btn btn-info" data-toggle="dropdown">Open</button>
                                         <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
                                             <span class="sr-only">Toggle Dropdown</span>
@@ -331,7 +343,6 @@
                                         </button> 
                                     </div>`,
                         active = tempTeam.active;
-                    // console.log(getEmployeeName(tempTeam.employee_id));
                     if (active == true) {
                         var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-hourglass-start'></i> Active</p>`
                     } else {
@@ -385,6 +396,15 @@
                 $('#list_emp').html(option);
             }
 
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
         });
     });
 
@@ -547,6 +567,15 @@
                     }
                 }
             }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
         });
     };
 

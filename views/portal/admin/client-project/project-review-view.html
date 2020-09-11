@@ -157,11 +157,6 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="card-body card">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h5 class="float-right">Project ID : <span id="lbl_planId"></span></h5>
-                            </div>
-                        </div>
                         <div class="row form-group">
                             <div class="col-md-3">
                                 <label class="col-md-12 col-form-label">Review Title</label>
@@ -179,7 +174,7 @@
                         <div class="row">
                             <div class="col-md-12 form-group">
                                 <button class="btn btn-outline-primary float-right ml-1" id="btn_add"><i class="fas fa-plus"></i> Create</button>
-                                <button class="btn btn-outline-danger float-right ml-1" id="btn_remove" style="display: none;"><i class="fas fa-times-circle"></i> Close</button>
+                                <button class="btn btn-outline-danger float-right ml-2" id="btn_remove" style="display: none;"><i class="fas fa-times-circle"></i> Close</button>
                                 <button class="btn btn-outline-primary float-right" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
                             </div>
                         </div>
@@ -259,7 +254,6 @@
         $(this).ekkoLightbox();
     });
     const urlParams = new URLSearchParams(window.location.search);
-    $('#lbl_planId').html(urlParams.get('plan_id'))
     $('#lbl_navReview').attr('href', `/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`)
     var postData;
     if (urlParams.has('review_id')) {
@@ -351,7 +345,7 @@
         if (description) {
             return description
         } else {
-            return 'This Post does not have Description'
+            return ' ';
         }
     }
 
@@ -374,7 +368,7 @@
             }
             return (docHtml)
         } else {
-            return 'This Post does not have any File'
+            return ' ';
         }
     };
 
