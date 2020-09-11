@@ -223,7 +223,7 @@
                                         <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                             <div class="row form-group" id="div_pdf">
                                                 <input type="file" id="file_post" accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
-                                                <div class="col-md-2" onclick="$('#file_post').click()" style="height: 130px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                <div class="col-md-2" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                     <div class="plus">
                                                         <ion-icon name="add-circle-outline"></ion-icon>
                                                     </div>
@@ -325,11 +325,12 @@
                 for (var i = 0; i < activityData.length; i++) {
                     tempActivity = activityData[i];
                     if (tempActivity.type == 'SERVICE') {
-                        var dateData = tempActivity.date;
-                        var dateData = new Date(dateData),
-                            d = dateData.getDate(),
-                            m = dateData.getMonth() + 1,
-                            y = dateData.getFullYear();
+                        var date = tempActivity.date
+                        var date = new Date(date),
+                            d = date.getDate(),
+                            m = date.getMonth() + 1,
+                            y = date.getFullYear();
+                        var oldDate = y + '/' + m + '/' + d;
                         var serviceHtml = `<div>
                                                     <i class="fa fa-cogs bg-blue"></i>
                                                     <div class="timeline-item">
@@ -351,7 +352,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div id="div_criteria_${i}">
-                                                                ${getCriteria(tempActivity.criteria)}
+                                                                ${getCriteria(i, tempActivity.criteria)}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -389,7 +390,7 @@
                                                             <div class="row form-group" id="div_image_${i}">
                                                                 ${getDocument(tempActivity.documents, tempActivity.activity_key)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
-                                                                <div class="col-md-2" id="div_post_${tempActivity.activity_key}" onclick="$('#file_post_${i}').click()" style="height: 130px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                                <div class="col-md-2" id="div_post_${tempActivity.activity_key}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                                     <div class="plus">
                                                                         <ion-icon name="add-circle-outline"></ion-icon>
                                                                     </div>
@@ -399,22 +400,24 @@
                                                         <div class="row form-group">
                                                             <div class="col-md-12">
                                                                 <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
-                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${oldDate}')><i class="fas fa-pencil-alt"></i> Update</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     </div>`;
                         $('#div_activity').prepend(serviceHtml);
                         $(`#txt_description_${i}`).val(tempActivity.description)
+                        $(`#txt_date_${i}`).val(oldDate)
+                        $('#lbl_headerDate').html(`Date : ` + oldDate)
+
+                    }
+                    if (tempActivity.type == 'ACTIVITY') {
                         var date = tempActivity.date
                         var date = new Date(date),
                             d = date.getDate(),
                             m = date.getMonth() + 1,
                             y = date.getFullYear();
-                        $(`#txt_date_${i}`).val((y + "/" + m + "/" + d))
-                        $('#lbl_headerDate').html(`Date : ${y} / ${m} / ${d}`)
-                    }
-                    if (tempActivity.type == 'ACTIVITY') {
+                        var oldDate = y + '/' + m + '/' + d;
                         var activityHtml = `<div>
                                             <i class="fa fa-chart-line bg-green"></i>
                                                     <div class="timeline-item">
@@ -463,7 +466,7 @@
                                                             <div class="row form-group" id="div_image_${i}">
                                                                 ${getDocument(tempActivity.documents, tempActivity.activity_key)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
-                                                                <div class="col-md-2" id="div_post_${tempActivity.activity_key}" onclick="$('#file_post_${i}').click()" style="height: 130px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                                <div class="col-md-2" id="div_post_${tempActivity.activity_key}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                                     <div class="plus">
                                                                         <ion-icon name="add-circle-outline"></ion-icon>
                                                                     </div>
@@ -473,20 +476,15 @@
                                                         <div class="row form-group">
                                                             <div class="col-md-12">
                                                                 <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
-                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${oldDate}')><i class="fas fa-pencil-alt"></i> Update</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                    </div> `;
                         $('#div_activity').prepend(activityHtml);
                         $(`#txt_description_${i}`).val(tempActivity.description)
-                        var date = tempActivity.date
-                        var date = new Date(date),
-                            d = date.getDate(),
-                            m = date.getMonth() + 1,
-                            y = date.getFullYear();
-                        $(`#txt_date_${i}`).val((y + "/" + m + "/" + d))
-                        $('#lbl_headerDate').html(`Date : ${y} / ${m} / ${d}`)
+                        $(`#txt_date_${i}`).val(oldDate);
+                        $('#lbl_headerDate').html(`Date : ` + oldDate);
                     }
                 }
             }
@@ -504,18 +502,18 @@
         }
     }
 
-    function getCriteria(criteria) {
+    function getCriteria(index, criteria) {
         if (criteria) {
             var criteriaHtml = '';
             for (var i = 0; i < criteria.length; i++) {
                 tempCriteria = criteria[i];
-                criteriaHtml += `<div class="row" id="div_getJson_${i}">
+                criteriaHtml += `<div class="row" id="div_getJson_${index}_${i}">
                                 <div class="col-md-12">
                                     <div class="form-group row">
-                                            <input id="txt_getCriteria_${i}_${tempCriteria.criteria_id}" value="${tempCriteria.criteria_id}" style="display:none;">
-                                        <label id="lbl_getCriteria_${i}_${tempCriteria.criteria_id}" class="ml-3">${tempCriteria.criteria}</label>
+                                            <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                        <label id="lbl_getCriteria_${index}_${i}" class="ml-3">${tempCriteria.criteria}</label>
                                         <div class="col-md-1">
-                                            <input type="text" id="txt_getCriteria_${tempCriteria.criteria_id}" class="form-control" value="${tempCriteria.value}" placeholder="Value">
+                                            <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value">
                                         </div>
                                     </div>
                                 </div>
@@ -535,7 +533,7 @@
                 if (ext != 'pdf') {
                     docHtml += `<div class="col-md-2 img_container form-group">
                                     <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
-                                        <img src="/admin/v1/profile/file/${tempDoc.filename}" id='img_post' class="image" style="height: 130px; width: 100%">
+                                        <img src="/admin/v1/profile/file/${tempDoc.filename}" id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
                                             <i class="fas fa-search"></i>
                                         </div>
@@ -547,7 +545,7 @@
                 } else {
                     docHtml += `<div class="col-md-2">
                                     <div>
-                                        <iframe src="" width="100%" height="130px"></iframe>
+                                        <iframe src="" width="100%" height="150px"></iframe>
                                         <div class="middle">
                                             <i class="fas fa-search"></i>
                                         </div>
@@ -593,7 +591,7 @@
             if (type == "pdf") {
                 pdf = `<div class="col-md-2">
                         <div>
-                            <iframe src="${objectURL}" width="100%" height="130px"></iframe>
+                            <iframe src="${objectURL}" width="100%" height="150px"></iframe>
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
@@ -607,7 +605,7 @@
             } else {
                 image = `<div class="col-md-2 img_container form-group">
                         <div class='' href='${objectURL}' data-toggle="lightbox">
-                            <img src="${objectURL}" id='img_post' class="image" style="height: 130px; width: 100%">
+                            <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
@@ -723,7 +721,7 @@
             if (type == "pdf") {
                 pdf = `<div class="col-md-2">
                         <div>
-                            <iframe src="${objectURL}" width="100%" height="130px"></iframe>
+                            <iframe src="${objectURL}" width="100%" height="150px"></iframe>
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
@@ -737,7 +735,7 @@
             } else {
                 image = `<div class="col-md-2 img_container form-group">
                         <div class='' href='${objectURL}' data-toggle="lightbox">
-                            <img src="${objectURL}" id='img_post' class="image" style="height: 130px; width: 100%">
+                            <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
@@ -754,10 +752,6 @@
             description = $('#txt_description').val(),
             title = $('#txt_title').val(),
             date = $('#txt_date').val();
-        var date = new Date(date),
-            d = date.getDate(),
-            m = date.getMonth() + 1,
-            y = date.getFullYear();
         formData = new FormData();
         formData.append('project_id', plan_id)
         if (!type) {
@@ -803,9 +797,25 @@
         if (title) {
             formData.append('title', title)
         }
-        // if (date) {
-        //     formData.append('date', (y + "/" + m + "/" + d))
-        // }
+        var d = new Date();
+        var strDate = d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+        if (date) {
+            var date = new Date(date),
+                d = date.getDate(),
+                m = date.getMonth() + 1,
+                y = date.getFullYear();
+            var newDate = y + "/" + m + "/" + d;
+            if (Date.parse(strDate) < Date.parse(newDate)) {
+                return $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Date must be less than Current Date',
+                    class: 'bg-danger',
+                });
+            }
+            formData.append('date', newDate)
+        }
         for (var i = 0; i < $('#file_post')[0].files.length; ++i) {
             formData.append('file', $('#file_post')[0].files[i]);
         }
@@ -844,24 +854,46 @@
         });
     });
 
-    function updateActivity(index, activity_id) {
-        var formData = new FormData();
-        var date = $('#txt_date_' + index).val(),
+    function updateActivity(index, activity_id, oldDate) {
+        var getDate = $('#txt_date_' + index).val(),
             description = $('#txt_description_' + index).val(),
             title = $('#txt_title_' + index).val();
+        var formData = new FormData();
         formData.append('project_id', plan_id)
         formData.append('activity_key', activity_id)
         var criteria = {};
-        var divJson = $(`[id^=div_getJson_]`)
-        console.log(divJson)
+        var divJson = $(`[id^=div_getJson_${index}]`)
         if ($('#txt_type_' + index).val() == 'SERVICE') {
-
+            for (var i = 0; i < divJson.length; i++) {
+                criteria[i] = {
+                    criteria_id: Number($(`#txt_getCriteria_${index}_${i}`).val()),
+                    value: Number($(`#txt_getValue_${index}_${i}`).val())
+                }
+            }
+            formData.append('criteria', JSON.stringify(criteria))
         }
-        var date = new Date(date),
-            d = date.getDate(),
-            m = date.getMonth() + 1,
-            y = date.getFullYear();
-        // formData.append('date', (y + '/' + m + '/' + d))
+        var d = new Date(oldDate),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+        if (month.length < 2) month = month;
+        if (day.length < 2) day = day;
+        var date = ([year, month, day].join('/'));
+        var getDate = new Date(getDate),
+            d = getDate.getDate(),
+            m = getDate.getMonth() + 1,
+            y = getDate.getFullYear();
+        var newDate = y + '/' + m + '/' + d;
+        if (Date.parse(newDate) > Date.parse(date)) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Date must be Less than created Date',
+                class: 'bg-danger',
+            });
+        }
+        formData.append('date', newDate)
         if (description) {
             formData.append('description', description)
         }
