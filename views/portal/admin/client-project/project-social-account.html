@@ -266,6 +266,7 @@
         "responsive": true,
     });
     const urlParams = new URLSearchParams(window.location.search);
+    var dbAccount
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
@@ -275,6 +276,38 @@
             window.location.href = `/admin/client/project?client_id=${urlParams.get('client_id')}`
         }
     });
+
+    $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=accounts`, (data) => {
+        var data = data.data;
+        dbAccount = data.accounts;
+    }).fail(error => {
+        tblSocial.clear().draw();
+        error = error.responseJSON
+        $(document).Toasts('create', {
+            title: 'Error #' + error.code,
+            autohide: true,
+            delay: 5000,
+            body: error.message,
+            class: 'bg-danger',
+        });
+    });
+
+    function getAccountData() {
+        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=accounts`, (data) => {
+            var data = data.data;
+            dbAccount = data.accounts;
+        }).fail(error => {
+            tblSocial.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+    }
 
     function getSocialAccount(planId) {
         $.get(`/admin/v1/project/fetch/${planId}?scope=accounts`, (data) => {
@@ -320,6 +353,7 @@
     $('#btn_addAccount').click(() => {
         var name = $('#list_social').val(),
             reference = $('#txt_reference').val();
+        var reference = reference.trim();
         if (!name) {
             return $(document).Toasts('create', {
                 title: 'Account name Required',
@@ -356,6 +390,7 @@
                 });
                 $('#modal_Social').modal('hide');
                 getSocialAccount(urlParams.get('plan_id'))
+                getAccountData();
             },
             error: error => {
                 error = error.responseJSON
@@ -383,43 +418,22 @@
         $('#txt_social').show();
         $('#btn_update').show();
         $('#modal_Social').modal('show');
-        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=accounts`, (data) => {
-            var data = data.data;
-            accountData = data.accounts;
-            if (accountData) {
-                for (var i = 0; i < accountData.length; i++) {
-                    var tempAccount = accountData[i],
-                        button = `<button type="button" class="btn btn-outline-info" id="btn_update_${i}" onclick=update(${i},'${account_id}')><i class="fas fa-check"></i> Save Changes</button>`
-                    if (tempAccount.account_id == account_id) {
-                        $('#txt_social').val(tempAccount.account_name);
-                        $('#txt_reference').val(tempAccount.reference);
-                        $('#div_button').append(button);
-                    }
+        if (dbAccount) {
+            for (var i = 0; i < dbAccount.length; i++) {
+                var tempAccount = dbAccount[i],
+                    button = `<button type="button" class="btn btn-outline-info" id="btn_update_${i}" onclick=update(${i},'${account_id}')><i class="fas fa-check"></i> Save Changes</button>`
+                if (tempAccount.account_id == account_id) {
+                    $('#txt_social').val(tempAccount.account_name);
+                    $('#txt_reference').val(tempAccount.reference);
+                    $('#div_button').append(button);
                 }
             }
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
+        }
     }
 
     function update(index, account_id) {
-        var reference = $('#txt_reference').val()
-        if (!reference) {
-            return $(document).Toasts('create', {
-                title: 'Reference Required',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Reference',
-                class: 'bg-danger',
-            });
-        }
+        var reference = $('#txt_reference').val();
+        var reference = reference.trim();
         $.post({
             type: 'POST',
             url: '/admin/v1/project/social-account/update',
@@ -438,6 +452,7 @@
                 });
                 $('#modal_Social').modal('hide');
                 getSocialAccount(urlParams.get('plan_id'))
+                getAccountData();
             },
             error: error => {
                 error = error.responseJSON
@@ -478,6 +493,7 @@
                             class: 'bg-success',
                         });
                         getSocialAccount(urlParams.get('plan_id'))
+                        getAccountData();
                     },
                     error: function(error) {
                         error = error.responseJSON

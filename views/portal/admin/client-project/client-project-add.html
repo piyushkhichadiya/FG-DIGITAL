@@ -322,6 +322,9 @@
             day = $('#txt_days').val(),
             amount = $('#txt_amount').val(),
             startDate = $('#txt_startDate').val();
+        var day = day.trim(),
+            amount = amount.trim(),
+            startDate = startDate.trim();
         if (!plan) {
             return $(document).Toasts('create', {
                 title: 'Plan required',
@@ -336,7 +339,7 @@
                 title: 'Amount required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please Enter Valid Plan Amount',
+                body: 'Please enter valid plan amount',
                 class: 'bg-danger',
             });
         }
@@ -351,10 +354,10 @@
         }
         if (!day || isNaN(day)) {
             return $(document).Toasts('create', {
-                title: 'days required',
+                title: 'Days required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please Enter Valid days',
+                body: 'Please enter valid days',
                 class: 'bg-danger',
             });
         }
@@ -418,57 +421,43 @@
     $('#btn_update').click(() => {
         var clientId = urlParams.get('client_id'),
             project_id = urlParams.get('plan_id'),
+            name = $('#txt_planName').val(),
             day = $('#txt_days').val(),
             amount = $('#txt_amount').val(),
             startDate = $('#txt_startDate').val();
-        if (!amount || isNaN(amount)) {
-            return $(document).Toasts('create', {
-                title: 'Amount required',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Valid Plan Amount',
-                class: 'bg-danger',
-            });
-        }
-        if (!isNaN(amount)) {
-            if (amount <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Amount must be positive numbers',
-                    class: 'bg-danger',
-                });
+        var day = day.trim(),
+            amount = amount.trim(),
+            startDate = startDate.trim();
+        if (amount) {
+            if (!isNaN(amount)) {
+                if (amount <= 0) {
+                    return $(document).Toasts('create', {
+                        title: 'Error!',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Amount must be greater than 0',
+                        class: 'bg-danger',
+                    });
+                }
             }
         }
-        if (!day || isNaN(day)) {
-            return $(document).Toasts('create', {
-                title: 'Duration required',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Valid days',
-                class: 'bg-danger',
-            });
-        }
-        if (!isNaN(day)) {
-            if (day <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'days must be positive numbers',
-                    class: 'bg-danger',
-                });
+        if (day) {
+            if (!isNaN(day)) {
+                if (!isNaN(day)) {
+                    if (day <= 0) {
+                        return $(document).Toasts('create', {
+                            title: 'Error!',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'days must be greater than 0',
+                            class: 'bg-danger',
+                        });
+                    }
+                }
             }
         }
-        if (!startDate) {
-            return $(document).Toasts('create', {
-                title: 'Date required',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project start date',
-                class: 'bg-danger',
-            });
+        if (startDate) {
+            startDate;
         }
         $.post({
             type: 'POST',
@@ -476,6 +465,7 @@
             data: {
                 "client_id": clientId,
                 "project_id": project_id,
+                "plan": name,
                 "start_date": startDate,
                 "duration": day,
                 "price": amount,

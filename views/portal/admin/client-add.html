@@ -140,7 +140,7 @@
                         </div>
                         <div class="row form-group">
                             <div class="col-md-12">
-                                <button class="btn btn-outline-primary float-right mr-2 ml-2" id="btn_add">Add</button>
+                                <button class="btn btn-outline-primary float-right mr-2 ml-2" id="btn_add"><i class="fas fa-plus"></i> Add</button>
                                 <button class="btn btn-outline-danger float-right ml-2" id="btn_remove" style="display: none;"><i class="fas fa-trash-alt"></i> Remove</button>
                                 <button class="btn btn-outline-primary float-right" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
                             </div>
@@ -246,6 +246,9 @@
         var name = $('#txt_name').val(),
             email = $('#txt_email').val(),
             password = $('#txt_password').val();
+        var name = name.trim(),
+            email = email.trim(),
+            password = password.trim();
         if (!name) {
             return $(document).Toasts('create', {
                 title: 'Name required',
@@ -263,6 +266,19 @@
                 body: 'Please Enter Email address',
                 class: 'bg-danger',
             });
+        } else {
+            var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if (!regex.test(email)) {
+                return $(document).Toasts('create', {
+                    title: 'Email is not in Proper format',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter valid Email Address',
+                    class: 'bg-danger',
+                });
+            } else {
+                email = String(email).trim();
+            }
         }
         if (!password) {
             return $(document).Toasts('create', {
@@ -314,26 +330,24 @@
         var client_id = urlParams.get('client_id'),
             name = $('#txt_name').val(),
             email = $('#txt_email').val();
-        if (!name) {
-            return $(document).Toasts('create', {
-                title: 'Name Missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please enter Name',
-                class: 'bg-danger',
-            });
-        } else {
+        var name = name.trim(),
+            email = email.trim();
+        if (name) {
             name = String(name)
         }
-        if (!email) {
-            return $(document).Toasts('create', {
-                title: 'Email Missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please enter Email',
-                class: 'bg-danger',
-            });
-        } else {
+        if (email) {
+            var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if (!regex.test(email)) {
+                return $(document).Toasts('create', {
+                    title: 'Email is not in Proper format',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter valid Email Address',
+                    class: 'bg-danger',
+                });
+            } else {
+                email = String(email).trim();
+            }
             email = String(email)
         }
         $.post({
@@ -418,6 +432,8 @@
         var client_id = urlParams.get('client_id'),
             password = $('#txt_newPassword').val(),
             conPassword = $('#txt_cPass').val();
+        // var password = password.trim(),
+        //     conPassword = conPassword.trim();
         if (!password || !conPassword) {
             return $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
@@ -453,8 +469,8 @@
                     body: 'Your Password has been changed Successfully',
                     class: 'bg-success',
                 });
-                $('#txt_newPassword').val(null)
-                $('#txt_cPass').val(null)
+                $('#txt_newPassword').val('')
+                $('#txt_cPass').val('')
             },
             error: error => {
                 error = error.responseJSON

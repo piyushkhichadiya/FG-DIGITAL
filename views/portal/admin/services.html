@@ -122,7 +122,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right mb-3" onclick="window.location.href = '/admin/service/create'" id="btn_create">Create Service</button>
+                                    <button class="btn btn-outline-primary float-right mb-3" onclick="window.location.href = '/admin/service/create'" id="btn_create"><i class="fas fa-plus"></i> Create Service</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -215,7 +215,7 @@
             if (dataService) {
                 for (var i = 0; i < dataService.length; i++) {
                     var tempService = dataService[i];
-                    button = `<button class='btn btn-block btn-info' onclick="window.location.href ='/admin/service/view?service_id=${tempService.service_id}'"><i class="fas fa-eye"></i> View</button>`
+                    button = `<button class='btn btn-info' onclick="window.location.href ='/admin/service/view?service_id=${tempService.service_id}'"><i class="fas fa-eye"></i> View</button>`
                     tbl_Service.row.add([
                         `${i+1}`, tempService.service_id, tempService.title, button
                     ]).draw();

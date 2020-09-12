@@ -55,8 +55,8 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
-                                <input type="checkbox" id="chk_remember" checked="checked">
-                                <label for="remember">Remember Me</label>
+                                <input type="checkbox" id="chk_remember">
+                                <label for="chk_remember">Remember Me</label>
                             </div>
                         </div>
                         <!-- /.col -->
@@ -105,9 +105,19 @@
                 class: 'bg-danger',
             });
         } else {
-            email = String(email).trim()
+            var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if (!regex.test(email)) {
+                return $(document).Toasts('create', {
+                    title: 'Email is not in Proper format',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter valid Email Address',
+                    class: 'bg-danger',
+                });
+            } else {
+                email = String(email).trim();
+            }
         }
-
         if (!password) {
             return $(document).Toasts('create', {
                 title: 'Password not Found!',
@@ -138,9 +148,9 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                if (error.status == 401) {
-                    logout(true)
-                }
+                // if (error.status == 401) {
+                //     logout(true)
+                // }
             },
             beforeSend: () => {
                 $('#btn_submit').attr('disabled', true)

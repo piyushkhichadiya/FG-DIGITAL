@@ -169,7 +169,7 @@
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <button class="btn btn-outline-primary float-right" id="btn_addEmp">Add Member</button>
+                            <button class="btn btn-outline-primary float-right" id="btn_addEmp"><i class="fas fa-plus"></i> Add Member</button>
                         </div>
                         <div id="div_other_details" style="display: none;">
                             <hr>
@@ -359,13 +359,16 @@
     $('#btn_addEmp').click(() => {
         var name = $('#txt_name').val(),
             email = $('#txt_email').val(),
-            password = $('#txt_password').val()
+            password = $('#txt_password').val();
+        var name = name.trim(),
+            email = email.trim(),
+            password = password.trim();
         if (!name) {
             return $(document).Toasts('create', {
                 title: 'Name is required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please fill out allfields',
+                body: 'Please fill out all fields',
                 class: 'bg-danger',
             });
         }
@@ -378,7 +381,18 @@
                 class: 'bg-danger',
             });
         } else {
-            email = String(email).trim()
+            var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if (!regex.test(email)) {
+                return $(document).Toasts('create', {
+                    title: 'Email is not in Proper format',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter valid Email Address',
+                    class: 'bg-danger',
+                });
+            } else {
+                email = String(email).trim();
+            }
         }
         if (!password) {
             return $(document).Toasts('create', {
@@ -476,8 +490,12 @@
             name = $('#txt_name').val(),
             position = $('#list_position').val(),
             skills = $('#txt_skill').val(),
-            contact = $('#txt_contact').val()
-        formData = new FormData();
+            contact = $('#txt_contact').val();
+        var name = name.trim(),
+            email = email.trim(),
+            skills = skills.trim(),
+            contact = contact.trim();
+        var formData = new FormData();
 
         if (name) {
             formData.append('name', name);
@@ -489,13 +507,42 @@
             formData.append('skills', skills);
         }
         if (email) {
+            var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if (!regex.test(email)) {
+                return $(document).Toasts('create', {
+                    title: 'Email is not in Proper format',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter valid Email Address',
+                    class: 'bg-danger',
+                });
+            } else {
+                email = String(email).trim();
+            }
             formData.append('email', email);
         }
         if (contact) {
+            if (isNaN(contact)) {
+                return $(document).Toasts('create', {
+                    title: 'Please Enter valid Phone number',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Phone number must be Numeric',
+                    class: 'bg-danger',
+                });
+            }
+            if (contact.length > 10 || contact.length < 10) {
+                return $(document).Toasts('create', {
+                    title: 'Please Enter valid Phone number',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Phone number Must be of 10 Digits',
+                    class: 'bg-danger',
+                });
+            }
             formData.append('mobile', contact);
         }
         if ($('#file_profile')[0].files[0]) {
-
             formData.append('profile_image', $('#file_profile')[0].files[0]);
         }
         $.post({
@@ -576,9 +623,11 @@
     });
 
     $('#btn_updatePassword').click(() => {
-        var emp_id = urlParams.get('emp_id')
-        password = $('#txt_newPassword').val(),
-            conPassword = $('#txt_cPassword').val()
+        var emp_id = urlParams.get('emp_id'),
+            password = $('#txt_newPassword').val(),
+            conPassword = $('#txt_cPassword').val();
+        // var password = password.trim(),
+        //     conPassword = conPassword.trim();
         if (!password || !conPassword) {
             return $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
@@ -614,8 +663,8 @@
                     body: 'Your Password has been changed Successfully',
                     class: 'bg-success',
                 });
-                $('#txt_password').val(null)
-                $('#txt_cpassword').val(null)
+                $('#txt_newPassword').val(null)
+                $('#txt_cPassword').val(null)
             },
             error: error => {
                 error = error.responseJSON
@@ -641,6 +690,7 @@
         var emp_id = urlParams.get('emp_id'),
             accountName = $('#list_social').val(),
             reference = $('#txt_link').val();
+        var reference = reference.trim();
         if (!accountName) {
             return $(document).Toasts('create', {
                 title: 'Error!',
@@ -703,6 +753,7 @@
             reference = $(`#txt_link_${index}`).val(),
             emp_id = urlParams.get('emp_id'),
             formData = new FormData();
+        var reference = reference.trim();
         formData.append('employee_id', emp_id)
         formData.append('account_id', account_id)
         if (accountName) {

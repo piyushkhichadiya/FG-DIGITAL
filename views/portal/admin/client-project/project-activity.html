@@ -563,7 +563,7 @@
                 } else {
                     docHtml += `<div class="col-md-2">
                                     <div>
-                                        <iframe src="" width="100%" height="150px"></iframe>
+                                        <embed  src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
                                         <div class="middle">
                                             <i class="fas fa-search"></i>
                                         </div>
@@ -987,7 +987,9 @@
                         window.location.reload();
                     },
                     error: error => {
+                        console.log(error)
                         error = error.responseJSON
+
                         $(document).Toasts('create', {
                             title: 'Error #' + error.code,
                             autohide: true,

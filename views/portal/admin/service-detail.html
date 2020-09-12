@@ -248,7 +248,8 @@
     }
 
     $('#btn_create').click(() => {
-        var name = $('#txt_service').val()
+        var name = $('#txt_service').val();
+        var name = name.trim();
         if (!name) {
             return $(document).Toasts('create', {
                 title: 'Service Name required',
@@ -297,6 +298,7 @@
     $('#btn_update').click(() => {
         var service_id = urlParams.get('service_id'),
             name = $('#txt_service').val();
+        var name = name.trim();
         if (!name) {
             return $(document).Toasts('create', {
                 title: 'Service Name required',
@@ -386,7 +388,8 @@
 
     $('#btn_add').click(() => {
         var service_id = urlParams.get('service_id'),
-            criteria = $('#txt_Criteria').val()
+            criteria = $('#txt_Criteria').val();
+        var criteria = criteria.trim();
         if (!criteria) {
             return $(document).Toasts('create', {
                 title: 'Criteria required',
@@ -435,7 +438,8 @@
 
     function updateCriteria(index, criteria_id) {
         var service_id = urlParams.get('service_id'),
-            criteria = $(`#txt_Criteria_${index}`).val()
+            criteria = $(`#txt_Criteria_${index}`).val();
+        var criteria = criteria.trim();
         if (!criteria) {
             return $(document).Toasts('create', {
                 title: 'Criteria required',

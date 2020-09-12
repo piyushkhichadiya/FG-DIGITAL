@@ -296,8 +296,8 @@
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+    var permissionData;
     var dbEmp;
-
     $.getJSON('/admin/v1/employee/get', (result) => {
         dbEmp = result.data;
     }).fail(error => {
@@ -310,6 +310,36 @@
             class: 'bg-danger',
         });
     });
+
+    $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=team`, (data) => {
+        var data = data.data;
+        permissionData = data.team;
+    }).fail(error => {
+        error = error.responseJSON
+        $(document).Toasts('create', {
+            title: 'Error #' + error.code,
+            autohide: true,
+            delay: 5000,
+            body: error.message,
+            class: 'bg-danger',
+        });
+    });
+
+    function getPermissionData() {
+        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=team`, (data) => {
+            var data = data.data;
+            permissionData = data.team;
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+    }
 
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
@@ -331,13 +361,12 @@
                     var tempTeam = teamData[i];
                     getEmployeeName(tempTeam.employee_id);
                     var button = `<div class="btn-group">
-                                        <button type="button" class="btn btn-info" data-toggle="dropdown">Open</button>
+                                        <button type="button" class="btn btn-info" id="btn_update_${i}" onclick=update(${i},'${tempTeam.employee_id}')><i class='fas fa-pencil-alt' ></i> Update Permission</button>
                                         <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
                                             <span class="sr-only">Toggle Dropdown</span>
                                             <div class="dropdown-menu" role="menu">
                                                 <a href='javascript:void(0);' class='dropdown-item' id="btn_activate_${i}" onclick=activate(${i},'${tempTeam.employee_id}')><i class='fas fa-hourglass-start'></i> Activate</a>
                                                 <a href='javascript:void(0);' class='dropdown-item' id="btn_deactivate_${i}" onclick=deactivate(${i},'${tempTeam.employee_id}')><i class='fas fa-ban'></i> Deactivate</a>
-                                                <a href='javascript:void(0);' class='dropdown-item' id="btn_update_${i}" onclick=update(${i},'${tempTeam.employee_id}')><i class='fas fa-pencil-alt' ></i> Update Permission</a>
                                                 <a href='javascript:void(0);' class='dropdown-item' id="btn_remove_${i}" onclick=remove(${i},'${tempTeam.employee_id}')><i class='fas fa-trash-alt' ></i> Remove</a>
                                             </div>
                                         </button> 
@@ -384,36 +413,24 @@
         }
     }
 
-    var empData
     $('#btn_add').click(() => {
+        $('#div_empDetails').hide();
+        $('#img_profile').attr('src', `images/logo-small.png`)
         $('#modal_Team').modal('show');
-        $.get('/admin/v1/employee/get', (data) => {
-            empData = data.data
-            var option = `<option value=''>Select Team member</option>`
-            for (var i = 0; i < empData.length; i++) {
-                var tempEmp = empData[i]
-                option += `<option value='${tempEmp.employee_id}'>${tempEmp.name}</option>`;
-                $('#list_emp').html(option);
-            }
-
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
+        var option = `<option value=''>Select Team member</option>`
+        for (var i = 0; i < dbEmp.length; i++) {
+            var tempEmp = dbEmp[i]
+            option += `<option value='${tempEmp.employee_id}'>${tempEmp.name}</option>`;
+            $('#list_emp').html(option);
+        }
     });
 
     $('#list_emp').change(() => {
         var empId = $('#list_emp').val();
         $('#div_empDetails').show();
         if (empId) {
-            for (var i = 0; i < empData.length; i++) {
-                var tempEmp = empData[i];
+            for (var i = 0; i < dbEmp.length; i++) {
+                var tempEmp = dbEmp[i];
                 if (empId == tempEmp.employee_id) {
                     var emp_id = tempEmp.employee_id,
                         empName = tempEmp.name,
@@ -457,7 +474,8 @@
                 });
                 $('#modal_Team').modal('hide');
                 tblTeam.clear().draw();
-                getEmployee(urlParams.get('plan_id'))
+                getEmployee(urlParams.get('plan_id'));
+                getPermissionData();
             },
             error: error => {
                 error = error.responseJSON
@@ -491,7 +509,8 @@
                     class: 'bg-success',
                 });
                 tblTeam.clear().draw();
-                getEmployee(urlParams.get('plan_id'))
+                getEmployee(urlParams.get('plan_id'));
+                getPermissionData();
             },
             error: function(error) {
                 error = error.responseJSON
@@ -527,7 +546,8 @@
                     class: 'bg-success',
                 });
                 tblTeam.clear().draw();
-                getEmployee(urlParams.get('plan_id'))
+                getEmployee(urlParams.get('plan_id'));
+                getPermissionData();
             },
             error: function(error) {
                 error = error.responseJSON
@@ -555,28 +575,15 @@
         $('#div_btn').empty()
         var button = `<button type="button" class="btn btn-primary" id="btn_update_${index}" onclick=updatePermission(${index},'${employee_id}')><i class="fas fa-check"></i> Save Changes</button>`
         $('#div_btn').append(button)
-        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=team`, (data) => {
-            var data = data.data;
-            var teamData = data.team;
-            if (teamData) {
-                for (var i = 0; i < teamData.length; i++) {
-                    var tempTeam = teamData[i];
-                    if (tempTeam.employee_id == employee_id) {
-                        $('#chk_review').prop('checked', tempTeam.permission.review);
-                        $('#chk_activity').prop('checked', tempTeam.permission.activity);
-                    }
+        if (permissionData) {
+            for (var i = 0; i < permissionData.length; i++) {
+                var tempTeam = permissionData[i];
+                if (tempTeam.employee_id == employee_id) {
+                    $('#chk_review').prop('checked', tempTeam.permission.review);
+                    $('#chk_activity').prop('checked', tempTeam.permission.activity);
                 }
             }
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
+        }
     };
 
     function updatePermission(index, employee_id) {
@@ -598,6 +605,7 @@
                     class: 'bg-success',
                 });
                 $('#modal_update').modal('hide');
+                getPermissionData();
             },
             error: error => {
                 error = error.responseJSON
@@ -638,7 +646,8 @@
                             class: 'bg-success',
                         });
                         tblTeam.clear().draw();
-                        getEmployee(urlParams.get('plan_id'))
+                        getEmployee(urlParams.get('plan_id'));
+                        getPermissionData();
                     },
                     error: function(error) {
                         error = error.responseJSON

@@ -122,7 +122,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right mt-4 mb-3" onclick="window.location.href = '/admin/client/add'" id="btn_add">Add Client</button>
+                                    <button class="btn btn-outline-primary float-right mt-4 mb-3" onclick="window.location.href = '/admin/client/add'" id="btn_add"><i class="fas fa-plus"></i> Add Client</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -215,7 +215,7 @@
             if (dataClient) {
                 for (var i = 0; i < dataClient.length; i++) {
                     var tempClient = dataClient[i];
-                    button = `<div class="btn-group"><button class='btn btn-info m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'"><i class='fas fa-eye'></i> View</button><button class='btn btn-warning m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'"><i class='fas fa-passport'></i> Projects</button></div>`
+                    button = `<div class="btn-group"><button class='btn btn-info m-1' onclick="window.location.href ='/admin/client/add?client_id=${tempClient.client_id}'"><i class='fas fa-eye'></i> View</button><button class='btn btn-default bg-olive m-1' onclick="window.location.href ='/admin/client/project?client_id=${tempClient.client_id}'"><i class='fas fa-passport'></i> Projects</button></div>`
                     tblClient.row.add([
                         `${i+1}`, tempClient.name, tempClient.email, button
                     ]).draw();

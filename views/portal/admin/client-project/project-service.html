@@ -335,49 +335,40 @@
         }
     }
 
-    var serviceData
-
     $('#btn_add').click(() => {
-        $('#modal_Service').modal('show')
-        $.get('/admin/v1/service/get', (data) => {
-            serviceData = data.data
-            var option = `<option value=''>Select Service</option>`
-            for (var i = 0; i < serviceData.length; i++) {
-                var tempService = serviceData[i]
-                option += `<option value='${tempService.service_id}'>${tempService.title}</option>`;
-                $('#list_service').html(option);
-            }
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
+        $('#modal_Service').modal('show');
+        $('#div_criteria').hide();
+        var option = `<option value=''>Select Service</option>`
+        for (var i = 0; i < dbService.length; i++) {
+            var tempService = dbService[i]
+            option += `<option value='${tempService.service_id}'>${tempService.title}</option>`;
+            $('#list_service').html(option);
+        }
     });
 
     $('#list_service').change(() => {
-        $('#div_criteria').show()
         var ServiceId = $('#list_service').val();
         if (ServiceId) {
-            for (var i = 0; i < serviceData.length; i++) {
-                var tempData = serviceData[i]
+            for (var i = 0; i < dbService.length; i++) {
+                var tempData = dbService[i]
                 if (ServiceId == tempData.service_id) {
                     var criteria = tempData.criteria,
                         list = '';
-                    for (var j = 0; j < criteria.length; j++) {
-                        var tempCriteria = criteria[j];
-                        list += `<li>${tempCriteria.criteria}</li>`
+                    if (criteria) {
+                        $('#div_criteria').show();
+                        for (var j = 0; j < criteria.length; j++) {
+                            var tempCriteria = criteria[j];
+                            list += `<li>${tempCriteria.criteria}</li>`
+                        }
+                        $('#list_data').html(list);
+                    } else {
+                        $('#div_criteria').hide();
                     }
-                    $('#list_data').html(list)
+
                 }
             }
         } else {
 
-            $('#div_criteria').hide()
         }
 
     });

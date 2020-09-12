@@ -164,11 +164,17 @@
                                     <input type="text" class="form-control" id="txt_title" placeholder="Title">
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="col-md-12 col-form-label">Description</label>
                                 <div class="col-md-12">
                                     <textarea class="form-control" id="txt_description" rows="2" placeholder="Description ..."></textarea>
                                 </div>
+                            </div>
+                            <div class="col-md-3" id="div_closeMessage" style="display: none;">
+                                <p class="">This Review Is Closed</p>
+                            </div>
+                            <div class="col-md-1" id="div_btnReopen" style="display:none;">
+                                <button class="btn btn-success">Reopen</button>
                             </div>
                         </div>
                         <div class="row">
@@ -184,6 +190,7 @@
                             <div id="div_posts"></div>
                             <textarea class="form-control mb-2" id="txt_post" rows="2" placeholder="Enter Description....." style="display: flex;"></textarea>
                             <div class="row" id="div_doc">
+                                <div></div>
                                 <input type="file" id="file_post" accept=".png, .jpg, .jpeg," style="display: none;" multiple>
                                 <div class="col-md-2" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                     <div class="plus">
@@ -193,7 +200,7 @@
                             </div>
                             <div class="row form-group">
                                 <div class="col-md-12">
-                                    <button class="btn btn-outline-primary float-right m-1" id="btn_addPost"><i class="fas fa-plus"></i> Add Post</button>
+                                    <button class="btn btn-outline-primary float-right mr-2" id="btn_addPost"><i class="fas fa-plus"></i> Add Post</button>
                                 </div>
                             </div>
                         </div>
@@ -271,8 +278,19 @@
                 for (var i = 0; i < reviewData.length; i++) {
                     var tempReview = reviewData[i];
                     if (tempReview.review_id == urlParams.get('review_id')) {
+
                         $('#txt_title').val(tempReview.title);
                         $('#txt_description').val(tempReview.description);
+                        if (tempReview.closed == true) {
+                            $('#btn_remove').remove();
+                            $('#btn_update').remove();
+                            $('#div_doc').remove();
+                            $('#btn_addPost').remove();
+                            $('#div_closeMessage').show();
+                            $('#div_btnReopen').show();
+                            $('#txt_title').attr('disabled', true)
+                            $('#txt_description').attr('disabled', true)
+                        }
                         getPost(urlParams.get('review_id'))
                     }
                 }
@@ -289,7 +307,19 @@
         });
     }
 
-    function getPost(review_id) {
+    function removeUploadedFiles() {
+        $('#div_posts').val('');
+        $("#div_doc").empty();
+        var DocHtml = `<input type="file" id="file_post" accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                    <div class="col-md-2" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                        <div class="plus">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </div>
+                    </div>`;
+        $("#div_doc").append(DocHtml);
+    }
+
+    function getPost(review_id, closed) {
         $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=review`, (data) => {
             var data = data.data;
             var reviewData = data.review;
@@ -297,11 +327,12 @@
                 for (var k = 0; k < reviewData.length; k++) {
                     var tempReview = reviewData[k];
                     if (tempReview.review_id == review_id) {
-                        var postData = tempReview.posts
-                        if (postData) {
-                            for (var i = 0; i < postData.length; i++) {
-                                var tempPost = postData[i];
-                                var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+                        if (tempReview.closed == true) {
+                            var postData = tempReview.posts
+                            if (postData) {
+                                for (var i = 0; i < postData.length; i++) {
+                                    var tempPost = postData[i];
+                                    var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
                                                 <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
                                                 <div class="row" id="div_doc_${i}">
@@ -322,7 +353,40 @@
                                                 </div>
                                                 </div>
                                                 <hr>`;
-                                $('#div_posts').append(postHtml);
+                                    $('#div_posts').append(postHtml);
+                                    $(`#btn_removePost_${i}`).remove();
+                                    $(`#btn_edit_${tempPost.post_key}`).remove();
+                                    $(`#btn_update_${tempPost.post_key}`).remove();
+                                }
+                            }
+                        } else {
+                            var postData = tempReview.posts
+                            if (postData) {
+                                for (var i = 0; i < postData.length; i++) {
+                                    var tempPost = postData[i];
+                                    var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+                                                <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
+                                                <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
+                                                <div class="row" id="div_doc_${i}">
+                                                    ${getDocument(i , tempPost.documents)}
+                                                    <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                                                    <div class="col-md-2" id="div_post_${tempPost.post_key}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                        <div class="plus">
+                                                            <ion-icon name="add-circle-outline"></ion-icon>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-md-12">
+                                                        <button class="btn btn-outline-danger float-right m-1" id="btn_removePost_${i}" onclick=removePost(${i},'${tempPost.post_key}')><i class="fas fa-trash-alt"></i> Remove Post</button>
+                                                        <button class="btn btn-outline-primary float-right m-1" id="btn_edit_${tempPost.post_key}" onclick=editPost(${i},'${tempPost.post_key}')><i class="fas fa-pencil-alt"></i> Edit Post</button>
+                                                        <button class="btn btn-outline-info float-right m-1" id="btn_update_${tempPost.post_key}" onclick=updatePost(${i},'${tempPost.post_key}') style="display:none;"><i class="fas fa-check"></i> Save Changes</button>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <hr>`;
+                                    $('#div_posts').append(postHtml);
+                                }
                             }
                         }
                     }
@@ -373,23 +437,16 @@
     };
 
     $('#btn_add').click(() => {
-        title = $('#txt_title').val();
-        description = $('#txt_description').val();
+        var title = $('#txt_title').val(),
+            description = $('#txt_description').val();
+        var title = title.trim(),
+            description = description.trim();
         if (!title) {
             return $(document).Toasts('create', {
                 title: 'Review Title Required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Review Title',
-                class: 'bg-danger',
-            });
-        }
-        if (!description) {
-            return $(document).Toasts('create', {
-                title: 'Review description Required',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Review description',
                 class: 'bg-danger',
             });
         }
@@ -473,10 +530,10 @@
     $('#btn_remove').click(() => {
         Swal.fire({
             title: 'Are you sure?',
-            text: "You want to Close this Review",
+            text: "you can re-open review in future",
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Remove'
+            confirmButtonText: 'Close'
         }).then((result) => {
             if (result.value) {
                 $.get({
@@ -528,10 +585,10 @@
             var type = files[i].type.split('/').pop().toLowerCase();
             if (type != "jpeg" && type != "jpg" && type != "png") {
                 return $(document).Toasts('create', {
-                    title: 'File Formate not Correct ',
+                    title: 'File Format not Correct ',
                     autohide: true,
                     delay: 5000,
-                    body: 'Select valid File Formate',
+                    body: 'Select valid File Format',
                     class: 'bg-danger',
                 });
             }
@@ -552,6 +609,9 @@
                                 <i class="fas fa-search"></i>
                             </div>
                         </div>
+                            <div>
+                                <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUploadedFiles()><i class="fas fa-trash-alt"></i> Remove all</button>
+                            </div>
                     </div>`;
             $("#div_doc").prepend(image);
         }
@@ -564,10 +624,10 @@
             var type = files[i].type.split('/').pop().toLowerCase();
             if (type != "jpeg" && type != "jpg" && type != "png") {
                 return $(document).Toasts('create', {
-                    title: 'File Formate not Correct ',
+                    title: 'File Format not Correct ',
                     autohide: true,
                     delay: 5000,
-                    body: 'Select valid File Formate',
+                    body: 'Select valid File Format',
                     class: 'bg-danger',
                 });
             }
@@ -645,9 +705,17 @@
 
     $('#btn_addPost').click(() => {
         var description = $('#txt_post').val()
-
+        var description = description.trim();
         formData = new FormData();
-
+        if (!description || !$('#file_post')[0].files) {
+            return $(document).Toasts('create', {
+                title: 'No data for post',
+                autohide: true,
+                delay: 5000,
+                body: 'Please add Description or Document',
+                class: 'bg-danger',
+            });
+        }
         if (description) {
             formData.append('description', description);
         }

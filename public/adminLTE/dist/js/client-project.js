@@ -20,7 +20,7 @@ if (client_id) {
 if (plan_id) {
     $.get(`/admin/v1/project/fetch/${plan_id}?scope=info`, (data) => {
         var name = data.data.info.project_name
-        $('#lbl_navProjectId').html(`${name} (${plan_id})`);
+        $('#lbl_navProjectId').html(`${name || ''} (${plan_id})`);
         $('#lbl_navProjectId').attr('href', `/admin/client/project-dashboard?client_id=${client_id}&plan_id=${plan_id}`);
     }).fail(error => {
         error = error.responseJSON

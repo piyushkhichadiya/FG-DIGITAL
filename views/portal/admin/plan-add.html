@@ -189,9 +189,12 @@
 </body>
 <script>
     $('#btn_add').click(() => {
-        plan = $('#txt_pname').val()
-        amount = $('#txt_amount').val()
-        days = $('#txt_days').val()
+        var plan = $('#txt_pname').val(),
+            amount = $('#txt_amount').val(),
+            days = $('#txt_days').val();
+        var plan = plan.trim(),
+            amount = amount.trim(),
+            days = days.trim();
         if (!plan || !amount || !days) {
             return $(document).Toasts('create', {
                 title: 'All data required',
@@ -289,10 +292,13 @@
     });
 
     $('#btn_update').click(() => {
-        var p_id = urlParams.get('plan_id')
-        plan = $('#txt_pname').val()
-        amount = $('#txt_amount').val()
-        days = $('#txt_days').val()
+        var p_id = urlParams.get('plan_id'),
+            plan = $('#txt_pname').val(),
+            amount = $('#txt_amount').val(),
+            days = $('#txt_days').val();
+        var plan = plan.trim(),
+            amount = amount.trim(),
+            days = days.trim();
         if (amount || days) {
             if (isNaN(amount) || isNaN(days)) {
                 return $(document).Toasts('create', {
@@ -303,7 +309,7 @@
                     class: 'bg-danger',
                 });
             }
-            if (amount < 0 || days < 0) {
+            if (amount <= 0 || days <= 0) {
                 return $(document).Toasts('create', {
                     title: 'Error!',
                     autohide: true,
@@ -312,41 +318,41 @@
                     class: 'bg-danger',
                 });
             }
-            $.post({
-                url: '/admin/v1/plan/update',
-                data: {
-                    "plan_id": p_id,
-                    "plan_name": plan,
-                    "price": amount,
-                    "days": days,
-                },
-                success: result => {
-                    $(document).Toasts('create', {
-                        title: 'Success',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Plan Details update Successfully',
-                        class: 'bg-success',
-                    });
-                },
-                error: error => {
-                    error = error.responseJSON
-                    $(document).Toasts('create', {
-                        title: 'Error #' + error.code,
-                        autohide: true,
-                        delay: 5000,
-                        body: error.message,
-                        class: 'bg-danger',
-                    });
-                },
-                beforeSend: () => {
-                    $('#btn_update').attr('disabled', true)
-                },
-                complete: () => {
-                    $('#btn_update').removeAttr('disabled')
-                }
-            });
         }
+        $.post({
+            url: '/admin/v1/plan/update',
+            data: {
+                "plan_id": p_id,
+                "plan_name": plan,
+                "price": amount,
+                "days": days,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Plan Details update Successfully',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
+            }
+        });
     });
 </script>
 
