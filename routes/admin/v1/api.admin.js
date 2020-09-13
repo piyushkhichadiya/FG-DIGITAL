@@ -1,39 +1,37 @@
 var express = require('express'),
     adminAPI = express(),
-    { response } = require('../../functions/functions'),
-    middleware = require('./v1/middleware/admin.middleware');
+    { response } = require('../../../functions/functions'),
+    middleware = require('./middleware/admin.middleware');
 
 //----------------------------- CONFIGURATION -------------------------------
 
 //---------------------------- GLOBAL VARIABLE ------------------------------
 
 //------------------------------ MIDDLEWARE ---------------------------------
-adminAPI.use(/^(?!\/user).*/, async(req, res, next) => {
-    await middleware.adminAuthToken(req, res, next)
-});
+adminAPI.use(/^(?!\/user).*/, middleware.adminAuthToken);
 
 //------------------------------ ADMIN APIs ---------------------------------
 
 // 1. USER ACCOUNT
-adminAPI.use('/user', require('./v1/components/user'));
+adminAPI.use('/user', require('./components/user'));
 
 // 2. ADMIN PROFILE
-adminAPI.use('/profile', require('./v1/components/profile'));
+adminAPI.use('/profile', require('./components/profile'));
 
 // 3. PLAN
-adminAPI.use('/plan', require('./v1/components/plan'));
+adminAPI.use('/plan', require('./components/plan'));
 
 // 4. CLIENT
-adminAPI.use('/client', require('./v1/components/client'));
+adminAPI.use('/client', require('./components/client'));
 
 // 5. EMPLOYEE
-adminAPI.use('/employee', require('./v1/components/employee'));
+adminAPI.use('/employee', require('./components/employee'));
 
 // 6. CLIENT PROJECTS
-adminAPI.use('/project', require('./v1/components/client-project'));
+adminAPI.use('/project', require('./components/client-project'));
 
 // 7. SERVICES
-adminAPI.use('/service', require('./v1/components/services'));
+adminAPI.use('/service', require('./components/services'));
 
 // 400 UNKNOWN APIs
 adminAPI.use('*', (req, res) => {
