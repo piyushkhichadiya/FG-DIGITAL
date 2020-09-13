@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Project Review - FG Digital</title>
+    <title>Project Review view - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -170,10 +170,8 @@
                                     <textarea class="form-control" id="txt_description" rows="2" placeholder="Description ..."></textarea>
                                 </div>
                             </div>
-                            <div class="col-md-3" id="div_closeMessage" style="display: none;">
-                                <p class="">This Review Is Closed</p>
-                            </div>
-                            <div class="col-md-1" id="div_btnReopen" style="display:none;">
+                            <div class="col-md-4" align='center' id="div_closeMessage" style="display: none;">
+                                <p style='color:red;'>This Review Is Closed</p>
                                 <button class="btn btn-success">Reopen</button>
                             </div>
                         </div>
@@ -286,8 +284,8 @@
                             $('#btn_update').remove();
                             $('#div_doc').remove();
                             $('#btn_addPost').remove();
+                            $('#txt_post').remove();
                             $('#div_closeMessage').show();
-                            $('#div_btnReopen').show();
                             $('#txt_title').attr('disabled', true)
                             $('#txt_description').attr('disabled', true)
                         }
@@ -307,18 +305,6 @@
         });
     }
 
-    function removeUploadedFiles() {
-        $('#div_posts').val('');
-        $("#div_doc").empty();
-        var DocHtml = `<input type="file" id="file_post" accept=".png, .jpg, .jpeg," style="display: none;" multiple>
-                    <div class="col-md-2" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
-                        <div class="plus">
-                            <ion-icon name="add-circle-outline"></ion-icon>
-                        </div>
-                    </div>`;
-        $("#div_doc").append(DocHtml);
-    }
-
     function getPost(review_id, closed) {
         $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=review`, (data) => {
             var data = data.data;
@@ -336,7 +322,7 @@
                                                 <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
                                                 <div class="row" id="div_doc_${i}">
-                                                    ${getDocument(i , tempPost.documents)}
+                                                    ${getDocument(i , tempPost.documents,tempReview.closed)}
                                                     <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
                                                     <div class="col-md-2" id="div_post_${tempPost.post_key}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                         <div class="plus">
@@ -368,7 +354,7 @@
                                                 <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
                                                 <div class="row" id="div_doc_${i}">
-                                                    ${getDocument(i , tempPost.documents)}
+                                                    ${getDocument(i , tempPost.documents,tempReview.closed)}
                                                     <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
                                                     <div class="col-md-2" id="div_post_${tempPost.post_key}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                         <div class="plus">
@@ -413,12 +399,22 @@
         }
     }
 
-    function getDocument(index, document) {
+    function getDocument(index, document, closed) {
         if (document || '') {
             var docHtml = '';
             for (var j = 0; j < document.length; j++) {
                 tempDoc = document[j];
-                docHtml += `<div class="col-md-2">
+                if (closed == true) {
+                    docHtml += `<div class="col-md-2">
+                            <div class='img_container' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                <img src="/admin/v1/profile/file/${tempDoc.filename}" class="image" style="height: 150px; width: 100%">
+                                <div class="middle">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    docHtml += `<div class="col-md-2">
                             <div class='img_container' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
                                 <img src="/admin/v1/profile/file/${tempDoc.filename}" class="image" style="height: 150px; width: 100%">
                                 <div class="middle">
@@ -429,6 +425,7 @@
                                 <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}')><i class="fas fa-trash-alt"></i> Remove</button>
                             </div>
                         </div>`;
+                }
             }
             return (docHtml)
         } else {
@@ -616,6 +613,18 @@
             $("#div_doc").prepend(image);
         }
     });
+
+    function removeUploadedFiles() {
+        $('#div_posts').val('');
+        $("#div_doc").empty();
+        var DocHtml = `<input type="file" id="file_post" accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                    <div class="col-md-2" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                        <div class="plus">
+                            <ion-icon name="add-circle-outline"></ion-icon>
+                        </div>
+                    </div>`;
+        $("#div_doc").append(DocHtml);
+    }
 
     function uploadFile(index, post_id) {
         var files = [];

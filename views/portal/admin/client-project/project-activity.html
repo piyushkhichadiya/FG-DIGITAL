@@ -304,9 +304,24 @@
     });
 
     const urlParams = new URLSearchParams(window.location.search);
-    var dbService
+    var dbService;
+    var dbProjectService;
     $.getJSON('/admin/v1/service/get', (result) => {
         dbService = result.data
+    }).fail(error => {
+        error = error.responseJSON
+        $(document).Toasts('create', {
+            title: 'Error!',
+            autohide: true,
+            delay: 5000,
+            body: 'Service Not Found',
+            class: 'bg-danger',
+        });
+    });
+
+    $.getJSON(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=service`, (result) => {
+        var data = result.data;
+        dbProjectService = data.service;
     }).fail(error => {
         error = error.responseJSON
         $(document).Toasts('create', {
@@ -338,8 +353,10 @@
                         var date = new Date(date),
                             d = date.getDate(),
                             m = date.getMonth() + 1,
-                            y = date.getFullYear();
-                        var oldDate = y + '/' + m + '/' + d;
+                            y = date.getFullYear(),
+                            hr = date.getHours(),
+                            minutes = date.getMinutes();
+                        var oldDate = y + '/' + m + '/' + d + ' | ' + hr + ':' + minutes;
                         var serviceHtml = `<div>
                                                     <i class="fa fa-cogs bg-blue"></i>
                                                     <div class="timeline-item">
@@ -422,11 +439,24 @@
                     }
                     if (tempActivity.type == 'ACTIVITY') {
                         var date = tempActivity.date
-                        var date = new Date(date),
-                            d = date.getDate(),
-                            m = date.getMonth() + 1,
-                            y = date.getFullYear();
-                        var oldDate = y + '/' + m + '/' + d;
+                        if (date) {
+                            var date = new Date(date),
+                                d = date.getDate(),
+                                m = date.getMonth() + 1,
+                                y = date.getFullYear(),
+                                hr = date.getHours(),
+                                minutes = date.getMinutes();
+                            if (hr > 12) {
+                                time = 'PM';
+                                hr = hr - 12;
+                            } else {
+                                time = 'AM'
+                            }
+                            var oldDate = y + '/' + m + '/' + d + ' | ' + hr + ':' + minutes + ' ' + time;
+                        } else {
+                            oldDate = '';
+                        }
+
                         var activityHtml = `<div>
                                             <i class="fa fa-chart-line bg-green"></i>
                                                     <div class="timeline-item">
@@ -637,29 +667,17 @@
     $('#list_type').change(() => {
         if ($('#list_type').val() == 'Service') {
             $('#div_service').show();
-            $.get(`/admin/v1/project/fetch/${plan_id}?scope=service`, (data) => {
-                service = data.data
-                serviceData = service.service
-                if (serviceData) {
-                    var option = `<option value="">Select Service<option>`
-                    for (var i = 0; i < serviceData.length; i++) {
-                        tempService = serviceData[i];
-                        if (tempService.active == true) {
-                            option += `<option value="${tempService.service_id}">${getServiceName(tempService.service_id)}<option>`
-                        }
+            if (dbProjectService) {
+                var option = `<option value="">Select Service<option>`
+                for (var i = 0; i < dbProjectService.length; i++) {
+                    tempService = dbProjectService[i];
+                    console.log(tempService)
+                    if (tempService.active == true) {
+                        option += `<option value="${tempService.service_id}">${getServiceName(tempService.service_id)}<option>`
                     }
                 }
                 $('#list_service').html(option)
-            }).fail(error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Service Not Found',
-                    class: 'bg-danger',
-                });
-            });
+            }
         } else {
             $('#div_service').hide();
             $('#list_service').val('');
@@ -680,38 +698,34 @@
 
     $('#list_service').change(() => {
         $('#div_criteria').empty();
-        $.get(`/admin/v1/service/get?service_id=` + $('#list_service').val(), (data) => {
-            var data = data.data;
-            var criteriaData = data.criteria;
-            var criteria = '';
-            if (criteriaData) {
-                for (var i = 0; i < criteriaData.length; i++) {
-                    var tempCriteria = criteriaData[i];
-                    criteria += `<div class="row" id='div_json_${i}'>
+        if (dbService) {
+            for (var i = 0; i < dbService.length; i++) {
+                var tempService = dbService[i];
+                if ($('#list_service').val() == tempService.service_id) {
+                    var criteriaData = tempService.criteria
+                    if (criteriaData) {
+                        var criteria = '';
+                        for (var j = 0; j < criteriaData.length; j++) {
+                            var tempCriteria = criteriaData[j];
+                            criteria += `<div class="row" id='div_json_${j}'>
                                     <div class="col-md-12">
                                         <div class="form-group row">
-                                            <input id="txt_criteria_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
-                                            <label id="lbl_criteria_${i}" class="ml-3">${tempCriteria.criteria}</label>
+                                            <input id="txt_criteria_${j}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                            <label id="lbl_criteria_${j}" class="ml-3">${tempCriteria.criteria}</label>
                                             <div class="col-md-1">
-                                                <input type="text" id="txt_value_${i}" class="form-control" placeholder="Value">
+                                                <input type="text" id="txt_value_${j}" class="form-control" placeholder="Value">
                                             </div>
                                         </div>
                                     </div>
                                 </div>`
+                        }
+                    }
+                    $('#div_criteria').append(criteria)
                 }
             }
-            $('#div_criteria').append(criteria)
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error!',
-                autohide: true,
-                delay: 5000,
-                body: 'Criteria Not Found',
-                class: 'bg-danger',
-            });
-        });
+        }
     });
+
     $("#file_post").change(function() {
         var files = [];
         for (var i = 0; i < $(this).get(0).files.length; ++i) {
@@ -770,6 +784,10 @@
             description = $('#txt_description').val(),
             title = $('#txt_title').val(),
             date = $('#txt_date').val();
+        var description = description.trim(),
+            title = title.trim(),
+            date = date.trim();
+
         formData = new FormData();
         formData.append('project_id', plan_id)
         if (!type) {
@@ -812,8 +830,18 @@
         if (description) {
             formData.append('description', description)
         }
-        if (title) {
-            formData.append('title', title)
+        if (type == 'Activity') {
+            if (!title) {
+                return $(document).Toasts('create', {
+                    title: 'Title Required',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter Title for Activity',
+                    class: 'bg-danger',
+                });
+            } else {
+                formData.append('title', title)
+            }
         }
         var d = new Date();
         var strDate = d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
@@ -876,6 +904,9 @@
         var getDate = $('#txt_date_' + index).val(),
             description = $('#txt_description_' + index).val(),
             title = $('#txt_title_' + index).val();
+        var getDate = getDate.trim(),
+            description = description.trim(),
+            title = title.trim();
         var formData = new FormData();
         formData.append('project_id', plan_id)
         formData.append('activity_key', activity_id)
@@ -1057,5 +1088,7 @@
         });
     };
 </script>
+
+</html>
 
 </html>
