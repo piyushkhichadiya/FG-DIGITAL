@@ -500,6 +500,7 @@ clientProjectAPI.post('/activity/add', (req, res) => {
     if (!req.body.type) {
         return response(res, 400, 'required', 'Type is required', undefined, 'E-3.2.2')
     }
+
     var projectID = String(req.body.project_id).trim(),
         type = String(req.body.type).trim().toUpperCase(),
         getKeyDB = getKeys(projectID)
@@ -1182,8 +1183,6 @@ clientProjectAPI.post('/activity/remove', (req, res) => {
                 tempDocument.lastModifiedOn = String(new Date())
                 unlinkFile(tempDocument.filename);
 
-            } else if (i == activityDocumentsKeys.length - 1) {
-                break;
             }
         }
     }
@@ -1304,7 +1303,9 @@ clientProjectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.review_id) {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'E-3.8.2')
     }
-
+    if (!req.body.description && !req.files.file) {
+        return response(res, 400, 'required', 'Description or filename is required', undefined, 'E-3.8.13')
+    }
     var projectID = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectID),
         reviewID = String(req.body.review_id).trim(),
