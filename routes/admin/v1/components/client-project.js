@@ -850,7 +850,7 @@ projectAPI.post('/review/add-post', (req, res) => {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.13.2')
     }
     if (!req.body.description && !req.files.file) {
-        return response(res, 400, 'required', 'Description or filename is required', undefined, 'E-3.8.13')
+        return response(res, 400, 'required', 'Description or filename is required', undefined, 'A-6.13.12')
     }
 
     var projectID = String(req.body.project_id).trim(),
