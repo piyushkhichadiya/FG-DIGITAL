@@ -849,8 +849,8 @@ projectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.review_id) {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.13.2')
     }
-    if (!req.body.description || !req.files.file) {
-        return response(res, 400, 'required', 'Description or filename is required', undefined, 'A-6.13.12')
+    if (!req.body.description && !req.files.file) {
+        return response(res, 400, 'required', 'Description or filename is required', undefined, 'E-3.8.13')
     }
 
     var projectID = String(req.body.project_id).trim(),
@@ -2229,8 +2229,6 @@ projectAPI.post('/activity/remove', (req, res) => {
                 tempDocument.lastModifiedOn = String(new Date())
                 unlinkFile(tempDocument.filename);
 
-            } else if (i == activityDocumentsKeys.length - 1) {
-                break;
             }
         }
     }
