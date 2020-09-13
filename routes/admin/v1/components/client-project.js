@@ -311,6 +311,8 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
             for (var i = 0; i < dbActivityKey.length; i++) {
                 var tempActivity = dbActivity[dbActivityKey[i]];
 
+                if (tempActivity.deleted) { continue }
+
                 var tempObj = {
                     activity_key: dbActivityKey[i],
                     type: tempActivity.type,
@@ -341,7 +343,7 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                 criteria_id: tempCriteria.criteria_id,
                                 criteria: validate.criteria,
                                 value: tempCriteria.value,
-                                deleted: validate.deleted,
+                                deleted: validate.deleted || validate.service_deleted,
                                 createdOn: tempCriteria.createdOn || tempActivity.createdOn,
                                 createdBy: tempCriteria.createdBy || tempActivity.createdBy,
                                 lastModifiedBy: tempCriteria.lastModifiedBy,
@@ -349,6 +351,9 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                             }
 
                             postCriteriaObj.push(tempCriteriaObj);
+                        }
+                        if (!tempObj.service_deleted && validate.service_deleted) {
+                            tempObj.service_deleted = true
                         }
                     }
 
@@ -407,7 +412,7 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
 
             for (var i = 0; i < dbServicesKey.length; i++) {
 
-                if (!dbServices[dbServicesKey[i]].deleted && dbServices[dbServicesKey[i]].service_id == service_id) {
+                if (dbServices[dbServicesKey[i]].service_id == service_id) {
                     if (dbServices[dbServicesKey[i]].criteria) {
                         var dbServiceCriteria = dbServices[dbServicesKey[i]].criteria,
                             dbServiceCriteriaKeys = Object.keys(dbServiceCriteria)
@@ -417,7 +422,8 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                 return {
                                     criteria_id: dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria_id,
                                     criteria: dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria,
-                                    deleted: dbServiceCriteria[dbServiceCriteriaKeys[j]].deleted
+                                    deleted: dbServiceCriteria[dbServiceCriteriaKeys[j]].deleted,
+                                    service_deleted: dbServices[dbServicesKey[i]].deleted
                                 }
                             }
                         }
@@ -552,7 +558,7 @@ projectAPI.post('/team/update', async(req, res) => {
     }
 })
 
-// 6.5 TEAM REMOVE
+// 6.5 TEAM > REMOVE
 projectAPI.get('/team/remove', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
         return response(res, 400, 'required', 'Project ID and Employee ID is required', undefined, 'A-6.5.1')
@@ -585,7 +591,7 @@ projectAPI.get('/team/remove', (req, res) => {
     }
 })
 
-// 6.6 TEAM DEACTIVATE
+// 6.6 TEAM > DEACTIVATE
 projectAPI.get('/team/deactivate', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
         return response(res, 400, 'required', 'Project ID and Employee ID are required', undefined, 'A-6.6.1')
@@ -620,7 +626,7 @@ projectAPI.get('/team/deactivate', (req, res) => {
     }
 })
 
-// 6.7 TEAM ACTIVATE
+// 6.7 TEAM > ACTIVATE
 projectAPI.get('/team/activate', (req, res) => {
     if (!req.query.project_id || !req.query.employee_id) {
         return response(res, 400, 'required', 'Project ID and employee ID are required', undefined, 'A-6.7.1')
@@ -656,7 +662,7 @@ projectAPI.get('/team/activate', (req, res) => {
 
 })
 
-// 6.8 SOCIAL ACCOUNT ADD
+// 6.8 SOCIAL ACCOUNT > ADD
 projectAPI.post('/social-account/add', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.8.1')
@@ -688,7 +694,7 @@ projectAPI.post('/social-account/add', (req, res) => {
     })
 })
 
-// 6.9 SOCIAL ACCOUNT UPDATE
+// 6.9 SOCIAL ACCOUNT > UPDATE
 projectAPI.post('/social-account/update', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.9.1')
@@ -736,7 +742,7 @@ projectAPI.post('/social-account/update', (req, res) => {
     }
 })
 
-// 6.10 SOCIAL ACCOUNT REMOVE 
+// 6.10 SOCIAL ACCOUNT > REMOVE 
 projectAPI.get('/social-account/remove', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project Id is required', undefined, 'A-6.10.1')
@@ -835,7 +841,7 @@ projectAPI.post('/review/create', (req, res) => {
 
 })
 
-// 6.13 REVIEW ADD POST
+// 6.13 REVIEW > ADD POST
 projectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.13.1')
@@ -946,7 +952,7 @@ projectAPI.post('/review/add-post', (req, res) => {
 
 })
 
-// 6.14 REMOVE POST
+// 6.14 REVIEW > REMOVE POST
 projectAPI.get('/review/remove-post', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.14.1')
@@ -1014,7 +1020,7 @@ projectAPI.get('/review/remove-post', (req, res) => {
     }
 })
 
-// 6.15 REVIEW CLOSE
+// 6.15 REVIEW > CLOSE
 projectAPI.get('/review/close', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.15.1')
@@ -1058,7 +1064,7 @@ projectAPI.get('/review/close', (req, res) => {
     }
 })
 
-// 6.16 REMOVE FILE
+// 6.16 REVIEW > REMOVE FILE
 projectAPI.get('/review/remove-file', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.16.1')
@@ -1133,7 +1139,7 @@ projectAPI.get('/review/remove-file', (req, res) => {
     }
 })
 
-// 6.17 Add Service
+// 6.17 SERVICE > ADD
 projectAPI.get('/service/add', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.17.1')
@@ -1164,7 +1170,7 @@ projectAPI.get('/service/add', (req, res) => {
                     for (var j = 0; j < serviceDBClientKey.length; j++) {
                         var tempServiceClient = serviceDBClient[serviceDBClientKey[j]]
 
-                        if (tempServiceClient.service_id == serviceID) {
+                        if (tempServiceClient.service_id == serviceID && !tempServiceClient.deleted) {
                             return response(res, 409, 'duplicate', 'Service already added', undefined, 'A-6.17.4')
                         } else if (j == serviceDBClientKey.length - 1) {
                             var pushData = {
@@ -1199,7 +1205,7 @@ projectAPI.get('/service/add', (req, res) => {
     }
 })
 
-// 6.18 Deactivate Service
+// 6.18 SERVICE > DEACTIVATE
 projectAPI.get('/service/deactivate', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.18.1')
@@ -1237,7 +1243,7 @@ projectAPI.get('/service/deactivate', (req, res) => {
 
 })
 
-// 6.19 Activate Service
+// 6.19 SERVICE > ACTIVATE
 projectAPI.get('/service/activate', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.19.1')
@@ -1279,7 +1285,7 @@ projectAPI.get('/service/activate', (req, res) => {
     }
 })
 
-// 6.20 Remove Service
+// 6.20 SERVICE > REMOVE
 projectAPI.get('/service/remove', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.20.1')
@@ -1321,7 +1327,7 @@ projectAPI.get('/service/remove', (req, res) => {
     }
 })
 
-// 6.21 Review Update Post
+// 6.21 REVIEW > UPDATE
 projectAPI.post('/review/update', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.21.1')
@@ -1377,7 +1383,7 @@ projectAPI.post('/review/update', (req, res) => {
 
 })
 
-// 6.22 Review Update Post
+// 6.22 REVIEW > UPDATE POST
 projectAPI.post('/review/update-post', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.22.1')
@@ -1503,7 +1509,7 @@ projectAPI.post('/review/update-post', (req, res) => {
     }
 })
 
-// 6.23 Review Activate
+// 6.23 REVIEW > CLOSE
 projectAPI.get('/review/open', (req, res) => {
     if (!req.query.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.23.1')
@@ -1546,7 +1552,7 @@ projectAPI.get('/review/open', (req, res) => {
 
 })
 
-// 6.24 Activity Add
+// 6.24 ACTIVITY > ADD
 projectAPI.post('/activity/add', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.24.1')
@@ -1735,7 +1741,7 @@ projectAPI.post('/activity/add', (req, res) => {
         if (req.body.date) {
             var date = new Date(req.body.date)
             if (date == "Invalid Date" || date > new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date. Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.24.16')
+                return response(res, 400, 'invalid', 'Date Time must not be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is required for 12-Hour Timestamp', undefined, 'A-6.24.16')
             }
             pushData.date = String(date)
         }
@@ -1781,8 +1787,8 @@ projectAPI.post('/activity/add', (req, res) => {
         }
 
         if (req.body.date) {
-            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) < new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date.Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.24.20')
+            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) > new Date()) {
+                return response(res, 400, 'invalid', 'Date Time must not be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is required for 12-Hour Timestamp', undefined, 'A-6.24.20')
             }
             pushData.date = String(new Date(req.body.date))
         }
@@ -1816,7 +1822,7 @@ projectAPI.post('/activity/add', (req, res) => {
     }
 })
 
-// 6.25 Activity Update
+// 6.25 ACTIVITY > UPDATE
 projectAPI.post('/activity/update', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.25.1')
@@ -1899,8 +1905,8 @@ projectAPI.post('/activity/update', (req, res) => {
         }
 
         if (req.body.date) {
-            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) > new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date.Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.25.8')
+            if (new Date(req.body.date) == "Invalid Date" || new Date(req.body.date) > new Date(tempActivity.createdOn)) {
+                return response(res, 400, 'invalid', 'Date Time must not be greater than creation time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is required for 12-Hour Timestamp', undefined, 'A-6.25.8')
             }
             tempActivity.date = String(new Date(req.body.date))
         }
@@ -2087,8 +2093,8 @@ projectAPI.post('/activity/update', (req, res) => {
 
         if (req.body.date) {
             var date = new Date(req.body.date)
-            if (date == "Invalid Date" || date > new Date()) {
-                return response(res, 400, 'invalid', 'Invalid Date. Date Time must be greater than current time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is optional for 12-Hour', undefined, 'A-6.25.18')
+            if (date == "Invalid Date" || date > new Date(tempActivity.createdOn)) {
+                return response(res, 400, 'invalid', 'Date Time must not be greater than creation time. Format: YYYY/MM/DD HH:MM:SS AM/PM. AM/PM is required for 12-Hour Timestamp', undefined, 'A-6.25.18')
             }
             tempActivity.date = String(date)
         }
@@ -2126,7 +2132,7 @@ projectAPI.post('/activity/update', (req, res) => {
     }
 })
 
-// 6.26 Remove File
+// 6.26 ACTIVITY > REMOVE FILE
 projectAPI.post('/activity/remove-file', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.26.1')

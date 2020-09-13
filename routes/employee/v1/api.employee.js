@@ -1,28 +1,25 @@
 var express = require('express'),
     employeeAPI = express(),
-    { response } = require('../../functions/functions'),
-    middleware = require('./v1/middleware/employee.middleware');
+    { response } = require('../../../functions/functions'),
+    middleware = require('./middleware/employee.middleware');
 
 //----------------------------- CONFIGURATION -------------------------------
 
 //---------------------------- GLOBAL VARIABLE ------------------------------
 
 //------------------------------ MIDDLEWARE ---------------------------------
-employeeAPI.use(/^(?!\/user).*/, (req, res, next) => {
-    middleware.employeeAuthToken(req, res, next)
-});
+employeeAPI.use(/^(?!\/user).*/, middleware.employeeAuthToken);
 
 //------------------------------ ADMIN APIs ---------------------------------
 
 // 1. USER ACCOUNT
-employeeAPI.use('/user', require('./v1/components/user'));
+employeeAPI.use('/user', require('./components/user'));
 
 // 2. EMPLOYEE PROFILE
-employeeAPI.use('/profile', require('./v1/components/profile'));
+employeeAPI.use('/profile', require('./components/profile'));
 
 // 3. CLIENT PROJECT
-employeeAPI.use('/client-project', require('./v1/components/client-project-activity')); // Author: Jenil Narola
-employeeAPI.use('/client-project', require('./v1/components/client-project-review')); // Author: Smit Luvani
+employeeAPI.use('/project', require('./components/client-project'));
 
 // 400 UNKNOWN APIs
 employeeAPI.use('*', (req, res) => {
