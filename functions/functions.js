@@ -145,6 +145,7 @@ module.exports = {
                 if (fs.existsSync(newPath + filename)) {
                     try {
                         fs.unlinkSync(newPath + filename)
+                        finder.stop();
                     } catch {}
                     return true
                 }

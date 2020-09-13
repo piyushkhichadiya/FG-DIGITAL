@@ -843,6 +843,9 @@ projectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.review_id) {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.13.2')
     }
+    if (!req.body.description || !req.files.file) {
+        return response(res, 400, 'required', 'Description or filename is required', undefined, 'A-6.13.12')
+    }
 
     var projectID = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectID),
@@ -2229,7 +2232,7 @@ projectAPI.post('/activity/remove', (req, res) => {
     tempDocument.lastModifiedOn = String(new Date())
     tempActivity.deleted = true
     return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).update(tempActivity).then(() => {
-        return response(res, 200, 'success', 'File has been removed successfully', undefined, 'A-6.27.7')
+        return response(res, 200, 'success', 'Activity has been removed successfully', undefined, 'A-6.27.7')
     })
 
 
