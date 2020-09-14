@@ -723,7 +723,7 @@
                     "in": "body",
                     "name": "body",
                     "schema": {
-                        "required": ["project_name", "project_description", "project_id"],
+                        "required": ["project_name", "project_id"],
                         "properties": {
                             "project_name": { "type": "string" },
                             "project_id": { "type": "string" },
