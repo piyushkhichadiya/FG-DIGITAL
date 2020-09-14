@@ -243,12 +243,11 @@
     });
 
     $('#btn_add').click(() => {
-        var name = $('#txt_name').val(),
+        var name = String($('#txt_name').val()).trim(),
             email = $('#txt_email').val(),
             password = $('#txt_password').val();
-        var name = name.trim(),
-            email = email.trim(),
-            password = password.trim();
+        email = email.trim()
+        password = password.trim()
         if (!name) {
             return $(document).Toasts('create', {
                 title: 'Name required',

@@ -201,7 +201,7 @@
                             <div class="form-group">
                                 <label>Account Name</label>
                                 <select class="form-control" id="list_social">
-                                    <option value="">Select Account</option>
+                                    <option id="option_select" value="">Select Account</option>
                                     <option value="Stack Overflow">Stack Overflow</option>
                                     <option value="Github">Github</option>
                                     <option value="Hacker Rank">Hacker Rank</option>
@@ -275,44 +275,13 @@
         if (urlParams.get('plan_id') == '') {
             window.location.href = `/admin/client/project?client_id=${urlParams.get('client_id')}`
         }
-    });
 
-    $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=accounts`, (data) => {
-        var data = data.data;
-        dbAccount = data.accounts;
-    }).fail(error => {
-        tblSocial.clear().draw();
-        error = error.responseJSON
-        $(document).Toasts('create', {
-            title: 'Error #' + error.code,
-            autohide: true,
-            delay: 5000,
-            body: error.message,
-            class: 'bg-danger',
-        });
     });
-
-    function getAccountData() {
-        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=accounts`, (data) => {
-            var data = data.data;
-            dbAccount = data.accounts;
-        }).fail(error => {
-            tblSocial.clear().draw();
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
-    }
 
     function getSocialAccount(planId) {
         $.get(`/admin/v1/project/fetch/${planId}?scope=accounts`, (data) => {
             var data = data.data;
-            var socialData = data.accounts;
+            socialData = dbAccount = data.accounts;
             tblSocial.clear().draw();
             if (socialData) {
                 for (var i = 0; i < socialData.length; i++) {
@@ -349,6 +318,10 @@
         $('#modal_Social').modal('show');
         $('#div_button').empty();
     });
+
+    $('#list_social').change(() => {
+        $('#option_select').hide();
+    })
 
     $('#btn_addAccount').click(() => {
         var name = $('#list_social').val(),
@@ -390,7 +363,6 @@
                 });
                 $('#modal_Social').modal('hide');
                 getSocialAccount(urlParams.get('plan_id'))
-                getAccountData();
             },
             error: error => {
                 error = error.responseJSON
@@ -452,7 +424,6 @@
                 });
                 $('#modal_Social').modal('hide');
                 getSocialAccount(urlParams.get('plan_id'))
-                getAccountData();
             },
             error: error => {
                 error = error.responseJSON
@@ -493,7 +464,6 @@
                             class: 'bg-success',
                         });
                         getSocialAccount(urlParams.get('plan_id'))
-                        getAccountData();
                     },
                     error: function(error) {
                         error = error.responseJSON

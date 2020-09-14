@@ -90,7 +90,7 @@
     if (urlParams.has('redirect') && urlParams.get('redirect') != '') {
         redirect = urlParams.get('redirect')
     }
-
+    $('#chk_remember').prop('checked', true)
     $('#txt_email').focus();
 
     $('#btn_submit').click(() => {

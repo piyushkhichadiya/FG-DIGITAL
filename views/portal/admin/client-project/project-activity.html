@@ -346,17 +346,25 @@
             activityData = projectData.activity;
             if (activityData) {
                 $('#div_activity').show();
-                for (var i = 0; i < activityData.length; i++) {
-                    tempActivity = activityData[i];
-                    if (tempActivity.type == 'SERVICE') {
-                        var date = tempActivity.date
-                        var date = new Date(date),
-                            d = date.getDate(),
-                            m = date.getMonth() + 1,
+                for (var i = activityData.length - 1; i >= 0; i--) {
+                    var tempActivity = activityData[i];
+                    if (date) {
+                        var date = new Date(tempActivity.date),
+                            d = date.getDate().toString().padStart(2, "0"),
+                            m = (date.getMonth() + 1).toString().padStart(2, "0"),
                             y = date.getFullYear(),
-                            hr = date.getHours(),
-                            minutes = date.getMinutes();
-                        var oldDate = y + '/' + m + '/' + d + ' | ' + hr + ':' + minutes;
+                            hr = date.getHours().toString().padStart(2, "0"),
+                            minutes = date.getMinutes().toString().padStart(2, "0");
+                    } else {
+                        var date = new Date(tempActivity.createdOn),
+                            d = date.getDate().toString().padStart(2, "0"),
+                            m = (date.getMonth() + 1).toString().padStart(2, "0"),
+                            y = date.getFullYear(),
+                            hr = date.getHours().toString().padStart(2, "0"),
+                            minutes = date.getMinutes().toString().padStart(2, "0");
+                    }
+                    var oldDate = y + '/' + m + '/' + d + ' | ' + hr + ':' + minutes;
+                    if (tempActivity.type == 'SERVICE') {
                         var serviceHtml = `<div>
                                                     <i class="fa fa-cogs bg-blue"></i>
                                                     <div class="timeline-item">
@@ -374,11 +382,11 @@
                                                                 <div class="row form-group">
                                                                     <div class="col-md-6">
                                                                         <label class="col-md-1" id="">Services</label>
-                                                                        <input type="text" id="txt_service_${i}" value="${getServiceName(tempActivity.service_id)}" class="form-control col-md-8" placeholder="Service Name" disabled>
+                                                                        <input type="text" id="txt_service_${i}" value="${tempActivity.service_name || ''}" class="form-control col-md-8" placeholder="Service Name" disabled>
                                                                     </div>
                                                                 </div>
                                                                 <div id="div_criteria_${i}">
-                                                                ${getCriteria(i, tempActivity.criteria)}
+                                                                ${getCriteria(i, tempActivity.criteria, tempActivity.service_deleted)}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -426,37 +434,18 @@
                                                         <div class="row form-group">
                                                             <div class="col-md-12">
                                                                 <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
-                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${oldDate}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}',${tempActivity.date})><i class="fas fa-pencil-alt"></i> Update</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     </div>`;
-                        $('#div_activity').prepend(serviceHtml);
+                        $('#div_activity').append(serviceHtml);
                         $(`#txt_description_${i}`).val(tempActivity.description)
                         $(`#txt_date_${i}`).val(oldDate)
                         $('#lbl_headerDate').html(`Date : ` + oldDate)
 
                     }
                     if (tempActivity.type == 'ACTIVITY') {
-                        var date = tempActivity.date
-                        if (date) {
-                            var date = new Date(date),
-                                d = date.getDate(),
-                                m = date.getMonth() + 1,
-                                y = date.getFullYear(),
-                                hr = date.getHours(),
-                                minutes = date.getMinutes();
-                            if (hr > 12) {
-                                time = 'PM';
-                                hr = hr - 12;
-                            } else {
-                                time = 'AM'
-                            }
-                            var oldDate = y + '/' + m + '/' + d + ' | ' + hr + ':' + minutes + ' ' + time;
-                        } else {
-                            oldDate = '';
-                        }
-
                         var activityHtml = `<div>
                                             <i class="fa fa-chart-line bg-green"></i>
                                                     <div class="timeline-item">
@@ -515,12 +504,12 @@
                                                         <div class="row form-group">
                                                             <div class="col-md-12">
                                                                 <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
-                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${oldDate}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${tempActivity.date}')><i class="fas fa-pencil-alt"></i> Update</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                    </div> `;
-                        $('#div_activity').prepend(activityHtml);
+                        $('#div_activity').append(activityHtml);
                         $(`#txt_description_${i}`).val(tempActivity.description)
                         $(`#txt_date_${i}`).val(oldDate);
                         $('#lbl_headerDate').html(`Date : ` + oldDate);
@@ -539,33 +528,36 @@
         });
     }
 
-    function getServiceName(service_id) {
-        if (dbService) {
-            for (var i = 0; i < dbService.length; i++) {
-                var tempService = dbService[i];
-                if (tempService.service_id == service_id) {
-                    return tempService.title
-                }
-            }
-        }
-    }
-
-    function getCriteria(index, criteria) {
+    function getCriteria(index, criteria, serviceData) {
         if (criteria) {
             var criteriaHtml = '';
             for (var i = 0; i < criteria.length; i++) {
                 tempCriteria = criteria[i];
-                criteriaHtml += `<div class="row" id="div_getJson_${index}_${i}">
+                if (serviceData == true) {
+                    criteriaHtml += `<div class="row" id="div_getJson_${index}_${i}">
                                 <div class="col-md-12">
                                     <div class="form-group row">
                                             <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
-                                        <label id="lbl_getCriteria_${index}_${i}" class="ml-3">${tempCriteria.criteria}</label>
+                                        <label id="lbl_getCriteria_${index}_${i}" class="ml-3">${tempCriteria.criteria} : </label>
+                                        <div class="col-md-1">
+                                            <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                } else {
+                    criteriaHtml += `<div class="row" id="div_getJson_${index}_${i}">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                            <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                        <label id="lbl_getCriteria_${index}_${i}" class="ml-3">${tempCriteria.criteria} : </label>
                                         <div class="col-md-1">
                                             <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value">
                                         </div>
                                     </div>
                                 </div>
                             </div>`;
+                }
             }
             return (criteriaHtml)
         }
@@ -581,7 +573,7 @@
                 if (ext != 'pdf') {
                     docHtml += `<div class="col-md-2 img_container form-group">
                                     <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
-                                        <img src="/admin/v1/profile/file/${tempDoc.filename}" id='img_post' class="image" style="height: 150px; width: 100%">
+                                        <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
                                             <i class="fas fa-search"></i>
                                         </div>
@@ -637,31 +629,39 @@
             }
             const objectURL = URL.createObjectURL(files[i])
             if (type == "pdf") {
-                pdf = `<div class="col-md-2">
+                pdf = `<div id='div_unUploaded_${i}' class="col-md-2">
                         <div>
                             <iframe src="${objectURL}" width="100%" height="150px"></iframe>
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
                         </div>
-                        <div class="row" style="display:none;">
-                            <a class="col-md-6 btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="${objectURL}" download="${objectURL}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
-                            <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-sm col-md-6"><i class="fas fa-trash-alt"></i> Remove</button>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUploaded(index)><i class="fas fa-trash-alt"></i> Remove all</button>
                         </div>
                     </div>`;
                 $('#div_image_' + index).prepend(pdf);
             } else {
-                image = `<div class="col-md-2 img_container form-group">
-                        <div class='' href='${objectURL}' data-toggle="lightbox">
+                image = `<div  id='div_unUploaded_${i}' class="col-md-2 img_container form-group">
+                        <div href='${objectURL}' data-toggle="lightbox">
                             <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
                         </div>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUploaded(${index})><i class="fas fa-trash-alt"></i> Remove all</button>
+                        </div>
                     </div>`;
                 $("#div_image_" + index).prepend(image);
             }
         }
+    }
+
+    function removeUploaded(index) {
+        $('#file_post_' + index).val(null);
+        var unUploaded = $('[id^=div_unUploaded_]')
+        $(unUploaded).remove();
     }
 
     $('#list_type').change(() => {
@@ -671,12 +671,12 @@
                 var option = `<option value="">Select Service<option>`
                 for (var i = 0; i < dbProjectService.length; i++) {
                     tempService = dbProjectService[i];
-                    console.log(tempService)
                     if (tempService.active == true) {
                         option += `<option value="${tempService.service_id}">${getServiceName(tempService.service_id)}<option>`
                     }
+                    $('#list_service').html(option)
                 }
-                $('#list_service').html(option)
+
             }
         } else {
             $('#div_service').hide();
@@ -711,7 +711,7 @@
                                     <div class="col-md-12">
                                         <div class="form-group row">
                                             <input id="txt_criteria_${j}" value="${tempCriteria.criteria_id}" style="display:none;">
-                                            <label id="lbl_criteria_${j}" class="ml-3">${tempCriteria.criteria}</label>
+                                            <label id="lbl_criteria_${j}" class="col-md-2 ml-3">${tempCriteria.criteria} : </label>
                                             <div class="col-md-1">
                                                 <input type="text" id="txt_value_${j}" class="form-control" placeholder="Value">
                                             </div>
@@ -751,32 +751,40 @@
             }
             const objectURL = URL.createObjectURL(files[i])
             if (type == "pdf") {
-                pdf = `<div class="col-md-2">
+                pdf = `<div id='div_uploaded_${i}' class="col-md-2">
                         <div>
                             <iframe src="${objectURL}" width="100%" height="150px"></iframe>
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
                         </div>
-                        <div class="row" style="display:none;">
-                            <a class="col-md-6 btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="${objectURL}" download="${objectURL}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
-                            <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-sm col-md-6"><i class="fas fa-trash-alt"></i> Remove</button>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUnUploaded()><i class="fas fa-trash-alt"></i> Remove all</button>
                         </div>
                     </div>`;
                 $('#div_pdf').prepend(pdf);
             } else {
-                image = `<div class="col-md-2 img_container form-group">
+                image = `<div id='div_uploaded_${i}' class="col-md-2 img_container form-group">
                         <div class='' href='${objectURL}' data-toggle="lightbox">
                             <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
                         </div>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUnUploaded()><i class="fas fa-trash-alt"></i> Remove all</button>
+                        </div>
                     </div>`;
                 $("#div_pdf").prepend(image);
             }
         }
     });
+
+    function removeUnUploaded() {
+        $('#file_post').val(null);
+        var unUploaded = $('[id^=div_uploaded_]')
+        $(unUploaded).remove();
+    }
 
     $('#btn_add').click(() => {
         var type = $('#list_type').val(),
@@ -804,29 +812,39 @@
         if (service_id) {
             formData.append('service_id', service_id)
         }
-
-        var criteria = {};
-        var divJson = $('[id^=div_json_]')
-        if ($('#list_type').val() == 'Service') {
-            if (divJson.length <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Criteria Required',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Please select minimum 1 criteria',
-                    class: 'bg-danger',
-                });
-            } else {
+        if (type == 'Service') {
+            if (service_id) {
+                var criteria = {};
+                var divJson = $('[id^=div_json_]')
                 for (var i = 0; i < divJson.length; i++) {
-                    criteria[i] = {
-                        criteria_id: Number($('#txt_criteria_' + i).val()),
-                        value: Number($('#txt_value_' + i).val())
+                    if ($('#txt_value_' + i).val() != '') {
+                        criteria[i] = {
+                            criteria_id: Number($('#txt_criteria_' + i).val()),
+                            value: Number($('#txt_value_' + i).val())
+                        }
                     }
                 }
-                formData.append('criteria', JSON.stringify(criteria))
+                if ((Object.keys(criteria)).length <= 0) {
+                    return $(document).Toasts('create', {
+                        title: 'Criteria Required',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Minimum 1 Criteria is Required',
+                        class: 'bg-danger',
+                    });
+                }
+                criteriaString = JSON.stringify(criteria);
+                formData.append('criteria', criteriaString)
+            } else {
+                return $(document).Toasts('create', {
+                    title: 'Service Required',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please select Service',
+                    class: 'bg-danger',
+                });
             }
         }
-
         if (description) {
             formData.append('description', description)
         }
@@ -901,17 +919,16 @@
     });
 
     function updateActivity(index, activity_id, oldDate) {
+        return console.log(oldDate)
         var getDate = $('#txt_date_' + index).val(),
-            description = $('#txt_description_' + index).val(),
-            title = $('#txt_title_' + index).val();
-        var getDate = getDate.trim(),
-            description = description.trim(),
-            title = title.trim();
+            description = String($('#txt_description_' + index).val()).trim(),
+            title = String($('#txt_title_' + index).val()).trim();
+        var getDate = getDate.trim();
         var formData = new FormData();
         formData.append('project_id', plan_id)
         formData.append('activity_key', activity_id)
         var criteria = {};
-        var divJson = $(`[id^=div_getJson_${index}]`)
+        var divJson = $(`[id^=div_getJson_${index}]`);
         if ($('#txt_type_' + index).val() == 'SERVICE') {
             for (var i = 0; i < divJson.length; i++) {
                 criteria[i] = {

@@ -244,13 +244,13 @@
                         <div class="col-md-12">
                             <div class="icheck-primary">
                                 <input type="checkbox" id="chk_review" checked="checked">
-                                <label>Review</label>
+                                <label for="chk_review">Review</label>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div class="icheck-primary">
                                 <input type="checkbox" id="chk_activity" checked="checked">
-                                <label>Activity</label>
+                                <label for="chk_activity">Activity</label>
                             </div>
                         </div>
                     </div>
@@ -293,6 +293,18 @@
 <script>
     var tblTeam = $("#tbl_Team").DataTable({
         "responsive": true,
+        "columns": [{
+                "width": "5%"
+            }, {
+                "width": "10%"
+            },
+            null, {
+                "width": "15%"
+            }, {
+                "width": "30%"
+            }
+
+        ]
     });
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -311,36 +323,6 @@
         });
     });
 
-    $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=team`, (data) => {
-        var data = data.data;
-        permissionData = data.team;
-    }).fail(error => {
-        error = error.responseJSON
-        $(document).Toasts('create', {
-            title: 'Error #' + error.code,
-            autohide: true,
-            delay: 5000,
-            body: error.message,
-            class: 'bg-danger',
-        });
-    });
-
-    function getPermissionData() {
-        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=team`, (data) => {
-            var data = data.data;
-            permissionData = data.team;
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
-    }
-
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
             var planId = urlParams.get('plan_id');
@@ -354,12 +336,11 @@
     function getEmployee(planId) {
         $.get(`/admin/v1/project/fetch/${planId}?scope=team`, (data) => {
             var data = data.data;
-            var teamData = data.team;
+            var teamData = permissionData = data.team;
+            tblTeam.clear().draw();
             if (teamData) {
-                tblTeam.clear().draw();
                 for (var i = 0; i < teamData.length; i++) {
                     var tempTeam = teamData[i];
-                    getEmployeeName(tempTeam.employee_id);
                     var button = `<div class="btn-group">
                                         <button type="button" class="btn btn-info" id="btn_update_${i}" onclick=update(${i},'${tempTeam.employee_id}')><i class='fas fa-pencil-alt' ></i> Update Permission</button>
                                         <button type="button" class="btn btn-info dropdown-toggle dropdown-icon" data-toggle="dropdown">
@@ -417,7 +398,7 @@
         $('#div_empDetails').hide();
         $('#img_profile').attr('src', `images/logo-small.png`)
         $('#modal_Team').modal('show');
-        var option = `<option value=''>Select Team member</option>`
+        var option = `<option id="option_select" value=''>Select Team member</option>`
         for (var i = 0; i < dbEmp.length; i++) {
             var tempEmp = dbEmp[i]
             option += `<option value='${tempEmp.employee_id}'>${tempEmp.name}</option>`;
@@ -426,6 +407,7 @@
     });
 
     $('#list_emp').change(() => {
+        $('#option_select').hide();
         var empId = $('#list_emp').val();
         $('#div_empDetails').show();
         if (empId) {
@@ -475,7 +457,6 @@
                 $('#modal_Team').modal('hide');
                 tblTeam.clear().draw();
                 getEmployee(urlParams.get('plan_id'));
-                getPermissionData();
             },
             error: error => {
                 error = error.responseJSON
@@ -510,7 +491,6 @@
                 });
                 tblTeam.clear().draw();
                 getEmployee(urlParams.get('plan_id'));
-                getPermissionData();
             },
             error: function(error) {
                 error = error.responseJSON
@@ -547,7 +527,6 @@
                 });
                 tblTeam.clear().draw();
                 getEmployee(urlParams.get('plan_id'));
-                getPermissionData();
             },
             error: function(error) {
                 error = error.responseJSON
@@ -572,6 +551,8 @@
 
     function update(index, employee_id) {
         $('#modal_update').modal('show');
+        $('#chk_review').prop('checked', false);
+        $('#chk_activity').prop('checked', false);
         $('#div_btn').empty()
         var button = `<button type="button" class="btn btn-primary" id="btn_update_${index}" onclick=updatePermission(${index},'${employee_id}')><i class="fas fa-check"></i> Save Changes</button>`
         $('#div_btn').append(button)
@@ -579,8 +560,12 @@
             for (var i = 0; i < permissionData.length; i++) {
                 var tempTeam = permissionData[i];
                 if (tempTeam.employee_id == employee_id) {
-                    $('#chk_review').prop('checked', tempTeam.permission.review);
-                    $('#chk_activity').prop('checked', tempTeam.permission.activity);
+                    if (tempTeam.permission.review) {
+                        $('#chk_review').prop('checked', tempTeam.permission.review);
+                    }
+                    if (tempTeam.permission.activity) {
+                        $('#chk_activity').prop('checked', tempTeam.permission.activity);
+                    }
                 }
             }
         }
@@ -605,7 +590,8 @@
                     class: 'bg-success',
                 });
                 $('#modal_update').modal('hide');
-                getPermissionData();
+                tblTeam.clear().draw();
+                getEmployee(urlParams.get('plan_id'));
             },
             error: error => {
                 error = error.responseJSON
@@ -647,7 +633,6 @@
                         });
                         tblTeam.clear().draw();
                         getEmployee(urlParams.get('plan_id'));
-                        getPermissionData();
                     },
                     error: function(error) {
                         error = error.responseJSON

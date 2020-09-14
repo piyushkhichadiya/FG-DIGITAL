@@ -157,6 +157,16 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="card-body card">
+                        <div class="row">
+                            <div class="col-md-12" id="div_closeMessage" style="display: none;">
+                                <p class="float-right" style='color:green;'>This Review Is Closed <i class="fas fa-check"></i></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12" id="div_closeButton" style="display: none;">
+                                <button class="btn btn-success float-right" id="btn_reOpen">Reopen</button>
+                            </div>
+                        </div>
                         <div class="row form-group">
                             <div class="col-md-3">
                                 <label class="col-md-12 col-form-label">Review Title</label>
@@ -169,10 +179,6 @@
                                 <div class="col-md-12">
                                     <textarea class="form-control" id="txt_description" rows="2" placeholder="Description ..."></textarea>
                                 </div>
-                            </div>
-                            <div class="col-md-4" align='center' id="div_closeMessage" style="display: none;">
-                                <p style='color:red;'>This Review Is Closed</p>
-                                <button class="btn btn-success">Reopen</button>
                             </div>
                         </div>
                         <div class="row">
@@ -254,6 +260,7 @@
     <script src="dist/js/client-project.js"></script>
 </body>
 <script>
+    var dbReview;
     $(document).on('click', '[data-toggle="lightbox"]', function(event) {
         event.preventDefault();
         $(this).ekkoLightbox();
@@ -271,7 +278,7 @@
         $('#btn_add').hide();
         $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=review`, (data) => {
             var data = data.data;
-            var reviewData = data.review;
+            var reviewData = dbReview = data.review;
             if (reviewData) {
                 for (var i = 0; i < reviewData.length; i++) {
                     var tempReview = reviewData[i];
@@ -286,6 +293,7 @@
                             $('#btn_addPost').remove();
                             $('#txt_post').remove();
                             $('#div_closeMessage').show();
+                            $('#div_closeButton').show();
                             $('#txt_title').attr('disabled', true)
                             $('#txt_description').attr('disabled', true)
                         }
@@ -305,20 +313,17 @@
         });
     }
 
-    function getPost(review_id, closed) {
-        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=review`, (data) => {
-            var data = data.data;
-            var reviewData = data.review;
-            if (reviewData) {
-                for (var k = 0; k < reviewData.length; k++) {
-                    var tempReview = reviewData[k];
-                    if (tempReview.review_id == review_id) {
-                        if (tempReview.closed == true) {
-                            var postData = tempReview.posts
-                            if (postData) {
-                                for (var i = 0; i < postData.length; i++) {
-                                    var tempPost = postData[i];
-                                    var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+    function getPost(review_id) {
+        if (dbReview) {
+            for (var k = 0; k < dbReview.length; k++) {
+                var tempReview = dbReview[k];
+                if (tempReview.review_id == review_id) {
+                    if (tempReview.closed == true) {
+                        var postData = tempReview.posts
+                        if (postData) {
+                            for (var i = 0; i < postData.length; i++) {
+                                var tempPost = postData[i];
+                                var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
                                                 <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
                                                 <div class="row" id="div_doc_${i}">
@@ -339,18 +344,18 @@
                                                 </div>
                                                 </div>
                                                 <hr>`;
-                                    $('#div_posts').append(postHtml);
-                                    $(`#btn_removePost_${i}`).remove();
-                                    $(`#btn_edit_${tempPost.post_key}`).remove();
-                                    $(`#btn_update_${tempPost.post_key}`).remove();
-                                }
+                                $('#div_posts').append(postHtml);
+                                $(`#btn_removePost_${i}`).remove();
+                                $(`#btn_edit_${tempPost.post_key}`).remove();
+                                $(`#btn_update_${tempPost.post_key}`).remove();
                             }
-                        } else {
-                            var postData = tempReview.posts
-                            if (postData) {
-                                for (var i = 0; i < postData.length; i++) {
-                                    var tempPost = postData[i];
-                                    var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+                        }
+                    } else {
+                        var postData = tempReview.posts
+                        if (postData) {
+                            for (var i = 0; i < postData.length; i++) {
+                                var tempPost = postData[i];
+                                var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
                                                 <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
                                                 <div class="row" id="div_doc_${i}">
@@ -371,24 +376,13 @@
                                                 </div>
                                                 </div>
                                                 <hr>`;
-                                    $('#div_posts').append(postHtml);
-                                }
+                                $('#div_posts').append(postHtml);
                             }
                         }
                     }
                 }
             }
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error!',
-                autohide: true,
-                delay: 5000,
-                body: 'Review Not Found',
-                class: 'bg-danger',
-            });
-        });
-
+        }
     }
 
     function getDescription(description) {
@@ -407,7 +401,7 @@
                 if (closed == true) {
                     docHtml += `<div class="col-md-2">
                             <div class='img_container' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
-                                <img src="/admin/v1/profile/file/${tempDoc.filename}" class="image" style="height: 150px; width: 100%">
+                                <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' class="image" style="height: 150px; width: 100%">
                                 <div class="middle">
                                     <i class="fas fa-search"></i>
                                 </div>
@@ -416,7 +410,7 @@
                 } else {
                     docHtml += `<div class="col-md-2">
                             <div class='img_container' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
-                                <img src="/admin/v1/profile/file/${tempDoc.filename}" class="image" style="height: 150px; width: 100%">
+                                <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' class="image" style="height: 150px; width: 100%">
                                 <div class="middle">
                                     <i class="fas fa-search"></i>
                                 </div>
@@ -599,8 +593,8 @@
                 });
             }
             const objectURL = URL.createObjectURL(files[i])
-            image = `<div class="col-md-2 img_container form-group">
-                        <div class='' href='${objectURL}' data-toggle="lightbox">
+            image = `<div class="col-md-2 img_container form-group" id = 'unUploaded_${i}'>
+                        <div href='${objectURL}' data-toggle="lightbox">
                             <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
                                 <i class="fas fa-search"></i>
@@ -615,15 +609,9 @@
     });
 
     function removeUploadedFiles() {
-        $('#div_posts').val('');
-        $("#div_doc").empty();
-        var DocHtml = `<input type="file" id="file_post" accept=".png, .jpg, .jpeg," style="display: none;" multiple>
-                    <div class="col-md-2" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
-                        <div class="plus">
-                            <ion-icon name="add-circle-outline"></ion-icon>
-                        </div>
-                    </div>`;
-        $("#div_doc").append(DocHtml);
+        $('#file_post').val('');
+        var unUploaded = $('[id^=unUploaded_]')
+        $(unUploaded).remove();
     }
 
     function uploadFile(index, post_id) {
@@ -650,17 +638,26 @@
                 });
             }
             const objectURL = URL.createObjectURL(files[i])
-            image = `<div class="col-md-2 img_container form-group">
+            image = `<div class="col-md-2 img_container form-group" id="postUnUploaded_${i}">
                         <div class='' href='${objectURL}' data-toggle="lightbox">
                             <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
                                 <i class="fas fa-search"></i>
                             </div>
                         </div>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUnUploaded(${index})><i class="fas fa-trash-alt"></i> Remove all</button>
+                        </div>
                     </div>`;
             $(`#div_doc_${index}`).prepend(image);
         }
     };
+
+    function removeUnUploaded(index) {
+        $('#file_post_' + index).val(null);
+        var unUploaded = $('[id^=postUnUploaded_]')
+        $(unUploaded).remove();
+    }
 
     function updatePost(index, post_id) {
         var description = $('#txt_post_' + index).val(),
@@ -856,6 +853,48 @@
             }
         })
     }
+
+    $('#btn_reOpen').click(() => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to reopen this Review",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Reopen'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/open?project_id=${urlParams.get('plan_id')}&review_id=${urlParams.get('review_id')}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'post removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $('#btn_reOpen').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_reOpen').removeAttr('disabled')
+                    }
+                });
+            }
+        });
+    });
 </script>
 
 </html>

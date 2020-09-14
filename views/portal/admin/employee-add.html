@@ -559,6 +559,8 @@
                     body: 'Member details has been Successfully Updated',
                     class: 'bg-success',
                 });
+                $('#div_social').empty();
+                getEmployee(emp_id)
             },
             error: error => {
                 error = error.responseJSON
@@ -626,8 +628,8 @@
         var emp_id = urlParams.get('emp_id'),
             password = $('#txt_newPassword').val(),
             conPassword = $('#txt_cPassword').val();
-        // var password = password.trim(),
-        //     conPassword = conPassword.trim();
+        var password = password.trim(),
+            conPassword = conPassword.trim();
         if (!password || !conPassword) {
             return $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
@@ -750,19 +752,22 @@
 
     function updateSocial(index, account_id) {
         var accountName = $(`#list_social_${index}`).val(),
-            reference = $(`#txt_link_${index}`).val(),
+            reference = String($(`#txt_link_${index}`).val()).trim(),
             emp_id = urlParams.get('emp_id'),
             formData = new FormData();
-        var reference = reference.trim();
         formData.append('employee_id', emp_id)
         formData.append('account_id', account_id)
-        if (accountName) {
-            formData.append('account_name', accountName)
+        formData.append('account_name', accountName)
+        if (!reference) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Reference not found',
+                class: 'bg-danger',
+            });
         }
-        if (reference) {
-            formData.append('reference', reference)
-        }
-        $(`#btn_update_${index}`).attr('disabled', true)
+        formData.append('reference', reference)
         $.post({
             type: 'POST',
             url: '/admin/v1/employee/social-account/update',

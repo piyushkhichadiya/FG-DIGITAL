@@ -134,6 +134,7 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th>Project ID</th>
                                             <th>Project Name</th>
                                             <th>Started On</th>
                                             <th>Status</th>
@@ -142,7 +143,8 @@
                                     </thead>
                                     <tbody>
                                         <tr align="center">
-                                            <td colspan="5"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td colspan="6"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
                                             <td hidden></td>
                                             <td hidden></td>
                                             <td hidden></td>
@@ -152,6 +154,7 @@
                                     <tfoot>
                                         <tr>
                                             <th>No.</th>
+                                            <th>Project ID</th>
                                             <th>Project Name</th>
                                             <th>Started On</th>
                                             <th>Status</th>
@@ -208,7 +211,6 @@
     <!-- custom JS  -->
     <script src="dist/js/logout.js"></script>
     <script src="dist/js/profile.js"></script>
-    <script src="dist/js/client-project.js"></script>
 </body>
 <script>
     var tblProject = $("#tbl_project").DataTable({
@@ -218,6 +220,31 @@
     const urlParams = new URLSearchParams(window.location.search);
 
     $(document).ready(() => {
+
+        if (urlParams.has('client_id')) {
+            if (urlParams.get('client_id')) {
+                $.get(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
+                    var name = data.data.name;
+                    $('#lbl_navClient').html(name)
+                    $('#lbl_navClient').attr('href', `/admin/client`)
+                }).fail(error => {
+                    error = error.responseJSON
+                    $(document).Toasts('create', {
+                        title: 'Error #' + error.code,
+                        autohide: true,
+                        delay: 5000,
+                        body: error.message,
+                        class: 'bg-danger',
+                    });
+                });
+            } else {
+                window.location.href = '/admin/client'
+            }
+        } else {
+            window.location.href = '/admin/client'
+        }
+
+
         $.getJSON(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
             var dataClient = data.data;
             tblProject.clear().draw();
@@ -228,8 +255,8 @@
                     button = `<div class=row><button class='btn btn-warning m-1' onclick="window.location.href ='/admin/client/project-dashboard?client_id=${urlParams.get('client_id')}&plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Dashboard</button>
                             <button class='btn btn-info m-1' onclick="window.location.href ='/admin/client/project-add?client_id=${urlParams.get('client_id')}&plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-eye"></i> View </button></div>`
                     var start_date = new Date(tempProject.start_date);
-                    var d = start_date.getDate();
-                    var m = start_date.getMonth() + 1;
+                    var d = start_date.getDate().toString().padStart(2, "0");
+                    var m = (start_date.getMonth() + 1).toString().padStart(2, "0");
                     var y = start_date.getFullYear(),
                         status = tempProject.status;
                     if (status == 'scheduled') {
@@ -242,7 +269,7 @@
                         status = `<p style='color:#dc3545; font-size:17px;'><i class='fas fa-calendar-times'></i> Expired</p>`
                     }
                     tblProject.row.add([
-                        `${i+1}`, tempProject.plan, y + "/" + m + "/" + d, status, button
+                        `${i+1}`, tempProject.project_id, tempProject.plan, y + "/" + m + "/" + d, status, button
                     ]).draw();
                 }
             }
