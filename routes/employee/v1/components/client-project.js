@@ -194,7 +194,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
 
                     // Service
                     var activeCriteria = [], // To validate in Activity Data
-                        activeServices = []
+                        allServices = {}
 
                     if (tempProject.service) {
 
@@ -216,11 +216,14 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                 for (var l = 0; l < dbServicesKey.length; l++) {
                                     var tempService = dbServices[dbServicesKey[l]]
 
+                                    allServices[tempService.service_id] = {
+                                        deleted: tempService.deleted,
+                                        service_name: tempService.title
+                                    }
+
                                     if (tempService.deleted || tempService.service_id != tempProjectService.service_id) {
                                         continue
                                     }
-
-                                    activeServices.push(tempService.service_id)
 
                                     var tempServiceObj = {
                                         service_id: tempProjectService.service_id
@@ -390,11 +393,10 @@ clientProjectAPI.get('/fetch', (req, res) => {
 
 
 
-                                if (tempObj.type == 'SERVICE') {
+                                if (tempObj.type == 'SERVICE' && allServices[tempObj.service_id]) {
 
-                                    if (!activeServices.includes(tempObj.service_id)) {
-                                        tempObj.service_deleted = true
-                                    }
+                                    tempObj.service_deleted = allServices[tempObj.service_id].deleted
+                                    tempObj.service_name = allServices[tempObj.service_id].service_name
 
                                     if (tempProjectActivity.criteria) {
                                         var dbActivityCriteria = tempProjectActivity.criteria,

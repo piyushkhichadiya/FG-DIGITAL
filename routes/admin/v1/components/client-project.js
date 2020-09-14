@@ -350,6 +350,10 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                 lastModifiedOn: tempCriteria.lastModifiedOn
                             }
 
+                            if (!tempObj.service_name) {
+                                tempObj.service_name = validate.service_name
+                            }
+
                             postCriteriaObj.push(tempCriteriaObj);
                         }
                         if (!tempObj.service_deleted && validate.service_deleted) {
@@ -423,7 +427,8 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                     criteria_id: dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria_id,
                                     criteria: dbServiceCriteria[dbServiceCriteriaKeys[j]].criteria,
                                     deleted: dbServiceCriteria[dbServiceCriteriaKeys[j]].deleted,
-                                    service_deleted: dbServices[dbServicesKey[i]].deleted
+                                    service_deleted: dbServices[dbServicesKey[i]].deleted,
+                                    service_name: dbServices[dbServicesKey[i]].title
                                 }
                             }
                         }
