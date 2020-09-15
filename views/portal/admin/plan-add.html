@@ -266,7 +266,7 @@
 
         if (urlParams.has('plan_id')) {
             if (urlParams.get('plan_id') == '') {
-                return window.history.go(-1)
+                return window.location.href = '/admin/plan'
             }
             $('#btn_add').hide();
             $('#btn_update').show();
@@ -279,14 +279,7 @@
                 $('#txt_amount').val(data.price)
                 $('#txt_days').val(data.days)
             }).fail(error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
+                window.location.href = '/admin/plan'
             });
         }
     });

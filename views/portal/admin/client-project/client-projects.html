@@ -228,14 +228,7 @@
                     $('#lbl_navClient').html(name)
                     $('#lbl_navClient').attr('href', `/admin/client`)
                 }).fail(error => {
-                    error = error.responseJSON
-                    $(document).Toasts('create', {
-                        title: 'Error #' + error.code,
-                        autohide: true,
-                        delay: 5000,
-                        body: error.message,
-                        class: 'bg-danger',
-                    });
+                    window.location.href = '/admin/client'
                 });
             } else {
                 window.location.href = '/admin/client'

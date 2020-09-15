@@ -338,7 +338,7 @@
     $('#btn_add').click(() => {
         $('#modal_Service').modal('show');
         $('#div_criteria').hide();
-        var option = `<option id="option_select" value=''>Select Service</option>`
+        var option = `<option value='' hidden>Select Service</option>`
         for (var i = 0; i < dbService.length; i++) {
             var tempService = dbService[i]
             option += `<option value='${tempService.service_id}'>${tempService.title}</option>`;
@@ -347,7 +347,6 @@
     });
 
     $('#list_service').change(() => {
-        $('#option_select').hide();
         var ServiceId = $('#list_service').val();
         if (ServiceId) {
             for (var i = 0; i < dbService.length; i++) {

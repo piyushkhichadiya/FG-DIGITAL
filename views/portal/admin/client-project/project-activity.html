@@ -172,7 +172,7 @@
                                                 <div class="col-md-6">
                                                     <label class="col-md-1">Type</label>
                                                     <select class="col-md-8 form-control" id="list_type">
-                                                    <option value="">Select Type</option>
+                                                    <option value="" hidden>Select Type</option>
                                                     <option value="Service">Service</option>
                                                     <option value="Activity">Activity</option>
                                                     </select>
@@ -181,23 +181,25 @@
                                             <div id="div_service" style="display: none;">
                                                 <div class="row form-group" id="div_service">
                                                     <div class="col-md-6">
-                                                        <label class="col-md-1" id="">Services</label>
+                                                        <label class="col-md-1">Services</label>
                                                         <select class="col-md-8 form-control" id="list_service">
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div id="div_criteria"></div>
+                                                <div class="row form-group" id="div_criteria"></div>
                                             </div>
                                         </div>
                                         <hr>
                                         <div class="row form-group">
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <label class="col-md-1" id="lbl_criteria">Date</label>
                                                 <div class="col-md-12">
-                                                    <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                                        <input type="text" class="form-control datetimepicker-input" id="txt_date" data-target="#reservationdate" placeholder="YYYY/MM/DD" />
-                                                        <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-                                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                    <div class="form-group">
+                                                        <div class="input-group date" id="datetimepicker" data-target-input="nearest">
+                                                            <input type="text" id="txt_date" class="form-control datetimepicker-input" data-target="#datetimepicker" />
+                                                            <div class="input-group-append" data-target="#datetimepicker" data-toggle="datetimepicker">
+                                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -223,7 +225,7 @@
                                         <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                             <div class="row form-group" id="div_pdf">
                                                 <input type="file" id="file_post" accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
-                                                <div class="col-md-2" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                <div class="col-md-2" id="input_plus" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                     <div class="plus">
                                                         <ion-icon name="add-circle-outline"></ion-icon>
                                                     </div>
@@ -295,9 +297,7 @@
     <script src="dist/js/client-project.js"></script>
 </body>
 <script>
-    $('#reservationdate').datetimepicker({
-        format: 'Y/MM/D'
-    });
+    $('#datetimepicker').datetimepicker();
     $(document).on('click', '[data-toggle="lightbox"]', function(event) {
         event.preventDefault();
         $(this).ekkoLightbox();
@@ -345,32 +345,32 @@
             var projectData = data.data;
             activityData = projectData.activity;
             if (activityData) {
-                $('#div_activity').show();
                 for (var i = activityData.length - 1; i >= 0; i--) {
                     var tempActivity = activityData[i];
-                    if (date) {
-                        var date = new Date(tempActivity.date),
-                            d = date.getDate().toString().padStart(2, "0"),
-                            m = (date.getMonth() + 1).toString().padStart(2, "0"),
-                            y = date.getFullYear(),
-                            hr = date.getHours().toString().padStart(2, "0"),
-                            minutes = date.getMinutes().toString().padStart(2, "0");
+                    var getDate = new Date(tempActivity.date || tempActivity.createdOn),
+                        d = ('0' + getDate.getDate()).slice(-2),
+                        m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                        y = getDate.getFullYear(),
+                        hr = getDate.getHours(),
+                        minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                    if (hr > 12) {
+                        time = 'PM';
+                        hr = hr - 12;
                     } else {
-                        var date = new Date(tempActivity.createdOn),
-                            d = date.getDate().toString().padStart(2, "0"),
-                            m = (date.getMonth() + 1).toString().padStart(2, "0"),
-                            y = date.getFullYear(),
-                            hr = date.getHours().toString().padStart(2, "0"),
-                            minutes = date.getMinutes().toString().padStart(2, "0");
+                        time = 'AM'
                     }
-                    var oldDate = y + '/' + m + '/' + d + ' | ' + hr + ':' + minutes;
+
+                    var date = y + '/' + m + '/' + d;
+                    var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
+
                     if (tempActivity.type == 'SERVICE') {
                         var serviceHtml = `<div>
                                                     <i class="fa fa-cogs bg-blue"></i>
                                                     <div class="timeline-item">
-                                                        <span class="time" id="lbl_headerDate"></span>
+                                                        <span class="time" id="lbl_headerDate_${i}"></span>
                                                         <span class="time">Created By : ${tempActivity.createdBy}</span>
-                                                        <h3 class="timeline-header">${tempActivity.title}</h3>
+                                                        <h3 class="timeline-header">${tempActivity.title || tempActivity.type}</h3>
                                                         <div class="timeline-body">
                                                             <div class="row form-group">
                                                                 <div class="col-md-6">
@@ -385,20 +385,22 @@
                                                                         <input type="text" id="txt_service_${i}" value="${tempActivity.service_name || ''}" class="form-control col-md-8" placeholder="Service Name" disabled>
                                                                     </div>
                                                                 </div>
-                                                                <div id="div_criteria_${i}">
+                                                                <div class='row form-group' id="div_criteria_${i}">
                                                                 ${getCriteria(i, tempActivity.criteria, tempActivity.service_deleted)}
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <hr>
                                                         <div class="row form-group">
-                                                            <div class="col-md-3">
+                                                            <div class="col-md-4">
                                                                 <label class="col-md-1" id="lbl_criteria">Date</label>
                                                                 <div class="col-md-12">
-                                                                    <div class="input-group date" id="reservationdate_${i}" data-target-input="nearest">
-                                                                        <input type="text" class="form-control datetimepicker-input" id="txt_date_${i}" data-target="#reservationdate_${i}" placeholder="YYYY/MM/DD" />
-                                                                        <div class="input-group-append" data-target="#reservationdate_${i}" data-toggle="datetimepicker">
-                                                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                    <div class="form-group">
+                                                                        <div class="input-group date" id="datetimepicker_${i}" data-target-input="nearest">
+                                                                            <input type="text" id="txt_date_${i}" value='${oldDate}' class="form-control datetimepicker-input" data-target="#datetimepicker_${i}" placeholder="YYYY/MM/DD"  />
+                                                                            <div class="input-group-append" data-target="#datetimepicker_${i}" data-toggle="datetimepicker">
+                                                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -408,7 +410,7 @@
                                                             <div class="col-md-6">
                                                                 <label class="col-md-1">Title</label>
                                                                 <div class="col-md-10">
-                                                                    <input type="text" class="form-control" value="${tempActivity.title}" id="txt_title_${i}" placeholder="Enter Title">
+                                                                    <input type="text" class="form-control" value="${tempActivity.title || ''}" id="txt_title_${i}" placeholder="Enter Title">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -422,9 +424,9 @@
                                                         </div>
                                                         <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                                             <div class="row form-group" id="div_image_${i}">
-                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key)}
+                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key, tempActivity.service_deleted)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
-                                                                <div class="col-md-2" id="div_post_${tempActivity.activity_key}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                                <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                                     <div class="plus">
                                                                         <ion-icon name="add-circle-outline"></ion-icon>
                                                                     </div>
@@ -434,22 +436,23 @@
                                                         <div class="row form-group">
                                                             <div class="col-md-12">
                                                                 <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
-                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}',${tempActivity.date})><i class="fas fa-pencil-alt"></i> Update</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${date}')><i class="fas fa-pencil-alt"></i> Update</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     </div>`;
-                        $('#div_activity').append(serviceHtml);
-                        $(`#txt_description_${i}`).val(tempActivity.description)
-                        $(`#txt_date_${i}`).val(oldDate)
-                        $('#lbl_headerDate').html(`Date : ` + oldDate)
 
+                        if (tempActivity.service_deleted == true) {
+                            $(`#btn_update_${i}`).remove();
+                            $(`#div_post_${i}`).remove();
+                        }
+                        $('#div_activity').append(serviceHtml);
                     }
                     if (tempActivity.type == 'ACTIVITY') {
                         var activityHtml = `<div>
                                             <i class="fa fa-chart-line bg-green"></i>
                                                     <div class="timeline-item">
-                                                        <span class="time" id="lbl_headerDate"></span>
+                                                        <span class="time" id="lbl_headerDate_${i}"></span>
                                                         <span class="time">Created By : ${tempActivity.createdBy}</span>
                                                         <h3 class="timeline-header">${tempActivity.title}</h3>
                                                         <div class="timeline-body">
@@ -462,13 +465,15 @@
                                                         </div>
                                                         <hr>
                                                         <div class="row form-group">
-                                                            <div class="col-md-3">
+                                                            <div class="col-md-4">
                                                                 <label class="col-md-1" id="lbl_criteria">Date</label>
                                                                 <div class="col-md-12">
-                                                                    <div class="input-group date" id="reservationdate_${i}" data-target-input="nearest">
-                                                                        <input type="text" class="form-control datetimepicker-input" id="txt_date_${i}" data-target="#reservationdate_${i}" placeholder="YYYY/MM/DD" />
-                                                                        <div class="input-group-append" data-target="#reservationdate_${i}" data-toggle="datetimepicker">
-                                                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                    <div class="form-group">
+                                                                        <div class="input-group date" id="datetimepicker_${i}" data-target-input="nearest">
+                                                                            <input type="text" id="txt_date_${i}" value='${oldDate}' class="form-control datetimepicker-input" data-target="#datetimepicker_${i}" placeholder="YYYY/MM/DD"  />
+                                                                            <div class="input-group-append" data-target="#datetimepicker_${i}" data-toggle="datetimepicker">
+                                                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -494,7 +499,7 @@
                                                             <div class="row form-group" id="div_image_${i}">
                                                                 ${getDocument(tempActivity.documents, tempActivity.activity_key)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
-                                                                <div class="col-md-2" id="div_post_${tempActivity.activity_key}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                                <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                                     <div class="plus">
                                                                         <ion-icon name="add-circle-outline"></ion-icon>
                                                                     </div>
@@ -504,16 +509,21 @@
                                                         <div class="row form-group">
                                                             <div class="col-md-12">
                                                                 <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
-                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${tempActivity.date}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${date}')><i class="fas fa-pencil-alt"></i> Update</button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                    </div> `;
                         $('#div_activity').append(activityHtml);
                         $(`#txt_description_${i}`).val(tempActivity.description)
-                        $(`#txt_date_${i}`).val(oldDate);
-                        $('#lbl_headerDate').html(`Date : ` + oldDate);
                     }
+
+                    $(`#lbl_headerDate_${i}`).html(`Date : ` + oldDate)
+                    $(`#txt_description_${i}`).val(tempActivity.description)
+
+                    $(`#reservationdate_${i}`).datetimepicker({
+                        format: 'Y/MM/D'
+                    });
                 }
             }
         }).fail(error => {
@@ -534,44 +544,64 @@
             for (var i = 0; i < criteria.length; i++) {
                 tempCriteria = criteria[i];
                 if (serviceData == true) {
-                    criteriaHtml += `<div class="row" id="div_getJson_${index}_${i}">
-                                <div class="col-md-12">
-                                    <div class="form-group row">
-                                            <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
-                                        <label id="lbl_getCriteria_${index}_${i}" class="ml-3">${tempCriteria.criteria} : </label>
-                                        <div class="col-md-1">
-                                            <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value" disabled>
+                    criteriaHtml += `<div class="col-md-4" id="div_getJson_${index}_${i}">
+                                        <div class="form-group row">
+                                                <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                            <label id="lbl_getCriteria_${index}_${i}" class="col-md-6 ml-1">${tempCriteria.criteria} : </label>
+                                            <div class="col-md-4">
+                                                <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value" disabled>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>`;
+                                    </div>`;
                 } else {
-                    criteriaHtml += `<div class="row" id="div_getJson_${index}_${i}">
-                                <div class="col-md-12">
-                                    <div class="form-group row">
-                                            <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
-                                        <label id="lbl_getCriteria_${index}_${i}" class="ml-3">${tempCriteria.criteria} : </label>
-                                        <div class="col-md-1">
-                                            <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value">
+                    criteriaHtml += `<div class="col-md-4" id="div_getJson_${index}_${i}">
+                                        <div class="form-group row">
+                                                <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                            <label id="lbl_getCriteria_${index}_${i}" class="col-md-6 ml-3">${tempCriteria.criteria} : </label>
+                                            <div class="col-md-4">
+                                                <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value">
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>`;
+                                    </div>`;
                 }
             }
             return (criteriaHtml)
         }
     };
 
-    function getDocument(document, activity_id) {
+    function getDocument(document, activity_id, service) {
         if (document) {
             var docHtml = '';
             for (var i = 0; i < document.length; i++) {
                 var tempDoc = document[i];
                 var file = tempDoc.filename;
                 var ext = file.substring(file.lastIndexOf('.') + 1);
-                if (ext != 'pdf') {
-                    docHtml += `<div class="col-md-2 img_container form-group">
+                if (service == true) {
+                    if (ext != 'pdf') {
+                        docHtml += `<div class="col-md-2 img_container form-group">
+                                    <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                        <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
+                                        <div class="middle">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                </div>`;
+                    } else {
+                        docHtml += `<div class="col-md-2">
+                                    <div>
+                                        <embed src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
+                                        <div class="middle">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <a class="btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                    </div>
+                                </div>`
+                    }
+                } else {
+                    if (ext != 'pdf') {
+                        docHtml += `<div class="col-md-2 img_container form-group">
                                     <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
                                         <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
@@ -582,8 +612,8 @@
                                         <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
                                     </div>
                                 </div>`;
-                } else {
-                    docHtml += `<div class="col-md-2">
+                    } else {
+                        docHtml += `<div class="col-md-2">
                                     <div>
                                         <embed  src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
                                         <div class="middle">
@@ -595,8 +625,8 @@
                                         <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-xs col-md-6" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}')><i class="fas fa-trash-alt"></i> Remove</button>
                                     </div>
                                 </div>`
+                    }
                 }
-
             }
             return (docHtml)
         } else {
@@ -655,6 +685,7 @@
                     </div>`;
                 $("#div_image_" + index).prepend(image);
             }
+            $(`#div_post_${index}`).hide();
         }
     }
 
@@ -662,17 +693,18 @@
         $('#file_post_' + index).val(null);
         var unUploaded = $('[id^=div_unUploaded_]')
         $(unUploaded).remove();
+        $(`#div_post_${index}`).show();
     }
 
     $('#list_type').change(() => {
         if ($('#list_type').val() == 'Service') {
             $('#div_service').show();
             if (dbProjectService) {
-                var option = `<option value="">Select Service<option>`
+                var option = `<option value="" hidden>Select Service</option>`
                 for (var i = 0; i < dbProjectService.length; i++) {
                     tempService = dbProjectService[i];
                     if (tempService.active == true) {
-                        option += `<option value="${tempService.service_id}">${getServiceName(tempService.service_id)}<option>`
+                        option += `<option value="${tempService.service_id}">${getServiceName(tempService.service_id)}</option>`
                     }
                     $('#list_service').html(option)
                 }
@@ -707,17 +739,15 @@
                         var criteria = '';
                         for (var j = 0; j < criteriaData.length; j++) {
                             var tempCriteria = criteriaData[j];
-                            criteria += `<div class="row" id='div_json_${j}'>
-                                    <div class="col-md-12">
-                                        <div class="form-group row">
-                                            <input id="txt_criteria_${j}" value="${tempCriteria.criteria_id}" style="display:none;">
-                                            <label id="lbl_criteria_${j}" class="col-md-2 ml-3">${tempCriteria.criteria} : </label>
-                                            <div class="col-md-1">
-                                                <input type="text" id="txt_value_${j}" class="form-control" placeholder="Value">
+                            criteria += `<div class="col-md-4" id='div_json_${j}'>
+                                            <div class="form-group row">
+                                                <input id="txt_criteria_${j}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                                <label id="lbl_criteria_${j}" class="col-md-6 ml-1">${tempCriteria.criteria} : </label>
+                                                <div class="col-md-4">
+                                                    <input type="text" id="txt_value_${j}" class="form-control" placeholder="Value">
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>`
+                                        </div>`
                         }
                     }
                     $('#div_criteria').append(criteria)
@@ -777,6 +807,7 @@
                     </div>`;
                 $("#div_pdf").prepend(image);
             }
+            $('#input_plus').hide();
         }
     });
 
@@ -784,6 +815,7 @@
         $('#file_post').val(null);
         var unUploaded = $('[id^=div_uploaded_]')
         $(unUploaded).remove();
+        $('#input_plus').show();
     }
 
     $('#btn_add').click(() => {
@@ -820,10 +852,29 @@
                     if ($('#txt_value_' + i).val() != '') {
                         criteria[i] = {
                             criteria_id: Number($('#txt_criteria_' + i).val()),
-                            value: Number($('#txt_value_' + i).val())
+                            value: String($('#txt_value_' + i).val())
+                        }
+                        if (isNaN(criteria[i].value)) {
+                            return $(document).Toasts('create', {
+                                title: 'Please Enter valid Input',
+                                autohide: true,
+                                delay: 5000,
+                                body: 'Value must be numbers',
+                                class: 'bg-danger',
+                            });
+                        }
+                        if ((criteria[i].value) <= 0) {
+                            return $(document).Toasts('create', {
+                                title: 'Error!',
+                                autohide: true,
+                                delay: 5000,
+                                body: 'Value must be Greater than 0',
+                                class: 'bg-danger',
+                            });
                         }
                     }
                 }
+
                 if ((Object.keys(criteria)).length <= 0) {
                     return $(document).Toasts('create', {
                         title: 'Criteria Required',
@@ -867,8 +918,11 @@
             var date = new Date(date),
                 d = date.getDate(),
                 m = date.getMonth() + 1,
-                y = date.getFullYear();
+                y = date.getFullYear(),
+                hr = date.getHours().toString().padStart(2, "0"),
+                minutes = date.getMinutes().toString().padStart(2, "0");
             var newDate = y + "/" + m + "/" + d;
+            var finalDate = y + "/" + m + "/" + d + ' ' + hr + ':' + minutes;
             if (Date.parse(strDate) < Date.parse(newDate)) {
                 return $(document).Toasts('create', {
                     title: 'Error!',
@@ -878,7 +932,7 @@
                     class: 'bg-danger',
                 });
             }
-            formData.append('date', newDate)
+            formData.append('date', finalDate)
         }
         for (var i = 0; i < $('#file_post')[0].files.length; ++i) {
             formData.append('file', $('#file_post')[0].files[i]);
@@ -919,11 +973,9 @@
     });
 
     function updateActivity(index, activity_id, oldDate) {
-        return console.log(oldDate)
         var getDate = $('#txt_date_' + index).val(),
             description = String($('#txt_description_' + index).val()).trim(),
             title = String($('#txt_title_' + index).val()).trim();
-        var getDate = getDate.trim();
         var formData = new FormData();
         formData.append('project_id', plan_id)
         formData.append('activity_key', activity_id)
@@ -933,7 +985,25 @@
             for (var i = 0; i < divJson.length; i++) {
                 criteria[i] = {
                     criteria_id: Number($(`#txt_getCriteria_${index}_${i}`).val()),
-                    value: Number($(`#txt_getValue_${index}_${i}`).val())
+                    value: String($(`#txt_getValue_${index}_${i}`).val())
+                }
+                if (isNaN(criteria[i].value)) {
+                    return $(document).Toasts('create', {
+                        title: 'Please Enter valid Input',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Value must be numbers',
+                        class: 'bg-danger',
+                    });
+                }
+                if ((criteria[i].value) <= 0) {
+                    return $(document).Toasts('create', {
+                        title: 'Error!',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Value must be Greater than 0',
+                        class: 'bg-danger',
+                    });
                 }
             }
             formData.append('criteria', JSON.stringify(criteria))
@@ -945,12 +1015,15 @@
         if (month.length < 2) month = month;
         if (day.length < 2) day = day;
         var date = ([year, month, day].join('/'));
-        var getDate = new Date(getDate),
-            d = getDate.getDate(),
-            m = getDate.getMonth() + 1,
-            y = getDate.getFullYear();
-        var newDate = y + '/' + m + '/' + d;
-        if (Date.parse(newDate) > Date.parse(date)) {
+        var getNewDate = new Date(getDate),
+            d = getNewDate.getDate(),
+            m = getNewDate.getMonth() + 1,
+            y = getNewDate.getFullYear(),
+            hr = getNewDate.getHours().toString().padStart(2, "0"),
+            minutes = getNewDate.getMinutes().toString().padStart(2, "0");
+        var newDate = y + '/' + m + '/' + d + ' ' + hr + ':' + minutes;
+        var dateOld = y + '/' + m + '/' + d;
+        if (Date.parse(dateOld) > Date.parse(date)) {
             return $(document).Toasts('create', {
                 title: 'Error!',
                 autohide: true,
@@ -1035,7 +1108,6 @@
                         window.location.reload();
                     },
                     error: error => {
-                        console.log(error)
                         error = error.responseJSON
 
                         $(document).Toasts('create', {

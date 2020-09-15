@@ -353,13 +353,22 @@
                                         </button> 
                                     </div>`,
                         active = tempTeam.active;
+                    var EmpName;
+                    if (dbEmp) {
+                        for (var j = 0; j < dbEmp.length; j++) {
+                            tempEmployee = dbEmp[j];
+                            if (tempEmployee.employee_id == tempTeam.employee_id) {
+                                EmpName = tempEmployee.name
+                            }
+                        }
+                    }
                     if (active == true) {
                         var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-hourglass-start'></i> Active</p>`
                     } else {
                         status = `<p style='color:#ff0000; font-size:17px;'><i class='fas fa-ban'></i> Deactivated</p>`
                     }
                     tblTeam.row.add([
-                        `${i+1}`, tempTeam.employee_id, getEmployeeName(tempTeam.employee_id), status, button
+                        `${i+1}`, tempTeam.employee_id, EmpName || 'N/A', status, button
                     ]).draw();
                     if (active == false) {
                         $(`#btn_deactivate_${i}`).hide();
@@ -383,22 +392,11 @@
         });
     }
 
-    function getEmployeeName(employee_id) {
-        if (dbEmp) {
-            for (var i = 0; i < dbEmp.length; i++) {
-                tempEmployee = dbEmp[i];
-                if (tempEmployee.employee_id == employee_id) {
-                    return tempEmployee.name
-                }
-            }
-        }
-    }
-
     $('#btn_add').click(() => {
         $('#div_empDetails').hide();
         $('#img_profile').attr('src', `images/logo-small.png`)
         $('#modal_Team').modal('show');
-        var option = `<option id="option_select" value=''>Select Team member</option>`
+        var option = `<option value='' hidden>Select Team member</option>`
         for (var i = 0; i < dbEmp.length; i++) {
             var tempEmp = dbEmp[i]
             option += `<option value='${tempEmp.employee_id}'>${tempEmp.name}</option>`;
@@ -407,7 +405,6 @@
     });
 
     $('#list_emp').change(() => {
-        $('#option_select').hide();
         var empId = $('#list_emp').val();
         $('#div_empDetails').show();
         if (empId) {

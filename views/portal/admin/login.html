@@ -95,7 +95,8 @@
 
     $('#btn_submit').click(() => {
         var email = $('#txt_email').val(),
-            password = $('#txt_password').val()
+            password = $('#txt_password').val(),
+            remember;
         if (!email) {
             return $(document).Toasts('create', {
                 title: 'Email not Found!',
@@ -129,12 +130,15 @@
         } else {
             password = String(password)
         }
+        if ($('#chk_remember').prop('checked') == true) {
+            remember = $('#chk_remember').prop('checked')
+        }
         $.post({
             url: '/admin/v1/user/login',
             data: {
                 "email": email,
                 "password": password,
-                "remember": $('#chk_remember').prop('checked')
+                "remember": remember
             },
             success: result => {
                 window.location.href = redirect;

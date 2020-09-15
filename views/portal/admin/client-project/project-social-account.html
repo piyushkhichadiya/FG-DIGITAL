@@ -201,7 +201,7 @@
                             <div class="form-group">
                                 <label>Account Name</label>
                                 <select class="form-control" id="list_social">
-                                    <option id="option_select" value="">Select Account</option>
+                                    <option value="" hidden>Select Account</option>
                                     <option value="Stack Overflow">Stack Overflow</option>
                                     <option value="Github">Github</option>
                                     <option value="Hacker Rank">Hacker Rank</option>
@@ -318,10 +318,6 @@
         $('#modal_Social').modal('show');
         $('#div_button').empty();
     });
-
-    $('#list_social').change(() => {
-        $('#option_select').hide();
-    })
 
     $('#btn_addAccount').click(() => {
         var name = $('#list_social').val(),
