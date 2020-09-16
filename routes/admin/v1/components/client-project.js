@@ -197,7 +197,8 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                     createdBy: tempSocialAccount.createdBy,
                     createdOn: tempSocialAccount.createdOn,
                     lastModifiedOn: tempSocialAccount.lastModifiedOn,
-                    lastModifiedBy: tempSocialAccount.lastModifiedBy
+                    lastModifiedBy: tempSocialAccount.lastModifiedBy,
+                    lastModifiedById: tempSocialAccount.lastModifiedById,
                 }
 
                 postObject.accounts.push(tempJSONObject);
@@ -230,8 +231,10 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                     description: tempReview.description,
                     createdOn: tempReview.createdOn,
                     createdBy: tempReview.createdBy,
-                    lastModifiedBy: tempReview.lastModifiedBy,
+                    createdById: tempReview.createdById,
                     lastModifiedOn: tempReview.lastModifiedOn,
+                    lastModifiedBy: tempReview.lastModifiedBy,
+                    lastModifiedById: tempReview.lastModifiedById,
                     closed: tempReview.closed
                 }
 
@@ -250,8 +253,10 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                             description: tempReviewPost.description,
                             createdOn: tempReviewPost.createdOn,
                             createdBy: tempReviewPost.createdBy,
-                            lastModifiedBy: tempReviewPost.lastModifiedBy,
+                            createdById: tempReviewPost.createdById,
                             lastModifiedOn: tempReviewPost.lastModifiedOn,
+                            lastModifiedBy: tempReviewPost.lastModifiedBy,
+                            lastModifiedById: tempReviewPost.lastModifiedById,
                         }
 
                         if (tempReviewPost.documents) {
@@ -270,8 +275,10 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                     filename: tempDocument.filename,
                                     lastModifiedOn: tempDocument.lastModifiedOn,
                                     lastModifiedBy: tempDocument.lastModifiedBy,
+                                    lastModifiedById: tempDocument.lastModifiedById,
                                     createdOn: tempDocument.createdOn,
-                                    createdBy: tempDocument.createdBy
+                                    createdBy: tempDocument.createdBy,
+                                    createdById: tempDocument.createdById
                                 }
 
                                 tempPostObj.documents.push(tempDocObj)
@@ -316,14 +323,16 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                 var tempObj = {
                     activity_key: dbActivityKey[i],
                     type: tempActivity.type,
-                    createdBy: tempActivity.createdBy,
                     createdOn: tempActivity.createdOn,
+                    createdBy: tempActivity.createdBy,
+                    createdById: tempActivity.createdById,
                     date: tempActivity.date,
                     title: tempActivity.title,
                     description: tempActivity.description,
                     service_id: tempActivity.service_id,
+                    lastModifiedOn: tempActivity.lastModifiedOn,
                     lastModifiedBy: tempActivity.lastModifiedBy,
-                    lastModifiedOn: tempActivity.lastModifiedOn
+                    lastModifiedById: tempActivity.lastModifiedById,
                 }
 
 
@@ -346,8 +355,10 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                 deleted: validate.deleted || validate.service_deleted,
                                 createdOn: tempCriteria.createdOn || tempActivity.createdOn,
                                 createdBy: tempCriteria.createdBy || tempActivity.createdBy,
+                                createdById: tempCriteria.createdById || tempActivity.createdById,
+                                lastModifiedOn: tempCriteria.lastModifiedOn,
                                 lastModifiedBy: tempCriteria.lastModifiedBy,
-                                lastModifiedOn: tempCriteria.lastModifiedOn
+                                lastModifiedById: tempCriteria.lastModifiedById,
                             }
 
                             if (!tempObj.service_name) {
@@ -381,8 +392,10 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                                 filename: tempDocument.filename,
                                 createdOn: tempDocument.createdOn || tempActivity.createdOn,
                                 createdBy: tempDocument.createdBy || tempActivity.createdBy,
-                                lastModifiedBy: tempDocument.lastModifiedBy,
+                                createdById: tempDocument.createdById || tempActivity.createdById,
                                 lastModifiedOn: tempDocument.lastModifiedOn,
+                                lastModifiedBy: tempDocument.lastModifiedBy,
+                                lastModifiedById: tempDocument.lastModifiedById,
                             })
                         }
                     }
@@ -1007,9 +1020,10 @@ projectAPI.get('/review/remove-post', (req, res) => {
 
                         tempReviewPost.deleted = true
                         tempReviewPost.lastModifiedBy = 'ADMIN'
+                        delete tempReviewPost.lastModifiedById
                         tempReviewPost.lastModifiedOn = String(new Date())
 
-                        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postKey}`).update(tempReviewPost).then(() => {
+                        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postKey}`).set(tempReviewPost).then(() => {
                             return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'A-6.14.5')
                         })
                     } else if (i == postDBKey.length - 1) {
@@ -1057,9 +1071,10 @@ projectAPI.get('/review/close', (req, res) => {
 
             tempReview.closed = true
             tempReview.lastModifiedBy = "ADMIN"
+            delete tempReview.lastModifiedById
             tempReview.lastModifiedOn = String(new Date())
 
-            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[i]}/`).update(tempReview).then(() => {
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[i]}/`).set(tempReview).then(() => {
                 return response(res, 200, 'success', 'Review has been closed successfully', undefined, 'A-6.15.6')
 
             })
@@ -1125,8 +1140,9 @@ projectAPI.get('/review/remove-file', (req, res) => {
                                 tempImage.deleted = true
                                 tempImage.lastModifiedBy = 'ADMIN'
                                 tempImage.lastModifiedOn = String(new Date())
+                                delete tempImage.lastModifiedById
 
-                                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postDBKey[i]}/documents/${documentsDBKeys[k]}/`).update(tempImage).then(() => {
+                                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postDBKey[i]}/documents/${documentsDBKeys[k]}/`).set(tempImage).then(() => {
                                     return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'A-6.16.8')
                                 })
                             }
@@ -1377,7 +1393,8 @@ projectAPI.post('/review/update', (req, res) => {
             }
             tempReview.lastModifiedBy = 'ADMIN'
             tempReview.lastModifiedOn = String(new Date())
-            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}`).update(tempReview).then(() => {
+            delete tempReview.lastModifiedById
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}`).set(tempReview).then(() => {
                 return response(res, 200, 'success', 'Review has been updated successfully', undefined, 'A-6.21.8')
 
             })
@@ -1474,6 +1491,7 @@ projectAPI.post('/review/update-post', (req, res) => {
                     tempPost.description = String(req.body.description).trim()
                     tempPost.lastModifiedOn = String(new Date())
                     tempPost.lastModifiedBy = "ADMIN"
+                    delete tempPost.lastModifiedById
                 }
 
                 // Append Documents
@@ -1502,7 +1520,7 @@ projectAPI.post('/review/update-post', (req, res) => {
                 }
 
 
-                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/post/${postKey}/`).update(tempPost).then(() => {
+                return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/post/${postKey}/`).set(tempPost).then(() => {
                     return response(res, 200, 'success', 'Post has been updated successfully', undefined, 'A-6.22.10')
                 })
             } else {
@@ -1547,6 +1565,7 @@ projectAPI.get('/review/open', (req, res) => {
             delete tempReview.closed
             tempReview.lastModifiedOn = String(new Date())
             tempReview.lastModifiedBy = "ADMIN"
+            delete tempReview.lastModifiedById
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/`).set(tempReview).then(() => {
                 return response(res, 200, 'success', 'Review activated successfully', undefined, 'A-6.23.6')
             })
@@ -2184,8 +2203,9 @@ projectAPI.post('/activity/remove-file', (req, res) => {
             tempDocument.deleted = true
             tempDocument.lastModifiedBy = "ADMIN"
             tempDocument.lastModifiedOn = String(new Date())
+            delete tempDocument.lastModifiedById
             unlinkFile(tempDocument.filename);
-            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/documents/${activityDocumentsKeys[i]}/`).update(tempDocument).then(() => {
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/documents/${activityDocumentsKeys[i]}/`).set(tempDocument).then(() => {
                 return response(res, 200, 'success', 'File has been removed successfully', undefined, 'A-6.26.7')
             })
 
@@ -2196,7 +2216,7 @@ projectAPI.post('/activity/remove-file', (req, res) => {
 
 })
 
-// 6.27 Remove Activity
+// 6.27 ACTIVITY > REMOVE
 projectAPI.post('/activity/remove', (req, res) => {
     if (!req.body.project_id) {
         return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.27.1')
@@ -2209,15 +2229,15 @@ projectAPI.post('/activity/remove', (req, res) => {
         activityKey = String(req.body.activity_key).trim(),
         getKeyDB = getKeys(projectID)
 
-    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.27.4') }
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.27.3') }
 
     if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity) {
-        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.27.5')
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.27.4')
     }
 
     var dbClientActivity = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].activity
     if (!dbClientActivity[activityKey] || dbClientActivity[activityKey].deleted) {
-        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.27.6')
+        return response(res, 404, 'notfound', 'Incorrect Activity Key', undefined, 'A-6.27.5')
     }
     var tempActivity = dbClientActivity[activityKey]
     if (tempActivity.documents) {
@@ -2230,23 +2250,91 @@ projectAPI.post('/activity/remove', (req, res) => {
             if (!tempDocument.deleted) {
 
                 tempDocument.deleted = true
-                tempDocument.lastModifiedBy = "Admin"
+                tempDocument.lastModifiedBy = "ADMIN"
                 tempDocument.lastModifiedOn = String(new Date())
+                delete tempDocument.lastModifiedId
                 unlinkFile(tempDocument.filename);
 
             }
         }
     }
-    tempDocument.lastModifiedBy = "Admin"
-    tempDocument.lastModifiedOn = String(new Date())
     tempActivity.deleted = true
-    return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).update(tempActivity).then(() => {
-        return response(res, 200, 'success', 'Activity has been removed successfully', undefined, 'A-6.27.7')
+    delete tempActivity.lastModifiedById
+    return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).set(tempActivity).then(() => {
+        return response(res, 200, 'success', 'Activity has been removed successfully', undefined, 'A-6.27.6')
     })
 
 
 })
 
+// 6.28 REVIEW > REVIEW
+projectAPI.get('/review/remove', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'A-6.28.1')
+    }
+
+    if (!req.query.review_id) {
+        return response(res, 400, 'required', 'Review ID is required', undefined, 'A-6.28.2')
+    }
+
+    var projectID = String(req.query.project_id).trim(),
+        reviewID = parseInt(String(req.query.review_id).trim()),
+        getKeyDB = getKeys(projectID)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'A-6.28.3') }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
+        return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.28.4')
+    }
+
+    var dbClientReview = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+        dbClientReviewKey = Object.keys(dbClientReview)
+
+    for (var i = 0; i < dbClientReviewKey.length; i++) {
+        var tempClientReview = dbClientReview[dbClientReviewKey[i]]
+
+        if (!tempClientReview.deleted && tempClientReview.review_id == reviewID) {
+
+            if (tempClientReview.post) {
+                var dbReviewPost = tempClientReview.post,
+                    dbReviewPostKey = Object.keys(dbReviewPost)
+
+                for (var j = 0; j < dbReviewPostKey.length; j++) {
+                    if (dbReviewPost[dbReviewPostKey[j]].documents) {
+                        var dbPostDocuments = dbReviewPost[dbReviewPostKey[j]].documents,
+                            dbPostDocumentsKey = Object.keys(dbPostDocuments)
+
+                        for (var k = 0; k < dbPostDocumentsKey.length; k++) {
+                            if (dbPostDocuments[dbPostDocumentsKey[k]].deleted) { continue }
+
+                            var tempPostDocument = dbPostDocuments[dbPostDocumentsKey[k]]
+                            tempPostDocument.lastModifiedOn = String(new Date())
+                            tempPostDocument.lastModifiedBy = 'ADMIN'
+                            delete tempPostDocument.lastModifiedById
+                            unlinkFile(tempPostDocument.filename);
+                        }
+                    }
+                }
+            }
+
+            tempClientReview.deleted = true
+            tempClientReview.lastModifiedOn = String(new Date())
+            tempClientReview.lastModifiedBy = 'ADMIN'
+            delete tempClientReview.lastModifiedById
+
+            return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${dbClientReviewKey[i]}/`).set(tempClientReview).then(() => {
+                return response(res, 200, 'success', 'Activity has been removed successfully', undefined, 'A-6.28.5')
+            })
+        } else if (i == dbClientReviewKey.length - 1) {
+            return response(res, 404, 'notFound', 'Incorrect Review ID', undefined, 'A-6.28.6')
+        }
+    }
+})
+
+module.exports = projectAPI;
+
+
+// Function: To Get Client and Project Key using Project ID
 function getKeys(project_id) {
     if (!dbAdminSnapshot.clients) {
         return false
@@ -2261,11 +2349,10 @@ function getKeys(project_id) {
             for (var j = 0; j < planKey.length; j++) {
                 var tempPlan = planDB[planKey[j]]
                 if (tempPlan.project_id == project_id && !tempPlan.deleted) {
-                    pushData = {
-                        "client_key": clientKey[i],
-                        "plan_key": planKey[j]
+                    return {
+                        client_key: clientKey[i],
+                        plan_key: planKey[j]
                     }
-                    return pushData
                 }
             }
         } else if (i == clientKey.length - 1) {
@@ -2274,4 +2361,3 @@ function getKeys(project_id) {
     }
 
 }
-module.exports = projectAPI;
