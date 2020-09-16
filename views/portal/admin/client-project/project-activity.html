@@ -425,7 +425,8 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
+                                                        
+                                                        <div id='div_border_${i}' style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                                             <div class="row form-group" id="div_image_${i}">
                                                                 ${getDocument(tempActivity.documents, tempActivity.activity_key, tempActivity.service_deleted)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
@@ -448,6 +449,9 @@
                         if (tempActivity.service_deleted == true) {
                             $(`#btn_update_${i}`).remove();
                             $(`#div_post_${i}`).remove();
+                            if (!tempActivity.documents) {
+                                $(`#div_border_${i}`).remove()
+                            }
                         }
                     }
                     if (tempActivity.type == 'ACTIVITY') {
@@ -498,7 +502,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
+                                                        <div id='div_border_${i}' style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                                             <div class="row form-group" id="div_image_${i}">
                                                                 ${getDocument(tempActivity.documents, tempActivity.activity_key)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
@@ -587,7 +591,7 @@
                 if (service == true) {
                     if (ext != 'pdf') {
                         docHtml += `<div class="col-md-2 img_container form-group">
-                                    <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                    <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' onError=this.href='images/notfound.jpg' data-toggle="lightbox">
                                         <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
                                             <i class="fas fa-search"></i>
