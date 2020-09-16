@@ -819,7 +819,7 @@ projectAPI.post('/update', (req, res) => {
         pushData.lastModifiedOn = String(new Date())
         pushData.lastModifiedBy = "ADMIN"
         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/`).update(pushData).then(() => {
-            return response(res, 200, 'success', 'Account Updated Successfully', undefined, 'A-6.11.3')
+            return response(res, 200, 'success', 'Project Information Updated Successfully', undefined, 'A-6.11.3')
 
         })
     } else {
@@ -1024,7 +1024,7 @@ projectAPI.get('/review/remove-post', (req, res) => {
                         tempReviewPost.lastModifiedOn = String(new Date())
 
                         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postKey}`).set(tempReviewPost).then(() => {
-                            return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'A-6.14.5')
+                            return response(res, 200, 'success', 'Post from Review has been deleted successfully', undefined, 'A-6.14.5')
                         })
                     } else if (i == postDBKey.length - 1) {
                         return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'A-6.14.6')
@@ -1143,7 +1143,7 @@ projectAPI.get('/review/remove-file', (req, res) => {
                                 delete tempImage.lastModifiedById
 
                                 return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postDBKey[i]}/documents/${documentsDBKeys[k]}/`).set(tempImage).then(() => {
-                                    return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'A-6.16.8')
+                                    return response(res, 200, 'success', 'File has been removed successfully', undefined, 'A-6.16.8')
                                 })
                             }
                         }
@@ -1567,7 +1567,7 @@ projectAPI.get('/review/open', (req, res) => {
             tempReview.lastModifiedBy = "ADMIN"
             delete tempReview.lastModifiedById
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/`).set(tempReview).then(() => {
-                return response(res, 200, 'success', 'Review activated successfully', undefined, 'A-6.23.6')
+                return response(res, 200, 'success', 'Review is opened successfully', undefined, 'A-6.23.6')
             })
         } else if (i == reviewDBKeys.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'A-6.23.7')
@@ -1709,7 +1709,7 @@ projectAPI.post('/activity/add', (req, res) => {
                             if (tempCriteria.criteria_id && tempCriteria.value) {
 
                                 if (isNaN(parseInt(tempCriteria.value)) || parseInt(tempCriteria.value) < 0) {
-                                    return response(res, 400, 'invalid', 'Criteria Value must be integer and greater than 0', undefined, 'A-6.24.24');
+                                    return response(res, 400, 'invalid', 'Criteria Value must be integer and greater than 0', undefined, 'A-6.24.23');
                                 }
 
                                 if (!activeCriteria.includes(tempCriteria.criteria_id)) {
@@ -1717,7 +1717,7 @@ projectAPI.post('/activity/add', (req, res) => {
                                 }
 
                                 if (tempPushCriteria.includes(tempCriteria.criteria_id)) {
-                                    return response(res, 400, 'invalid', 'Criteria ID must be unique', undefined, 'A-6.24.23')
+                                    return response(res, 400, 'invalid', 'Criteria ID must be unique', undefined, 'A-6.24.22')
                                 }
 
                                 pushCriteria.push({
@@ -1790,9 +1790,7 @@ projectAPI.post('/activity/add', (req, res) => {
             }
         }
 
-        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/`).push(pushData).then(() => {
-            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.18')
-        })
+
     }
 
     // Activity Type: Activity
@@ -1839,11 +1837,11 @@ projectAPI.post('/activity/add', (req, res) => {
                 })
             }
         }
-
-        return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/`).push(pushData).then(() => {
-            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.22')
-        })
     }
+
+    return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/`).push(pushData).then(() => {
+        return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.24.18')
+    })
 })
 
 // 6.25 ACTIVITY > UPDATE
@@ -1967,7 +1965,7 @@ projectAPI.post('/activity/update', (req, res) => {
         delete tempActivity.lastModifiedById
 
         return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}`).set(tempActivity).then(() => {
-            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'A-6.25.10')
+            return response(res, 200, 'success', 'Activity has been updated successfully', undefined, 'A-6.25.10')
         })
     }
 
@@ -2308,6 +2306,8 @@ projectAPI.get('/review/remove', (req, res) => {
                             if (dbPostDocuments[dbPostDocumentsKey[k]].deleted) { continue }
 
                             var tempPostDocument = dbPostDocuments[dbPostDocumentsKey[k]]
+
+                            tempPostDocument.deleted = true
                             tempPostDocument.lastModifiedOn = String(new Date())
                             tempPostDocument.lastModifiedBy = 'ADMIN'
                             delete tempPostDocument.lastModifiedById
@@ -2323,7 +2323,7 @@ projectAPI.get('/review/remove', (req, res) => {
             delete tempClientReview.lastModifiedById
 
             return firebase.database().ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${dbClientReviewKey[i]}/`).set(tempClientReview).then(() => {
-                return response(res, 200, 'success', 'Activity has been removed successfully', undefined, 'A-6.28.5')
+                return response(res, 200, 'success', 'Review has been removed successfully', undefined, 'A-6.28.5')
             })
         } else if (i == dbClientReviewKey.length - 1) {
             return response(res, 404, 'notFound', 'Incorrect Review ID', undefined, 'A-6.28.6')

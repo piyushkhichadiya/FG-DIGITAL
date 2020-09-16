@@ -40,7 +40,7 @@
         "/user/create": {
             "post": {
                 "tags": ["1. User Account"],
-                "summary": "Create Admin Account",
+                "summary": "1.1 Create Admin Account",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -68,7 +68,7 @@
         "/user/login": {
             "post": {
                 "tags": ["1. User Account"],
-                "summary": "Authentication for Access admin panel",
+                "summary": "1.2 Authentication for Access admin panel",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -99,21 +99,21 @@
         "/user/logout": {
             "get": {
                 "tags": ["1. User Account"],
-                "summary": "To logout or expire session from portal",
+                "summary": "1.3 To logout or expire session from portal",
                 "responses": {}
             }
         },
         "/profile": {
             "get": {
                 "tags": ["2. Profile"],
-                "summary": "Get Profile",
+                "summary": "2.1 Get Profile",
                 "responses": {}
             }
         },
         "/profile/update": {
             "post": {
                 "tags": ["2. Profile"],
-                "summary": "Update Profile Details",
+                "summary": "2.2 Update Profile Details",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
                         "name": "name",
@@ -140,7 +140,7 @@
         "/profile/password": {
             "post": {
                 "tags": ["2. Profile"],
-                "summary": "Change Password",
+                "summary": "2.3 Change Password",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -161,8 +161,8 @@
         },
         "/profile/file/{filename}": {
             "get": {
-                "tags": ["2. Profile"],
-                "summary": "To Get Any file from storage",
+                "tags": ["2. Profile", "Global"],
+                "summary": "2.4 To Get Any file from storage",
                 "parameters": [{
                     "in": "path",
                     "name": "filename",
@@ -175,7 +175,7 @@
         "/plan/add": {
             "post": {
                 "tags": ["3. Plan"],
-                "summary": "Add New Plan",
+                "summary": "3.1 Add New Plan",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -207,7 +207,7 @@
         "/plan/update": {
             "post": {
                 "tags": ["3. Plan"],
-                "summary": "Update existing plan",
+                "summary": "3.2 Update existing plan",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -243,7 +243,7 @@
         "/plan/remove": {
             "get": {
                 "tags": ["3. Plan"],
-                "summary": "Remove Existing Plan",
+                "summary": "3.3 Remove Existing Plan",
                 "parameters": [{
                     "in": "query",
                     "name": "plan_id",
@@ -257,14 +257,14 @@
         "/plan/get": {
             "get": {
                 "tags": ["3. Plan"],
-                "summary": "Get Existing Plans",
+                "summary": "3.4 Get Existing Plans",
                 "responses": {}
             }
         },
         "/client/create": {
             "post": {
                 "tags": ["4. Client"],
-                "summary": "Create New Client",
+                "summary": "4.1 Create New Client",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -294,7 +294,7 @@
         "/client/update": {
             "post": {
                 "tags": ["4. Client"],
-                "summary": "Update existing client details",
+                "summary": "4.2 Update existing client details",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -324,7 +324,7 @@
         "/client/remove": {
             "get": {
                 "tags": ["4. Client"],
-                "summary": "Remove existing client and all plans/projects",
+                "summary": "4.3 Remove existing client and all plans/projects",
                 "parameters": [{
                     "in": "query",
                     "name": "client_id",
@@ -334,10 +334,128 @@
                 "responses": {}
             }
         },
+        "/client/plan/add": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "4.4 Add new plan to client account",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["client_id", "plan", "start_date", "duration", "price"],
+                        "properties": {
+                            "client_id": { "type": "string" },
+                            "plan": { "type": "string", "description": "Get Plan Name using /plan/get" },
+                            "start_date": { "type": "string", "format": "date" },
+                            "duration": { "type": "integer" },
+                            "price": { "type": "integer" }
+                        },
+                        "example": {
+                            "client_id": "-MDa5rMi4PeMnbevEOyV",
+                            "plan": "Customized Plan",
+                            "start_date": "2020/05/30",
+                            "duration": 30,
+                            "price": 50000
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/client/plan/update": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "4.5 Update existing plan details",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["client_id", "project_id"],
+                        "properties": {
+                            "client_id": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "plan": { "type": "string", "description": "Get Plan Name using /plan/get" },
+                            "start_date": { "type": "string", "format": "date" },
+                            "duration": { "type": "integer" },
+                            "price": { "type": "integer" }
+                        },
+                        "example": {
+                            "client_id": "-MDa5rMi4PeMnbevEOyV",
+                            "project_id": 123465789,
+                            "plan": "Customized Plan",
+                            "start_date": "2020/05/30",
+                            "duration": 30,
+                            "price": 50000
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/client/plan/remove": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "4.6 Remove existing plan/project from client",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["client_id", "project_id"],
+                        "properties": {
+                            "client_id": { "type": "string" },
+                            "project_id": { "type": "string" }
+                        },
+                        "example": {
+                            "client_id": "-MDa5rMi4PeMnbevEOyV",
+                            "project_id": 474905198593
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/client/get": {
+            "get": {
+                "tags": ["4. Client"],
+                "summary": "4.7 Get All Client",
+                "parameters": [{
+                    "in": "query",
+                    "name": "client_id",
+                    "description": "Client ID",
+                    "required": false,
+                    "type": "string"
+                }],
+                "responses": {}
+            }
+
+        },
+        "/client/change-password": {
+            "post": {
+                "tags": ["4. Client"],
+                "summary": "4.8 Change password client",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "description": "client_id and password",
+                    "schema": {
+                        "required": ["client_id"],
+                        "properties": {
+                            "client_id": { "type": "string" },
+                            "password": { "type": "string" }
+                        },
+                        "example": {
+                            "client_id": "-MDa5rMi4PeMnbevEOyV",
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
         "/employee/add": {
             "post": {
                 "tags": ["5. Employee"],
-                "summary": "Add New Employee",
+                "summary": "5.1 Add New Employee",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -361,7 +479,7 @@
         "/employee/get": {
             "get": {
                 "tags": ["5. Employee"],
-                "summary": "Get Employee Details",
+                "summary": "5.2 Get Employee Details",
                 "parameters": [{
                     "in": "query",
                     "name": "employee_id",
@@ -375,7 +493,7 @@
         "/employee/update/{employee_id}": {
             "post": {
                 "tags": ["5. Employee"],
-                "summary": "Update existing employee",
+                "summary": "5.3 Update existing employee",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
                     "in": "path",
@@ -444,7 +562,7 @@
         "/employee/change-password": {
             "post": {
                 "tags": ["5. Employee"],
-                "summary": "Change Employee Password",
+                "summary": "5.4 Change Employee Password",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -466,7 +584,7 @@
         "/employee/remove": {
             "get": {
                 "tags": ["5. Employee"],
-                "summary": "Remove existing employee",
+                "summary": "5.5 Remove existing employee",
                 "parameters": [{
                     "in": "query",
                     "name": "employee_id",
@@ -483,7 +601,7 @@
         "/employee/social-account/add": {
             "post": {
                 "tags": ["5. Employee"],
-                "summary": "Add social media account",
+                "summary": "5.6 Add social media account",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -507,7 +625,7 @@
         "/employee/social-account/update": {
             "post": {
                 "tags": ["5. Employee"],
-                "summary": "Update existing social account details",
+                "summary": "5.7 Update existing social account details",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -533,7 +651,7 @@
         "/employee/social-account/remove": {
             "get": {
                 "tags": ["5. Employee"],
-                "summary": "Remove existing social account",
+                "summary": "5.8 Remove existing social account",
                 "parameters": [{
                     "in": "query",
                     "name": "employee_id",
@@ -554,119 +672,145 @@
                 "responses": {}
             }
         },
-        "/client/plan/add": {
+        "/service/create": {
             "post": {
-                "tags": ["4. Client"],
-                "summary": "Add new plan to client account",
+                "tags": ["7. Services"],
+                "summary": "7.1 Create New Service",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
                     "schema": {
-                        "required": ["client_id", "plan", "start_date", "duration", "price"],
+                        "required": ["title"],
                         "properties": {
-                            "client_id": { "type": "string" },
-                            "plan": { "type": "string", "description": "Get Plan Name using /plan/get" },
-                            "start_date": { "type": "string", "format": "date" },
-                            "duration": { "type": "integer" },
-                            "price": { "type": "integer" }
+                            "title": { "type": "string" }
                         },
                         "example": {
-                            "client_id": "-MDa5rMi4PeMnbevEOyV",
-                            "plan": "Customized Plan",
-                            "start_date": "2020/05/30",
-                            "duration": 30,
-                            "price": 50000
+                            "title": "Email Marketing"
                         }
                     }
                 }],
                 "responses": {}
             }
         },
-        "/client/plan/update": {
-            "post": {
-                "tags": ["4. Client"],
-                "summary": "Update existing plan details",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["client_id", "project_id"],
-                        "properties": {
-                            "client_id": { "type": "string" },
-                            "project_id": { "type": "string" },
-                            "plan": { "type": "string", "description": "Get Plan Name using /plan/get" },
-                            "start_date": { "type": "string", "format": "date" },
-                            "duration": { "type": "integer" },
-                            "price": { "type": "integer" }
-                        },
-                        "example": {
-                            "client_id": "-MDa5rMi4PeMnbevEOyV",
-                            "project_id": 123465789,
-                            "plan": "Customized Plan",
-                            "start_date": "2020/05/30",
-                            "duration": 30,
-                            "price": 50000
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/client/plan/remove": {
-            "post": {
-                "tags": ["4. Client"],
-                "summary": "Remove existing plan/project from client",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["client_id", "project_id"],
-                        "properties": {
-                            "client_id": { "type": "string" },
-                            "project_id": { "type": "string" }
-                        },
-                        "example": {
-                            "client_id": "-MDa5rMi4PeMnbevEOyV",
-                            "project_id": 474905198593
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/client/get": {
+        "/service/get": {
             "get": {
-                "tags": ["4. Client"],
-                "summary": "Get All Client",
+                "tags": ["7. Services"],
+                "summary": "7.2 Get existing services",
                 "parameters": [{
                     "in": "query",
-                    "name": "client_id",
-                    "description": "Client ID",
-                    "required": false,
-                    "type": "string"
+                    "name": "service_id",
+                    "type": "integer",
+                    "description": "To get particular service"
                 }],
                 "responses": {}
             }
-
         },
-        "/client/change-password": {
+        "/service/update": {
             "post": {
-                "tags": ["4. Client"],
-                "summary": "Change password client",
+                "tags": ["7. Services"],
+                "summary": "7.3 Update existing services",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
-                    "description": "client_id and password",
                     "schema": {
-                        "required": ["client_id"],
+                        "required": ["service_id", "title"],
                         "properties": {
-                            "client_id": { "type": "string" },
-                            "password": { "type": "string" }
+                            "service_id": { "type": "integer" },
+                            "title": { "type": "string" }
                         },
                         "example": {
-                            "client_id": "-MDa5rMi4PeMnbevEOyV",
-                            "password": "my-secret-password"
+                            "service_id": 371889110187,
+                            "title": "Social Media Marketing"
                         }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/remove": {
+            "get": {
+                "tags": ["7. Services"],
+                "summary": "7.4 Remove existing services",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "integer",
+                    "required": true,
+                    "description": "To remove particular service",
+                    "schema": {
+                        "example": "371889110187"
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/criteria/add": {
+            "post": {
+                "tags": ["7. Services"],
+                "summary": "7.5 Add criteria to service",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["service_id", "criteria"],
+                        "properties": {
+                            "service_id": { "type": "integer" },
+                            "criteria": { "type": "string" }
+                        },
+                        "example": {
+                            "service_id": 371889110187,
+                            "criteria": "Instagram Follower"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/criteria/update": {
+            "post": {
+                "tags": ["7. Services"],
+                "summary": ".6 Update criteria to service",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["service_id", "criteria_id", "criteria"],
+                        "properties": {
+                            "service_id": { "type": "integer" },
+                            "criteria_id": { "type": "integer" },
+                            "criteria": { "type": "string" }
+                        },
+                        "example": {
+                            "service_id": 371889110187,
+                            "criteria_id": 390441675983,
+                            "criteria": "Facebook Follower"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/service/criteria/remove": {
+            "get": {
+                "tags": ["7. Services"],
+                "summary": "7.7 Remove existing service criteria",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "integer",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "criteria_id",
+                    "description": "Criteria ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 390441675983
                     }
                 }],
                 "responses": {}
@@ -675,7 +819,7 @@
         "/project/get": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Get All Project Details",
+                "summary": "6.1 Get All Project Details",
                 "parameters": [{
                     "in": "query",
                     "name": "client_id",
@@ -690,7 +834,7 @@
         "/project/fetch/{project_id}": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Get Project using defined scope",
+                "summary": "6.2 Get Project using defined scope",
                 "parameters": [{
                     "in": "path",
                     "name": "project_id",
@@ -715,34 +859,10 @@
             }
 
         },
-        "/project/update": {
-            "post": {
-                "tags": ["6. Client Project"],
-                "summary": "Update Account Info",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["project_name", "project_id"],
-                        "properties": {
-                            "project_name": { "type": "string" },
-                            "project_id": { "type": "string" },
-                            "project_description": { "type": "string" }
-                        },
-                        "example": {
-                            "project_id": "93492065515",
-                            "project_name": "Social Media",
-                            "project_description": "Test description for project"
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
         "/project/team/add": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Assign Team member to project",
+                "summary": "6.3 Assign Team member to project",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -766,7 +886,7 @@
         "/project/team/update": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Update Permission to team member",
+                "summary": "6.4 Update Permission to team member",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -793,7 +913,7 @@
         "/project/team/remove": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Remove Project",
+                "summary": "6.5 Remove Team Member",
                 "parameters": [{
                     "in": "query",
                     "name": "project_id",
@@ -824,7 +944,7 @@
         "/project/team/deactivate": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Remove Project",
+                "summary": "6.6 Deactivate from Project",
                 "parameters": [{
                     "in": "query",
                     "name": "project_id",
@@ -855,7 +975,7 @@
         "/project/team/activate": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Remove Project",
+                "summary": "6.7 Re-activate for Project",
                 "parameters": [{
                     "in": "query",
                     "name": "project_id",
@@ -882,7 +1002,7 @@
         "/project/social-account/add": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Add Social Account",
+                "summary": "6.8 Add Social Account",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -907,7 +1027,7 @@
         "/project/social-account/update": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Update Social Account",
+                "summary": "6.9 Update Social Account",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -931,7 +1051,7 @@
         "/project/social-account/remove": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Remove Social Account",
+                "summary": "6.10 Remove Social Account",
                 "parameters": [{
                         "in": "query",
                         "name": "project_id",
@@ -954,10 +1074,34 @@
                 "responses": {}
             }
         },
+        "/project/update": {
+            "post": {
+                "tags": ["6. Client Project"],
+                "summary": "6.11 Update Project Information",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["project_name", "project_id"],
+                        "properties": {
+                            "project_name": { "type": "string" },
+                            "project_id": { "type": "string" },
+                            "project_description": { "type": "string" }
+                        },
+                        "example": {
+                            "project_id": "93492065515",
+                            "project_name": "Social Media",
+                            "project_description": "Test description for project"
+                        }
+                    }
+                }],
+                "responses": {}
+            }
+        },
         "/project/review/create": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Create Review",
+                "summary": "6.12 Create Review",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -981,7 +1125,7 @@
         "/project/review/add-post": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Add Post Detail",
+                "summary": "6.13 Add Post in Review",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
                         "name": "description",
@@ -1027,7 +1171,7 @@
         "/project/review/remove-post": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Remove Post",
+                "summary": "6.14 Remove Post from Review",
                 "parameters": [{
                         "in": "query",
                         "name": "project_id",
@@ -1066,7 +1210,7 @@
         "/project/review/close": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Close Review",
+                "summary": "6.15 Close Review",
                 "parameters": [{
                         "in": "query",
                         "name": "project_id",
@@ -1093,7 +1237,7 @@
         "/project/review/remove-file": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Close Review",
+                "summary": "6.16 Remove file from Review Post",
                 "parameters": [{
                         "in": "query",
                         "name": "project_id",
@@ -1125,10 +1269,114 @@
                 "responses": {}
             }
         },
+        "/project/service/add": {
+            "get": {
+                "tags": ["6. Client Project"],
+                "summary": "6.17 Add Service to Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "integer",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 93492065515
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/service/deactivate": {
+            "get": {
+                "tags": ["6. Client Project"],
+                "summary": "6.18 Deactivate Service from Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "string",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 93492065515
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/service/activate": {
+            "get": {
+                "tags": ["6. Client Project"],
+                "summary": "6.19 Activate Service for Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "string",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 93492065515
+                    }
+                }],
+                "responses": {}
+            }
+        },
+        "/project/service/remove": {
+            "get": {
+                "tags": ["6. Client Project"],
+                "summary": "6.20 Remove Service from Project",
+                "parameters": [{
+                    "in": "query",
+                    "name": "service_id",
+                    "type": "string",
+                    "required": true,
+                    "description": "Service ID",
+                    "schema": {
+                        "example": 371889110187
+                    }
+                }, {
+                    "in": "query",
+                    "name": "project_id",
+                    "description": "Project ID",
+                    "required": true,
+                    "type": "integer",
+                    "schema": {
+                        "example": 93492065515
+                    }
+                }],
+                "responses": {}
+            }
+        },
         "/project/review/update": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Update review title and description",
+                "summary": "6.21 Update review title and description",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -1154,7 +1402,7 @@
         "/project/review/update-post": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Update review post and description",
+                "summary": "6.22 Update description and add documents",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
                         "name": "project_id",
@@ -1210,7 +1458,7 @@
         "/project/review/open": {
             "get": {
                 "tags": ["6. Client Project"],
-                "summary": "Close Review",
+                "summary": "6.23 Re-Open Review",
                 "parameters": [{
                         "in": "query",
                         "name": "project_id",
@@ -1235,286 +1483,10 @@
                 "responses": {}
             }
         },
-        "/project/review/remove": {
-            "get": {
-                "tags": ["6. Client Project"],
-                "summary": "6.28 Remove Review",
-                "parameters": [{
-                        "in": "query",
-                        "name": "project_id",
-                        "description": "Project ID",
-                        "required": true,
-                        "type": "integer",
-                        "schema": {
-                            "example": 93492065515
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "review_id",
-                        "type": "integer",
-                        "required": true,
-                        "description": "Review ID",
-                        "schema": {
-                            "example": 1449459567309
-                        }
-                    }
-                ],
-                "responses": {}
-            }
-        },
-        "/service/create": {
-            "post": {
-                "tags": ["7. Services"],
-                "summary": "Create New Service",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["title"],
-                        "properties": {
-                            "title": { "type": "string" }
-                        },
-                        "example": {
-                            "title": "Email Marketing"
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/service/get": {
-            "get": {
-                "tags": ["7. Services"],
-                "summary": "Get existing services",
-                "parameters": [{
-                    "in": "query",
-                    "name": "service_id",
-                    "type": "integer",
-                    "description": "To get particular service"
-                }],
-                "responses": {}
-            }
-        },
-        "/service/update": {
-            "post": {
-                "tags": ["7. Services"],
-                "summary": "Update existing services",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["service_id", "title"],
-                        "properties": {
-                            "service_id": { "type": "integer" },
-                            "title": { "type": "string" }
-                        },
-                        "example": {
-                            "service_id": 371889110187,
-                            "title": "Social Media Marketing"
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/service/remove": {
-            "get": {
-                "tags": ["7. Services"],
-                "summary": "Remove existing services",
-                "parameters": [{
-                    "in": "query",
-                    "name": "service_id",
-                    "type": "integer",
-                    "required": true,
-                    "description": "To remove particular service",
-                    "schema": {
-                        "example": "371889110187"
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/service/criteria/add": {
-            "post": {
-                "tags": ["7. Services"],
-                "summary": "Add criteria to service",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["service_id", "criteria"],
-                        "properties": {
-                            "service_id": { "type": "integer" },
-                            "criteria": { "type": "string" }
-                        },
-                        "example": {
-                            "service_id": 371889110187,
-                            "criteria": "Instagram Follower"
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/service/criteria/update": {
-            "post": {
-                "tags": ["7. Services"],
-                "summary": "Update criteria to service",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["service_id", "criteria_id", "criteria"],
-                        "properties": {
-                            "service_id": { "type": "integer" },
-                            "criteria_id": { "type": "integer" },
-                            "criteria": { "type": "string" }
-                        },
-                        "example": {
-                            "service_id": 371889110187,
-                            "criteria_id": 390441675983,
-                            "criteria": "Facebook Follower"
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/service/criteria/remove": {
-            "get": {
-                "tags": ["7. Services"],
-                "summary": "Remove existing service criteria",
-                "parameters": [{
-                    "in": "query",
-                    "name": "service_id",
-                    "type": "integer",
-                    "required": true,
-                    "description": "Service ID",
-                    "schema": {
-                        "example": 371889110187
-                    }
-                }, {
-                    "in": "query",
-                    "name": "criteria_id",
-                    "description": "Criteria ID",
-                    "required": true,
-                    "type": "integer",
-                    "schema": {
-                        "example": 390441675983
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/project/service/add": {
-            "get": {
-                "tags": ["6. Client Project"],
-                "summary": "Add Service to client",
-                "parameters": [{
-                    "in": "query",
-                    "name": "service_id",
-                    "type": "integer",
-                    "required": true,
-                    "description": "Service ID",
-                    "schema": {
-                        "example": 371889110187
-                    }
-                }, {
-                    "in": "query",
-                    "name": "project_id",
-                    "description": "Project ID",
-                    "required": true,
-                    "type": "integer",
-                    "schema": {
-                        "example": 93492065515
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/project/service/deactivate": {
-            "get": {
-                "tags": ["6. Client Project"],
-                "summary": "Deactivate Service to client",
-                "parameters": [{
-                    "in": "query",
-                    "name": "service_id",
-                    "type": "string",
-                    "required": true,
-                    "description": "Service ID",
-                    "schema": {
-                        "example": 371889110187
-                    }
-                }, {
-                    "in": "query",
-                    "name": "project_id",
-                    "description": "Project ID",
-                    "required": true,
-                    "type": "integer",
-                    "schema": {
-                        "example": 93492065515
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/project/service/activate": {
-            "get": {
-                "tags": ["6. Client Project"],
-                "summary": "Activate Service to client",
-                "parameters": [{
-                    "in": "query",
-                    "name": "service_id",
-                    "type": "string",
-                    "required": true,
-                    "description": "Service ID",
-                    "schema": {
-                        "example": 371889110187
-                    }
-                }, {
-                    "in": "query",
-                    "name": "project_id",
-                    "description": "Project ID",
-                    "required": true,
-                    "type": "integer",
-                    "schema": {
-                        "example": 93492065515
-                    }
-                }],
-                "responses": {}
-            }
-        },
-        "/project/service/remove": {
-            "get": {
-                "tags": ["6. Client Project"],
-                "summary": "Remove Service from client",
-                "parameters": [{
-                    "in": "query",
-                    "name": "service_id",
-                    "type": "string",
-                    "required": true,
-                    "description": "Service ID",
-                    "schema": {
-                        "example": 371889110187
-                    }
-                }, {
-                    "in": "query",
-                    "name": "project_id",
-                    "description": "Project ID",
-                    "required": true,
-                    "type": "integer",
-                    "schema": {
-                        "example": 93492065515
-                    }
-                }],
-                "responses": {}
-            }
-        },
         "/project/activity/add": {
             "post": {
                 "tags": ["6. Client Project"],
-                "summary": "Add Activity",
+                "summary": "6.24 Add Activity",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
                         "name": "project_id",
@@ -1725,6 +1697,34 @@
                         }
                     }
                 }],
+                "responses": {}
+            }
+        },
+        "/project/review/remove": {
+            "get": {
+                "tags": ["6. Client Project"],
+                "summary": "6.28 Remove Review",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "description": "Project ID",
+                        "required": true,
+                        "type": "integer",
+                        "schema": {
+                            "example": 93492065515
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "type": "integer",
+                        "required": true,
+                        "description": "Review ID",
+                        "schema": {
+                            "example": 1449459567309
+                        }
+                    }
+                ],
                 "responses": {}
             }
         }

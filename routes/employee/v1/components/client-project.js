@@ -890,7 +890,7 @@ clientProjectAPI.post('/activity/update', (req, res) => {
         tempActivity.lastModifiedOn = String(new Date())
 
         return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}`).update(tempActivity).then(() => {
-            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'E-3.3.11')
+            return response(res, 200, 'success', 'Activity has been updated successfully', undefined, 'E-3.3.11')
         })
     }
 
@@ -1194,7 +1194,7 @@ clientProjectAPI.post('/activity/remove', (req, res) => {
     tempDocument.lastModifiedOn = String(new Date())
     tempActivity.deleted = true
     return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).update(tempActivity).then(() => {
-        return response(res, 200, 'success', 'File has been removed successfully', undefined, 'E-3.5.7')
+        return response(res, 200, 'success', 'Activity has been removed successfully', undefined, 'E-3.5.7')
     })
 
 })
@@ -1600,7 +1600,7 @@ clientProjectAPI.get('/review/remove-post', (req, res) => {
                         tempReviewPost.lastModifiedById = dbEmployeeAccount.employee_id
 
                         return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postKey}`).update(tempReviewPost).then(() => {
-                            return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'E-3.10.8')
+                            return response(res, 200, 'success', 'Post from Review has been deleted successfully', undefined, 'E-3.10.8')
                         })
                     } else if (i == postDBKey.length - 1) {
                         return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'E-3.10.9')
@@ -1702,7 +1702,7 @@ clientProjectAPI.get('/review/open', (req, res) => {
             tempReview.lastModifiedById = dbEmployeeAccount.employee_id
 
             return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/`).set(tempReview).then(() => {
-                return response(res, 200, 'success', 'Review activated successfully', undefined, 'E-3.12.7')
+                return response(res, 200, 'success', 'Review is opened successfully', undefined, 'E-3.12.7')
             })
         } else if (i == reviewDBKeys.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'E-3.12.8')
@@ -1773,7 +1773,7 @@ clientProjectAPI.get('/review/remove-file', (req, res) => {
                                 tempImage.lastModifiedById = dbEmployeeAccount.employee_id
 
                                 return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postDBKey[i]}/documents/${documentsDBKeys[k]}/`).update(tempImage).then(() => {
-                                    return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'E-3.13.8')
+                                    return response(res, 200, 'success', 'File has been deleted successfully', undefined, 'E-3.13.8')
                                 })
                             }
                         }
@@ -1786,6 +1786,75 @@ clientProjectAPI.get('/review/remove-file', (req, res) => {
             }
         } else if (j == reviewDBKey.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Review ID or FileName', undefined, 'E-3.13.11')
+        }
+    }
+})
+
+// 3.14 Remove Review
+clientProjectAPI.get('/review/remove', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'E-3.14.1')
+    }
+
+    if (!req.query.review_id) {
+        return response(res, 400, 'required', 'Review ID is required', undefined, 'E-3.14.2')
+    }
+
+    var projectID = String(req.query.project_id).trim(),
+        reviewID = parseInt(String(req.query.review_id).trim()),
+        getKeyDB = getKeys(projectID)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'E-3.14.3') }
+    if (!getKeyDB.permission.review) {
+        return response(res, 403, 'insufficientPermissions', 'Employee ID is restricted perform this action', undefined, 'E-3.14.7')
+    }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
+        return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'E-3.14.4')
+    }
+
+    var dbClientReview = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+        dbClientReviewKey = Object.keys(dbClientReview)
+
+    for (var i = 0; i < dbClientReviewKey.length; i++) {
+        var tempClientReview = dbClientReview[dbClientReviewKey[i]]
+
+        if (!tempClientReview.deleted && tempClientReview.review_id == reviewID) {
+
+            if (tempClientReview.post) {
+                var dbReviewPost = tempClientReview.post,
+                    dbReviewPostKey = Object.keys(dbReviewPost)
+
+                for (var j = 0; j < dbReviewPostKey.length; j++) {
+                    if (dbReviewPost[dbReviewPostKey[j]].documents) {
+                        var dbPostDocuments = dbReviewPost[dbReviewPostKey[j]].documents,
+                            dbPostDocumentsKey = Object.keys(dbPostDocuments)
+
+                        for (var k = 0; k < dbPostDocumentsKey.length; k++) {
+                            if (dbPostDocuments[dbPostDocumentsKey[k]].deleted) { continue }
+
+                            var tempPostDocument = dbPostDocuments[dbPostDocumentsKey[k]]
+
+                            tempPostDocument.deleted = true
+                            tempPostDocument.lastModifiedOn = String(new Date())
+                            tempPostDocument.lastModifiedBy = 'EMPLOYEE'
+                            tempPostDocument.lastModifiedById = dbEmployeeAccount.employee_id
+                            unlinkFile(tempPostDocument.filename);
+                        }
+                    }
+                }
+            }
+
+            tempClientReview.deleted = true
+            tempClientReview.lastModifiedOn = String(new Date())
+            tempClientReview.lastModifiedBy = 'EMPLOYEE'
+            tempClientReview.lastModifiedById = dbEmployeeAccount.employee_id
+
+            return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${dbClientReviewKey[i]}/`).set(tempClientReview).then(() => {
+                return response(res, 200, 'success', 'Review has been removed successfully', undefined, 'E-3.14.5')
+            })
+        } else if (i == dbClientReviewKey.length - 1) {
+            return response(res, 404, 'notFound', 'Incorrect Review ID', undefined, 'E-3.14.6')
         }
     }
 })

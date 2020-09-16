@@ -24,7 +24,7 @@
         "/user/login": {
             "post": {
                 "tags": ["1. User"],
-                "summary": "Login into Portal",
+                "summary": "1.1 Login into Portal",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -52,21 +52,43 @@
         "/user/logout": {
             "get": {
                 "tags": ["1. User"],
-                "summary": "To logout or expire session from portal",
+                "summary": "1.2 To logout or expire session from portal",
                 "responses": {}
             }
         },
         "/profile": {
             "get": {
                 "tags": ["2. Profile"],
-                "summary": "Get Profile",
+                "summary": "2.1 Get Profile",
+                "responses": {}
+            }
+        },
+        "/profile/password": {
+            "post": {
+                "tags": ["2. Profile"],
+                "summary": "2.2 Change Password",
+                "parameters": [{
+                    "in": "body",
+                    "name": "body",
+                    "schema": {
+                        "required": ["password"],
+                        "properties": {
+                            "password": {
+                                "type": "string"
+                            }
+                        },
+                        "example": {
+                            "password": "my-secret-password"
+                        }
+                    }
+                }],
                 "responses": {}
             }
         },
         "/profile/update": {
             "post": {
                 "tags": ["2. Profile"],
-                "summary": "Update Profile Details",
+                "summary": "2.3 Update Profile Details",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
                         "name": "name",
@@ -90,32 +112,10 @@
                 "responses": {}
             }
         },
-        "/profile/password": {
-            "post": {
-                "tags": ["2. Profile"],
-                "summary": "Change Password",
-                "parameters": [{
-                    "in": "body",
-                    "name": "body",
-                    "schema": {
-                        "required": ["password"],
-                        "properties": {
-                            "password": {
-                                "type": "string"
-                            }
-                        },
-                        "example": {
-                            "password": "my-secret-password"
-                        }
-                    }
-                }],
-                "responses": {}
-            }
-        },
         "/profile/file/{filename}": {
             "get": {
-                "tags": ["2. Profile"],
-                "summary": "To Get Any file from storage",
+                "tags": ["2. Profile", "Global"],
+                "summary": "2.4 To Get Any file from storage",
                 "parameters": [{
                     "in": "path",
                     "name": "filename",
@@ -133,7 +133,7 @@
                     "in": "query",
                     "name": "project_id",
                     "type": "string",
-                    "description": "Project to Fetch related resources",
+                    "description": "Project to Fetch related resources. <br><b>Do not enter any project id get list of all projects</b>",
                     "example": "93492065515",
                     "schema": {
                         "example": 93492065515
@@ -422,7 +422,7 @@
         "/project/review/update": {
             "post": {
                 "tags": ["3. Client Project"],
-                "summary": "3.7 Update review title and description",
+                "summary": "3.7 Update description and title",
                 "parameters": [{
                     "in": "body",
                     "name": "body",
@@ -494,7 +494,7 @@
         "/project/review/update-post": {
             "post": {
                 "tags": ["3. Client Project"],
-                "summary": "3.9 Update review post",
+                "summary": "3.9 Update review post and add documents",
                 "consumes": ["multipart/form-data"],
                 "parameters": [{
                         "name": "project_id",
@@ -670,6 +670,34 @@
                         "type": "string",
                         "schema": {
                             "example": "Post-251469.png"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/project/review/remove": {
+            "get": {
+                "tags": ["3. Client Project"],
+                "summary": "3.14 Remove Review",
+                "parameters": [{
+                        "in": "query",
+                        "name": "project_id",
+                        "description": "Project ID",
+                        "required": true,
+                        "type": "integer",
+                        "schema": {
+                            "example": 93492065515
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "review_id",
+                        "type": "integer",
+                        "required": true,
+                        "description": "Review ID",
+                        "schema": {
+                            "example": 1449459567309
                         }
                     }
                 ],
