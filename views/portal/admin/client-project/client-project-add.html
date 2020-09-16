@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
@@ -45,7 +47,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="javascript:void(0);" class="brand-link">
+            <a href="/admin" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -54,10 +56,10 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
-                        <a href="javascript:void(0);" class="d-block">Alexander Pierce</a>
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
                 <!-- Sidebar Menu -->
@@ -66,27 +68,27 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
                                 <p>Plans</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
                                 <p>Client</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
                                 <p>Team</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
                                 <p>Services</p>
                             </a>
                         </li>
@@ -103,12 +105,18 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Add Project</h1>
+                            <h1 id="lbl_project">Add Project</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/admin/client">Client</a></li>
-                                <li class="breadcrumb-item active">Add Project</li>
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navClient" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item" id="list_navPlan" style="display: none;">
+                                    <a id="lbl_navProjectId" href=""> </a>
+                                </li>
+                                <li class="breadcrumb-item active" id="lbl_navProject">Add Project</li>
                             </ol>
                         </div>
                     </div>
@@ -125,6 +133,7 @@
                                     <label>Plan Name:</label>
                                     <select class="form-control" id="list_planName">
                                     </select>
+                                    <input type="text" id="txt_planName" class="form-control" placeholder="Amount" style="display:none;">
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -152,29 +161,8 @@
                         <div class="row form-group">
                             <div class="col-md-12">
                                 <button class="btn btn-outline-primary float-right" id="btn_add"><i class="fas fa-plus"></i> Add Project</button>
+                                <button class="btn btn-outline-danger float-right ml-2" id="btn_remove" style="display: none;"><i class="fas fa-trash-alt"></i> Remove</button>
                                 <button class="btn btn-outline-primary float-right" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
-                            </div>
-                        </div>
-                        <div id="div_projectInfo" style="display: none;">
-                            <hr>
-                            <h4 class="header-title">Project Info.</h4>
-                            <div class="row form-group">
-                                <label for="inputEmail3" class="col-md-2 col-form-label">Project Name:</label>
-                                <div class="col-md-3">
-                                    <input type="text" class="form-control" id="txt_projectName" placeholder="Project Name">
-                                </div>
-                            </div>
-                            <div class="row form-group">
-                                <label for="inputEmail3" class="col-md-2 col-form-label">Description:</label>
-                                <div class="col-md-3">
-                                    <textarea class="form-control" id="txt_description" rows="4" placeholder="Description ..."></textarea>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <button class="btn btn-outline-danger float-right ml-2" id="btn_remove"><i class="fas fa-trash-alt"></i> Remove</button>
-                                    <button class="btn btn-outline-primary float-right" id="btn_updateInfo"><i class="fas fa-pencil-alt"></i> Update Information</button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -186,7 +174,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -215,14 +203,18 @@
     <script src="plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
     <!-- sweetalert -->
     <script src="dist/js/sweetalert2.js"></script>
-    <!-- Logout -->
-    <script src="dist/js/logout.js"></script>
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- custom JS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
+    <script src="dist/js/client-project.js"></script>
 </body>
 <script>
     $('#reservationdate').datetimepicker({
@@ -241,7 +233,10 @@
             $('#div_projectInfo').show();
             $('#btn_add').hide();
             $('#btn_update').show();
-
+            $('#btn_remove').show();
+            $('#lbl_navProject').html('View Project')
+            $('#lbl_project').html('View Project')
+            $('#list_navPlan').show();
         }
 
         $.get(`/admin/v1/plan/get`, (data) => {
@@ -279,7 +274,12 @@
                     d = start_date.getDate(),
                     m = start_date.getMonth() + 1,
                     y = start_date.getFullYear();
-                $('#list_planName').val(plan);
+                if (urlParams.has('plan_id')) {
+                    $('#list_planName').remove();
+                    $('#txt_planName').show();
+                    $('#txt_planName').val(plan);
+                    $('#txt_planName').attr('disabled', true);
+                }
                 $('#txt_amount').val(price);
                 $('#txt_days').val(days);
                 if (isNaN(start_date)) {
@@ -290,30 +290,6 @@
 
             };
 
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
-
-        $.get(`/admin/v1/project/get?client_id=${client_id}`, (data) => {
-            var ProjectData = data.data;
-            if (ProjectData) {
-                for (var i = 0; i < ProjectData.length; i++) {
-                    var tempProj = ProjectData[i]
-                    if (tempProj.project_id == plan_id) {
-                        var Description = tempProj.project_description,
-                            ProjectName = tempProj.project_name;
-                        $('#txt_projectName').val(ProjectName);
-                        $('#txt_description').val(Description);
-                    }
-                }
-            }
         }).fail(error => {
             error = error.responseJSON
             $(document).Toasts('create', {
@@ -346,21 +322,24 @@
             day = $('#txt_days').val(),
             amount = $('#txt_amount').val(),
             startDate = $('#txt_startDate').val();
+        var day = day.trim(),
+            amount = amount.trim(),
+            startDate = startDate.trim();
         if (!plan) {
             return $(document).Toasts('create', {
-                title: 'Plan name missing',
+                title: 'Plan required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please Enter Plan name',
+                body: 'Please Select Plan',
                 class: 'bg-danger',
             });
         }
         if (!amount || isNaN(amount)) {
             return $(document).Toasts('create', {
-                title: 'Amount missing',
+                title: 'Amount required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please Enter Valid Plan Amount',
+                body: 'Please enter valid plan amount',
                 class: 'bg-danger',
             });
         }
@@ -375,10 +354,10 @@
         }
         if (!day || isNaN(day)) {
             return $(document).Toasts('create', {
-                title: 'Duration missing',
+                title: 'Days required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please Enter Valid days',
+                body: 'Please enter valid days',
                 class: 'bg-danger',
             });
         }
@@ -393,7 +372,7 @@
         }
         if (!startDate) {
             return $(document).Toasts('create', {
-                title: 'Date missing',
+                title: 'Duration required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Project start date',
@@ -429,6 +408,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
             }
         });
     });
@@ -436,67 +421,43 @@
     $('#btn_update').click(() => {
         var clientId = urlParams.get('client_id'),
             project_id = urlParams.get('plan_id'),
+            name = $('#txt_planName').val(),
             day = $('#txt_days').val(),
-            plan = $('#list_planName').val(),
             amount = $('#txt_amount').val(),
             startDate = $('#txt_startDate').val();
-        if (!plan) {
-            return $(document).Toasts('create', {
-                title: 'Plan name missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Plan name',
-                class: 'bg-danger',
-            });
-        }
-        if (!amount || isNaN(amount)) {
-            return $(document).Toasts('create', {
-                title: 'Amount missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Valid Plan Amount',
-                class: 'bg-danger',
-            });
-        }
-        if (!isNaN(amount)) {
-            if (amount <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Amount must be positive numbers',
-                    class: 'bg-danger',
-                });
+        var day = day.trim(),
+            amount = amount.trim(),
+            startDate = startDate.trim();
+        if (amount) {
+            if (!isNaN(amount)) {
+                if (amount <= 0) {
+                    return $(document).Toasts('create', {
+                        title: 'Error!',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Amount must be greater than 0',
+                        class: 'bg-danger',
+                    });
+                }
             }
         }
-        if (!day || isNaN(day)) {
-            return $(document).Toasts('create', {
-                title: 'Duration missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Valid days',
-                class: 'bg-danger',
-            });
-        }
-        if (!isNaN(day)) {
-            if (day <= 0) {
-                return $(document).Toasts('create', {
-                    title: 'Error!',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'days must be positive numbers',
-                    class: 'bg-danger',
-                });
+        if (day) {
+            if (!isNaN(day)) {
+                if (!isNaN(day)) {
+                    if (day <= 0) {
+                        return $(document).Toasts('create', {
+                            title: 'Error!',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'days must be greater than 0',
+                            class: 'bg-danger',
+                        });
+                    }
+                }
             }
         }
-        if (!startDate) {
-            return $(document).Toasts('create', {
-                title: 'Date missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project start date',
-                class: 'bg-danger',
-            });
+        if (startDate) {
+            startDate;
         }
         $.post({
             type: 'POST',
@@ -504,7 +465,7 @@
             data: {
                 "client_id": clientId,
                 "project_id": project_id,
-                "plan": plan,
+                "plan": name,
                 "start_date": startDate,
                 "duration": day,
                 "price": amount,
@@ -527,66 +488,15 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
             }
         });
     });
-
-    $('#btn_updateInfo').click(() => {
-        var project_id = urlParams.get('plan_id'),
-            project_name = $('#txt_projectName').val(),
-            project_description = $('#txt_description').val();
-        if (!project_name) {
-            return $(document).Toasts('create', {
-                title: 'Project Name Missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project Name',
-                class: 'bg-danger',
-            });
-        } else {
-            project_name = String(project_name)
-        }
-        if (!project_description) {
-            return $(document).Toasts('create', {
-                title: 'Description Missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project Description',
-                class: 'bg-danger',
-            });
-        } else {
-            project_description = String(project_description)
-        }
-        $.post({
-            type: 'POST',
-            url: '/admin/v1/project/update',
-            data: {
-                "project_id": project_id,
-                "project_name": project_name,
-                "project_description": project_description,
-            },
-            success: result => {
-                $(document).Toasts('create', {
-                    title: 'Updated',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Projects Info. Updated',
-                    class: 'bg-success',
-                });
-            },
-            error: error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
-            }
-        });
-    });
-
     $('#btn_remove').click(() => {
         var clientId = urlParams.get('client_id'),
             project_id = urlParams.get('plan_id');
@@ -624,6 +534,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
                     }
                 });
             }

@@ -44,7 +44,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="javascript:void(0);" class="brand-link">
+            <a href="/admin" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -54,10 +54,11 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+
                     </div>
                     <div class="info">
-                        <a href="javascript:void(0);" class="d-block">Alexander Pierce</a>
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
 
@@ -67,19 +68,19 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Plans</p></a>
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Plans</p></a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-user-friends"></i><p>Client</p></a>
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i><p>Client</p></a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-users"></i><p>Team</p></a>
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i><p>Team</p></a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-cogs"></i><p>Services</p></a>
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i><p>Services</p></a>
                         </li>
                     </ul>
                 </nav>
@@ -99,7 +100,7 @@
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item active">Profile</li>
                             </ol>
                         </div>
@@ -115,7 +116,7 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <img src="images/logo-small.png" id="img_profile" style="width: 100px;height: 100px; border-radius:50%;">
-                                <img src="" id="img_originalProfile" style="width: 100px;height: 100px; border-radius:50%; display: none"><br>
+                                <img src="" id="img_originalProfile" onError=this.src='images/logo-small.png' style="width: 100px;height: 100px; border-radius:50%; display: none"><br>
                                 <i class="fa fa-camera mt-2" id="icon_camera" style="margin-left: 41px;cursor: pointer;"></i>
                                 <input type="file" id="file_profile" accept=".png, .jpg, .jpeg" style="display: none">
                             </div>
@@ -132,7 +133,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <button class="btn btn-outline-primary float-right" id="btn_updateProfile">Update Profile</button>
+                                <button class="btn btn-outline-primary float-right" id="btn_updateProfile"><i class="fas fa-pencil-alt"></i> Update Profile</button>
                             </div>
                         </div>
                         <hr>
@@ -145,7 +146,7 @@
                                 <input type="password" class="form-control" id="txt_cpassword" placeholder="Confirm Password">
                             </div>
                             <div class="col-md-3 mt-2">
-                                <button class="btn btn-outline-primary" id="btn_update">Update Password</button>
+                                <button class="btn btn-outline-primary" id="btn_update"><i class="fas fa-pencil-alt"></i> Update Password</button>
                             </div>
                         </div>
                     </div>
@@ -155,7 +156,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
@@ -184,9 +185,9 @@
     <script src="plugins/toastr/toastr.min.js"></script>
     <!-- pace-progress -->
     <script src="plugins/pace-progress/pace.js"></script>
-
     <!-- Custom JS -->
     <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
 
 </body>
 <script>
@@ -231,14 +232,11 @@
         }
     });
 
-
-
     $('#btn_updateProfile').click(() => {
         var username = $('#txt_username').val()
         var formData = new FormData();
         formData.append('name', username);
         formData.append('profile_image', $('#file_profile')[0].files[0]);
-
         $.post({
             type: 'POST',
             url: '/admin/v1/profile/update',
@@ -263,6 +261,21 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_updateProfile').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_updateProfile').removeAttr('disabled')
+            },
+            xhr: () => {
+                var xhr = $.ajaxSettings.xhr();
+                if ($('#file_profile')[0].files[0]) {
+                    xhr.upload.onprogress = function(evt) {
+                        console.log(evt.loaded / evt.total * 100);
+                    };
+                }
+                return xhr;
             }
         })
     });
@@ -287,10 +300,9 @@
     });
 
     $('#btn_update').click(() => {
-
         var password = $('#txt_password').val(),
-            conpassword = $('#txt_cpassword').val()
-        if (!password || !conpassword) {
+            confirm_password = $('#txt_cpassword').val()
+        if (!password || !confirm_password) {
             return $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
                 autohide: true,
@@ -300,10 +312,9 @@
             });
         } else {
             password = String(password)
-            conpassword = String(conpassword)
+            confirm_password = String(confirm_password)
         }
-
-        if (password != conpassword) {
+        if (password != confirm_password) {
             return $(document).Toasts('create', {
                 title: 'Error!',
                 autohide: true,
@@ -311,9 +322,7 @@
                 body: 'Password and Confirm Password must be same',
                 class: 'bg-danger',
             });
-
         }
-
         $.post({
             url: '/admin/v1/profile/password',
             data: {
@@ -339,6 +348,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
             }
         });
 

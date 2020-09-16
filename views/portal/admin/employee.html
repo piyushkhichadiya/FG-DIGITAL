@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
@@ -43,7 +45,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="javascript:void(0);" class="brand-link">
+            <a href="/admin" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -52,10 +54,10 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
-                        <a href="javascript:void(0);" class="d-block">Alexander Pierce</a>
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
                 <!-- Sidebar Menu -->
@@ -64,27 +66,27 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
                                 <p>Plans</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
                                 <p>Client</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
                                 <p>Team</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
                                 <p>Services</p>
                             </a>
                         </li>
@@ -137,6 +139,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="6"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -162,7 +172,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -187,37 +197,54 @@
     <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
     <!-- sweetalert -->
     <script src="dist/js/sweetalert2.js"></script>
-    <!-- Logout -->
-    <script src="dist/js/logout.js"></script>
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- custom JS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
 </body>
 <script>
     var tblEmp = $("#tbl_emp").DataTable({
         "responsive": true,
+        "pageLength": 25,
     });
 
     $(document).ready(() => {
         $.getJSON('/admin/v1/employee/get', (data) => {
-            var empData = data.data
-            for (var i = 0; i < empData.length; i++) {
-                var tempEmp = empData[i],
-                    button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/employee/add?emp_id=${tempEmp.employee_id}'">open</button>`,
-                    image;
-                if (tempEmp.profile_image) {
-                    image = `<img src='/admin/v1/profile/file/${tempEmp.profile_image}' style='border-radius: 50%; height:70px;width:70px'>`
-                } else {
-                    image = `<img src='images/logo-small.png' style='border-radius: 50%; height:70px;width:70px'>`
-                }
+            var empData = data.data;
+            tblEmp.clear().draw();
+            if (empData) {
+                for (var i = 0; i < empData.length; i++) {
+                    var tempEmp = empData[i],
+                        button = `<button class='btn btn-info' onclick="window.location.href ='/admin/employee/view?emp_id=${tempEmp.employee_id}'"><i class="fas fa-eye"></i> View</button>`,
+                        image;
+                    if (tempEmp.profile_image) {
+                        image = `<img src='/admin/v1/profile/file/${tempEmp.profile_image}' onError="this.onerror=null;this.src='images/logo-small.png';" style='border-radius: 50%; height:70px;width:70px'>`
+                    } else {
+                        image = `<img src='images/logo-small.png' style='border-radius: 50%; height:70px;width:70px'>`
+                    }
 
-                tblEmp.row.add([
-                    `${i+1}`, tempEmp.employee_id, image, tempEmp.name, tempEmp.email, button
-                ]).draw();
+                    tblEmp.row.add([
+                        `${i+1}`, tempEmp.employee_id, image, tempEmp.name, tempEmp.email, button
+                    ]).draw();
+                }
             }
+        }).fail(error => {
+            tblEmp.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
         });
     });
 </script>

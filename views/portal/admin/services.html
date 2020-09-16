@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Service - FG Digital</title>
+    <title>Services - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
@@ -43,7 +45,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="javascript:void(0);" class="brand-link">
+            <a href="/admin" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -52,10 +54,10 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
-                        <a href="javascript:void(0);" class="d-block">Alexander Pierce</a>
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
                 <!-- Sidebar Menu -->
@@ -64,27 +66,27 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
                                 <p>Plans</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
                                 <p>Client</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
                                 <p>Team</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
                                 <p>Services</p>
                             </a>
                         </li>
@@ -101,12 +103,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Service</h1>
+                            <h1>Services</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
-                                <li class="breadcrumb-item active">Service</li>
+                                <li class="breadcrumb-item active">Services</li>
                             </ol>
                         </div>
                     </div>
@@ -120,7 +122,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right mb-3" onclick="window.location.href = '/admin/service/create'" id="btn_create">Create Service</button>
+                                    <button class="btn btn-outline-primary float-right mb-3" onclick="window.location.href = '/admin/service/create'" id="btn_create"><i class="fas fa-plus"></i> Create Service</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
@@ -129,18 +131,24 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Service Name</th>
                                             <th>Service ID</th>
+                                            <th>Name</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="4"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Service Name</th>
                                             <th>Service ID</th>
+                                            <th>Name</th>
                                             <th>Action</th>
                                         </tr>
                                     </tfoot>
@@ -158,7 +166,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -183,34 +191,46 @@
     <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
     <!-- sweetalert -->
     <script src="dist/js/sweetalert2.js"></script>
-    <!-- Logout -->
-    <script src="dist/js/logout.js"></script>
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- customJS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
 </body>
 <script>
     tbl_Service = $("#tbl_Service").DataTable({
         "responsive": true,
     });
 
-    function create() {
-        window.location.href = '/admin/service/create'
-    };
-
     $(document).ready(() => {
         $.getJSON('/admin/v1/service/get', (data) => {
             var dataService = data.data
-            for (var i = 0; i < dataService.length; i++) {
-                var tempService = dataService[i];
-                button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/service/create?service_id=${tempService.service_id}'">open</button>`
-                tbl_Service.row.add([
-                    `${i+1}`, tempService.title, tempService.service_id, button
-                ]).draw();
+            tbl_Service.clear().draw();
+            if (dataService) {
+                for (var i = 0; i < dataService.length; i++) {
+                    var tempService = dataService[i];
+                    button = `<button class='btn btn-info' onclick="window.location.href ='/admin/service/view?service_id=${tempService.service_id}'"><i class="fas fa-eye"></i> View</button>`
+                    tbl_Service.row.add([
+                        `${i+1}`, tempService.service_id, tempService.title, button
+                    ]).draw();
+                }
             }
+        }).fail(error => {
+            tbl_Service.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
         });
     });
 </script>

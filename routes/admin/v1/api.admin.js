@@ -15,7 +15,7 @@ adminAPI.use(/^(?!\/user).*/, middleware.adminAuthToken);
 // 1. USER ACCOUNT
 adminAPI.use('/user', require('./components/user'));
 
-// 2. ADMIN PROFILE
+// 2.Admin Profile
 adminAPI.use('/profile', require('./components/profile'));
 
 // 3. PLAN

@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Project Review view - FG Digital</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="dist/css/ionicons.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link rel="stylesheet" href="dist/css/ekko-lightbox.css">
+    <style>
+        .middle {
+            transition: .5s ease;
+            opacity: 0;
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 50px;
+        }
+        
+        .img_container:hover .image {
+            opacity: 0.3;
+            cursor: pointer;
+        }
+        
+        .img_container:hover .middle {
+            opacity: 1;
+            cursor: pointer;
+        }
+        
+        .plus {
+            position: absolute;
+            top: 56%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 60px;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini sidebar-collapse">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-success elevation-4">
+            <!-- Brand Logo -->
+            <a href="/admin" class="brand-link">
+                <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FG Digital</span>
+            </a>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                    </div>
+                    <div class="info">
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
+                    </div>
+                </div>
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+                        <li class="nav-item">
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                                <p>Plans</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                                <p>Client</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                                <p>Team</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                                <p>Services</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Project Review</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navClient" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navProjectId" href=""> </a>
+                                </li>
+                                <li class="breadcrumb-item"><a id="lbl_navReview" href="">Reviews</a></li>
+                                <li class="breadcrumb-item active">View</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="card-body card">
+                        <!-- <div class="row">
+                            <div class="col-md-12" id="div_closeMessage" style="display: none;">
+                                <p class="float-right" style='color:green;'>This Review Is Closed <i class="fas fa-check"></i></p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12" id="div_closeButton" style="display: none;">
+                                <button class="btn btn-success float-right" id="btn_reOpen">Reopen</button>
+                            </div>
+                        </div> -->
+                        <div class="row form-group">
+                            <div class="col-md-12">
+                                <p class="float-right ml-2" style="font-size: 13px; color: #999;">Date: <span id="lbl_ReviewDate"></span></p>&nbsp;
+                                <a class="float-right" style="font-size: 13px; color: #999;" id="link_ReviewCreate"></a>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="col-md-12 col-form-label">Review Title</label>
+                                <div class="col-md-12">
+                                    <input type="text" class="form-control" id="txt_title" placeholder="Title">
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="col-md-12 col-form-label">Description</label>
+                                <div class="col-md-12">
+                                    <textarea class="form-control" id="txt_description" rows="2" placeholder="Description ..."></textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mt-2">
+                                <div class="float-right" id="div_closeMessage" style="display: none;">
+                                    <p style='color:green;'>This Review Is Closed <i class="fas fa-check"></i> &nbsp; <button class="btn btn-info bg-olive btn-xs" id="btn_reOpen">Reopen</button></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 form-group">
+                                <button class="btn btn-outline-primary float-right ml-1" id="btn_add"><i class="fas fa-plus"></i> Create</button>
+                                <button class="btn btn-outline-danger float-right ml-2" id="btn_reviewRemove" style="display: none;"><i class="fas fa-trash-alt"></i> Remove</button>
+                                <button class="btn btn-outline-success float-right ml-2" id="btn_remove" style="display: none;"><i class="fas fa-check"></i> Close</button>
+                                <button class="btn btn-outline-primary float-right" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
+                            </div>
+                        </div>
+                        <div id="div_post" style="display: none;">
+                            <hr>
+                            <h4 class="header-title">Conversation</h4>
+                            <div id="div_posts"></div>
+                            <textarea class="form-control mb-2" id="txt_post" rows="2" placeholder="Enter Description....." style="display: flex;"></textarea>
+                            <div class="row" id="div_doc">
+                                <div></div>
+                                <input type="file" id="file_post" accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                                <div class="col-md-2" id="input_plus" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                    <div class="plus">
+                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    <button class="btn btn-outline-primary float-right mr-2" id="btn_addPost"><i class="fas fa-plus"></i> Add Post</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card body -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
+            </div>
+            <strong>Copyright &copy <script>
+                document.write(new Date().getFullYear());
+                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+        </footer>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+    <!-- jQuery -->
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="dist/js/demo.js"></script>
+    <!-- sweetalert -->
+    <script src="dist/js/sweetalert2.js"></script>
+    <!-- toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- lightBox -->
+    <script src="dist/js/ekko-lightbox.min.js"></script>
+    <!-- ionicon -->
+    <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
+    <!-- Custom JS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
+    <script src="dist/js/client-project.js"></script>
+</body>
+<script>
+    var dbReview;
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+        event.preventDefault();
+        $(this).ekkoLightbox();
+    });
+    const urlParams = new URLSearchParams(window.location.search);
+    $('#lbl_navReview').attr('href', `/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`)
+    var postData;
+    if (urlParams.has('review_id')) {
+        if (urlParams.get('review_id') == '') {
+            window.location.href = `http://localhost/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`
+        }
+        $('#btn_update').show();
+        $('#btn_remove').show();
+        $('#btn_reviewRemove').show();
+        $('#div_post').show();
+        $('#btn_add').hide();
+        getReview()
+    }
+
+    function getReview() {
+        $.get(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=review`, (data) => {
+            var data = data.data;
+            var reviewData = dbReview = data.review;
+            if (reviewData) {
+                for (var i = 0; i < reviewData.length; i++) {
+                    var tempReview = reviewData[i];
+                    if (tempReview.review_id == urlParams.get('review_id')) {
+                        var getDate = new Date(tempReview.createdOn),
+                            d = ('0' + getDate.getDate()).slice(-2),
+                            m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                            y = getDate.getFullYear(),
+                            hr = getDate.getHours(),
+                            minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                        if (hr > 12) {
+                            time = 'PM';
+                            hr = hr - 12;
+                        } else {
+                            time = 'AM'
+                        }
+
+                        var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
+                        $('#txt_title').val(tempReview.title);
+                        $('#txt_description').val(tempReview.description);
+                        if (tempReview.createdBy == 'EMPLOYEE') {
+                            $('#link_ReviewCreate').html('Created By : ' + tempReview.createdBy + `(${tempReview.createdById})`);
+                            $('#link_ReviewCreate').attr('href', `/admin/employee/view?emp_id=${tempReview.createdById}`)
+                        } else {
+                            $('#link_ReviewCreate').html('Created By : ' + tempReview.createdBy);
+                        }
+
+                        $('#lbl_ReviewDate').html(oldDate)
+                        if (tempReview.closed == true) {
+                            $('#btn_remove').remove();
+                            $('#btn_update').remove();
+                            $('#div_doc').remove();
+                            $('#btn_addPost').remove();
+                            $('#txt_post').remove();
+                            $('#div_closeMessage').show();
+                            $('#div_closeButton').show();
+                            $('#txt_title').attr('disabled', true)
+                            $('#txt_description').attr('disabled', true)
+                        }
+                        getPost(urlParams.get('review_id'))
+                    }
+                }
+            }
+        }).fail(error => {
+            window.location.href = `http://localhost/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`
+        });
+    }
+
+    function getPost(review_id) {
+        if (dbReview) {
+            for (var k = 0; k < dbReview.length; k++) {
+                var tempReview = dbReview[k];
+                if (tempReview.review_id == review_id) {
+                    if (tempReview.closed == true) {
+                        var postData = tempReview.posts
+                        if (postData) {
+                            for (var i = 0; i < postData.length; i++) {
+                                var tempPost = postData[i];
+                                var getDate = new Date(tempPost.createdOn),
+                                    d = ('0' + getDate.getDate()).slice(-2),
+                                    m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                                    y = getDate.getFullYear(),
+                                    hr = getDate.getHours(),
+                                    minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                                if (hr > 12) {
+                                    time = 'PM';
+                                    hr = hr - 12;
+                                } else {
+                                    time = 'AM'
+                                }
+
+                                var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
+                                var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+                                                    <div class="col-md-12">
+                                                        <p class="float-right ml-2" style="font-size: 13px;color: #999; ">Date: <span id="lbl_ReviewDate_${i}"></span></p>&nbsp;
+                                                        <a class="float-right" style="font-size: 13px;color: #999;" id="link_ReviewCreate_${i}"></a>
+                                                    </div>
+                                                <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
+                                                <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
+                                                <div class="row" id="div_doc_${i}">
+                                                    ${getDocument(i , tempPost.documents,tempReview.closed)}
+                                                    <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                                                    <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                        <div class="plus">
+                                                            <ion-icon name="add-circle-outline"></ion-icon>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-md-12">
+                                                        <button class="btn btn-outline-danger float-right m-1" id="btn_removePost_${i}" onclick=removePost(${i},'${tempPost.post_key}')><i class="fas fa-trash-alt"></i> Remove Post</button>
+                                                        <button class="btn btn-outline-primary float-right m-1" id="btn_edit_${tempPost.post_key}" onclick=editPost(${i},'${tempPost.post_key}')><i class="fas fa-pencil-alt"></i> Edit Post</button>
+                                                        <button class="btn btn-outline-info float-right m-1" id="btn_update_${tempPost.post_key}" onclick=updatePost(${i},'${tempPost.post_key}') style="display:none;"><i class="fas fa-check"></i> Save Changes</button>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <hr>`;
+                                $('#div_posts').append(postHtml);
+                                $(`#btn_removePost_${i}`).remove();
+                                $(`#btn_edit_${tempPost.post_key}`).remove();
+                                $(`#btn_update_${tempPost.post_key}`).remove();
+                                $(`#lbl_ReviewDate_${i}`).html(oldDate);
+                                if (tempPost.createdBy == 'EMPLOYEE') {
+                                    $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy + `(${tempPost.createdById})`)
+                                    $(`#link_ReviewCreate_${i}`).attr('href', `/admin/employee/view?emp_id=${tempPost.createdById}`)
+                                } else {
+                                    $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy)
+                                }
+                            }
+                        }
+                    } else {
+                        var postData = tempReview.posts
+                        if (postData) {
+                            for (var i = 0; i < postData.length; i++) {
+                                var tempPost = postData[i];
+                                var getDate = new Date(tempPost.createdOn),
+                                    d = ('0' + getDate.getDate()).slice(-2),
+                                    m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                                    y = getDate.getFullYear(),
+                                    hr = getDate.getHours(),
+                                    minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                                if (hr > 12) {
+                                    time = 'PM';
+                                    hr = hr - 12;
+                                } else {
+                                    time = 'AM'
+                                }
+
+                                var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
+                                var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+                                                    <div class="col-md-12">
+                                                        <p class="float-right ml-2" style="font-size: 13px; color: #999;">Date: <span id="lbl_ReviewDate_${i}"></span></p>&nbsp;
+                                                        <a class="float-right" style="font-size: 13px;color: #999;" id="link_ReviewCreate_${i}"></a>
+                                                    </div>
+                                                <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
+                                                <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
+                                                <div class="row" id="div_doc_${i}">
+                                                    ${getDocument(i , tempPost.documents,tempReview.closed)}
+                                                    <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                                                    <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                        <div class="plus">
+                                                            <ion-icon name="add-circle-outline"></ion-icon>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-md-12">
+                                                        <button class="btn btn-outline-danger float-right m-1" id="btn_removePost_${i}" onclick=removePost(${i},'${tempPost.post_key}')><i class="fas fa-trash-alt"></i> Remove Post</button>
+                                                        <button class="btn btn-outline-primary float-right m-1" id="btn_edit_${tempPost.post_key}" onclick=editPost(${i},'${tempPost.post_key}')><i class="fas fa-pencil-alt"></i> Edit Post</button>
+                                                        <button class="btn btn-outline-info float-right m-1" id="btn_update_${tempPost.post_key}" onclick=updatePost(${i},'${tempPost.post_key}') style="display:none;"><i class="fas fa-check"></i> Save Changes</button>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <hr>`;
+                                $('#div_posts').append(postHtml);
+                                $(`#lbl_ReviewDate_${i}`).html(oldDate)
+                                if (tempPost.createdBy == 'EMPLOYEE') {
+                                    $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy + `(${tempPost.createdById})`)
+                                    $(`#link_ReviewCreate_${i}`).attr('href', `/admin/employee/view?emp_id=${tempPost.createdById}`)
+                                } else {
+                                    $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy)
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function getDescription(description) {
+        if (description) {
+            return description
+        } else {
+            return ' ';
+        }
+    }
+
+    function getDocument(index, document, closed) {
+        if (document || '') {
+            var docHtml = '';
+            for (var j = 0; j < document.length; j++) {
+                tempDoc = document[j];
+                if (closed == true) {
+                    docHtml += `<div class="col-md-2">
+                            <div class='img_container' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' class="image" style="height: 150px; width: 100%">
+                                <div class="middle">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    docHtml += `<div class="col-md-2">
+                            <div class='img_container' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' class="image" style="height: 150px; width: 100%">
+                                <div class="middle">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}')><i class="fas fa-trash-alt"></i> Remove</button>
+                            </div>
+                        </div>`;
+                }
+            }
+            return (docHtml)
+        } else {
+            return ' ';
+        }
+    };
+
+    $('#btn_add').click(() => {
+        var title = $('#txt_title').val(),
+            description = $('#txt_description').val();
+        var title = title.trim(),
+            description = description.trim();
+        if (!title) {
+            return $(document).Toasts('create', {
+                title: 'Review Title Required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Review Title',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/review/create',
+            data: {
+                "title": title,
+                "project_id": urlParams.get('plan_id'),
+                "description": description,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Review Created',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Review Created Successfully',
+                    class: 'bg-success',
+                });
+                window.location.href = `/admin/client/project-reviews-view?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}&review_id=${result.data.review_id}`
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('btn_add').removeAttr('disabled')
+            }
+        });
+    });
+
+    $('#btn_update').click(() => {
+        title = $('#txt_title').val();
+        description = $('#txt_description').val();
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/review/update',
+            data: {
+                "review_id": urlParams.get('review_id'),
+                "project_id": urlParams.get('plan_id'),
+                "title": title,
+                "description": description,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Review updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Review updated Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_posts').empty();
+                getReview()
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('btn_update').removeAttr('disabled')
+            }
+        });
+    });
+
+    $('#btn_remove').click(() => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "you can re-open review in future",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Close'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/close?project_id=${urlParams.get('plan_id')}&review_id=${urlParams.get('review_id')}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Review closed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.href = `http://localhost/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $('btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('btn_remove').removeAttr('disabled')
+                    }
+                });
+            }
+        })
+    });
+
+    function editPost(index, post_id) {
+        $(`#txt_post_${index}`).val($(`#lbl_post_${index}`).text());
+        $(`#lbl_post_${index}`).hide();
+        $(`#txt_post_${index}`).show();
+        $(`#btn_update_${post_id}`).show();
+        $(`#btn_edit_${post_id}`).hide();
+        $(`#div_post_${index}`).show();
+    }
+
+    $("#file_post").change(function() {
+        var files = [];
+        for (var i = 0; i < $(this).get(0).files.length; ++i) {
+            files.push($(this).get(0).files[i]);
+            var type = files[i].type.split('/').pop().toLowerCase();
+            if (type != "jpeg" && type != "jpg" && type != "png") {
+                return $(document).Toasts('create', {
+                    title: 'File Format not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Format',
+                    class: 'bg-danger',
+                });
+            }
+            if (files[i].size / 1024 / 1024 > 10) {
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 10 MB',
+                    class: 'bg-danger',
+                });
+            }
+            const objectURL = URL.createObjectURL(files[i])
+            image = `<div class="col-md-2 img_container form-group" id = 'unUploaded_${i}'>
+                        <div href='${objectURL}' data-toggle="lightbox">
+                            <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
+                            <div class="middle">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                            <div>
+                                <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUploadedFiles()><i class="fas fa-trash-alt"></i> Remove all</button>
+                            </div>
+                    </div>`;
+            $("#div_doc").prepend(image);
+        }
+        $('#input_plus').hide();
+    });
+
+    function removeUploadedFiles() {
+        $('#file_post').val('');
+        var unUploaded = $('[id^=unUploaded_]')
+        $(unUploaded).remove();
+        $('#input_plus').show();
+    }
+
+    function uploadFile(index, post_id) {
+        var files = [];
+        for (var i = 0; i < $('#file_post_' + index).get(0).files.length; ++i) {
+            files.push($('#file_post_' + index).get(0).files[i]);
+            var type = files[i].type.split('/').pop().toLowerCase();
+            if (type != "jpeg" && type != "jpg" && type != "png") {
+                return $(document).Toasts('create', {
+                    title: 'File Format not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Format',
+                    class: 'bg-danger',
+                });
+            }
+            if (files[i].size / 1024 / 1024 > 10) {
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 10 MB',
+                    class: 'bg-danger',
+                });
+            }
+            const objectURL = URL.createObjectURL(files[i])
+            image = `<div class="col-md-2 img_container form-group" id="postUnUploaded_${i}">
+                        <div class='' href='${objectURL}' data-toggle="lightbox">
+                            <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
+                            <div class="middle">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUnUploaded(${index})><i class="fas fa-trash-alt"></i> Remove all</button>
+                        </div>
+                    </div>`;
+            $(`#div_doc_${index}`).prepend(image);
+        }
+        $('#div_post_' + index).hide();
+    };
+
+    function removeUnUploaded(index) {
+        $('#file_post_' + index).val(null);
+        var unUploaded = $('[id^=postUnUploaded_]')
+        $(unUploaded).remove();
+        $('#div_post_' + index).show();
+    }
+
+    function updatePost(index, post_id) {
+        var description = $('#txt_post_' + index).val(),
+            formData = new FormData();
+
+        if (description) {
+            formData.append('description', description);
+        }
+
+        for (var i = 0; i < $('#file_post_' + index)[0].files.length; ++i) {
+            formData.append('file', $('#file_post_' + index)[0].files[i]);
+        }
+        formData.append('post_key', post_id);
+        formData.append('project_id', urlParams.get('plan_id'));
+        formData.append('review_id', urlParams.get('review_id'));
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/review/update-post',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Post updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Post updated Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_posts').empty();
+                getReview()
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_update_' + post_id).attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update_' + post_id).removeAttr('disabled')
+            }
+        });
+    };
+
+    $('#btn_addPost').click(() => {
+        var description = $('#txt_post').val()
+        var description = description.trim();
+        formData = new FormData();
+        if (!description && $('#file_post')[0].files.length <= 0) {
+            return $(document).Toasts('create', {
+                title: 'No data for post',
+                autohide: true,
+                delay: 5000,
+                body: 'Please add Description or Document',
+                class: 'bg-danger',
+            });
+        }
+        if (description) {
+            formData.append('description', description);
+        }
+
+        for (var i = 0; i < $('#file_post')[0].files.length; ++i) {
+            formData.append('file', $('#file_post')[0].files[i]);
+        }
+
+        formData.append('project_id', urlParams.get('plan_id'));
+        formData.append('review_id', urlParams.get('review_id'));
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/review/add-post',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Post Added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Post added Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_posts').empty();
+                getReview();
+                var unUploaded = $('[id^=unUploaded_]')
+                $('#txt_post').val('');
+                $('#file_post').val('');
+                $(unUploaded).remove();
+                $('#input_plus').show();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_addPost').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_addPost').removeAttr('disabled')
+            }
+        });
+    });
+
+    function removeFile(filename) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this File",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/remove-file?project_id=${urlParams.get('plan_id')}&review_id=${urlParams.get('review_id')}&filename=${filename}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'file removed successfully',
+                            class: 'bg-success',
+                        });
+                        $('#div_posts').empty();
+                        getReview()
+                        $('#txt_post').val('');
+                        $('#file_post').val('');
+                        var unUploaded = $('[id^=unUploaded_]')
+                        $(unUploaded).remove();
+                        $('#input_plus').show();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_removeDoc_${filename}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`btn_removeDoc_${filename}`).removeAttr('disabled')
+                    }
+                });
+            }
+        })
+    }
+
+    function removePost(index, post_id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Post",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/remove-post?project_id=${urlParams.get('plan_id')}&review_id=${urlParams.get('review_id')}&post_key=${post_id}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'post removed successfully',
+                            class: 'bg-success',
+                        });
+                        $('#div_posts').empty();
+                        getReview()
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_removePost_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`btn_removePost_${index}`).removeAttr('disabled')
+                    }
+                });
+            }
+        })
+    }
+
+    $('#btn_reviewRemove').click(() => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Review",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/remove?project_id=${urlParams.get('plan_id')}&review_id=${urlParams.get('review_id')}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Review removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.href = `http://localhost/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`;
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $('btn_reviewRemove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('btn_reviewRemove').removeAttr('disabled')
+                    }
+                });
+            }
+        });
+    });
+
+    $('#btn_reOpen').click(() => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to reopen this Review",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Reopen'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/open?project_id=${urlParams.get('plan_id')}&review_id=${urlParams.get('review_id')}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'post removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $('#btn_reOpen').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_reOpen').removeAttr('disabled')
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+</html>
