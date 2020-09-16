@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Dashboard - Admin- FG Digital</title>
+    <title>Projects - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -40,6 +40,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
+
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -60,7 +61,7 @@
                         <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
-                        <a href="/employee/profile" id="lbl_profileName" class="d-block">Member Profile</a>
+                        <a href="/employee/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
 
@@ -89,12 +90,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Dashboard</h1>
+                            <h1>Projects</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/employee">Admin</a></li>
-                                <li class="breadcrumb-item active">Dashboard</li>
+                                <li class="breadcrumb-item"><a href="/employee">Home</a></li>
+                                <li class="breadcrumb-item active">Projects</li>
                             </ol>
                         </div>
                     </div>
@@ -107,52 +108,41 @@
                 <div class="container-fluid">
                     <div class="card-body card">
                         <div class="row">
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-info">
-                                    <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Members</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-users"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
-                                </div>
+                            <!-- /.card-header -->
+                            <div class="col-md-12">
+                                <table id="tbl_project" class="table table-bordered table-striped w-100">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Project ID</th>
+                                            <th>Name</th>
+                                            <th>description</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr align="center">
+                                            <td colspan="5"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Project ID</th>
+                                            <th>Name</th>
+                                            <th>description</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-success">
-                                    <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Projects</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-copy"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-warning">
-                                    <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Pending Reviews</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-tasks"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
-                                </div>
-                            </div>
+                            <!-- /.card-body -->
                         </div>
+                        <!-- /.row -->
                     </div>
                     <!-- Card body -->
                 </div>
@@ -193,12 +183,36 @@
     <script src="dist/js/demo.js"></script>
     <!-- sweetalert -->
     <script src="dist/js/sweetalert2.js"></script>
-    <!-- Custom JS -->
+    <!-- toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- customJS -->
     <script src="dist/js/employee-logout.js"></script>
     <script src="dist/js/employee-profile.js"></script>
-
 </body>
 <script>
+    var tblProject = $("#tbl_project").DataTable({
+        "responsive": true,
+    });
+    $(document).ready(() => {
+        getProject()
+    });
+
+    function getProject() {
+        $.getJSON('/employee/v1/project/fetch', (result) => {
+            var data = result.data;
+            var dbProject = data.projects;
+            tblProject.clear().draw();
+            if (dbProject) {
+                for (var i = 0; i < dbProject.length; i++) {
+                    var tempProject = dbProject[i];
+                    var button = `<div class=row><button class='btn btn-default bg-olive m-1' onclick="window.location.href ='/employee/project-dashboard?plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Dashboard</button>`
+                    tblProject.row.add([
+                        `${i+1}`, tempProject.project_id, tempProject.project_name, tempProject.project_description, button
+                    ]).draw();
+                }
+            }
+        });
+    }
 </script>
 
 </html>

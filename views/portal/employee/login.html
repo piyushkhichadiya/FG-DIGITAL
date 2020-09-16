@@ -32,9 +32,9 @@
                     <img src="images/logo-small.png" class="Logo"><br>
                     <a href="javascript:void(0);"><b>Member Login</b></a>
                 </div>
-                <form action="#!" method="post">
+                <form id='form_login'>
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="txt_email" placeholder="Email or Member_Id" autocomplete="off">
+                        <input type="email" id="txt_email" class="form-control" placeholder="Email or Employee ID" autocomplete="off">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -42,7 +42,7 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input type="password" class="form-control" id="txt_password" placeholder="Password" autocomplete="off">
+                        <input type="password" id="txt_password" class="form-control" placeholder="Password" autocomplete="off">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -52,13 +52,13 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
-                                <input type="checkbox" id="chk_remember" checked="checked">
-                                <label for="remember">Remember Me</label>
+                                <input type="checkbox" id="chk_remember">
+                                <label for="chk_remember">Remember Me</label>
                             </div>
                         </div>
                         <!-- /.col -->
                         <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                            <button type="button" id="btn_submit" class="btn btn-primary btn-block">Sign In</button>
                         </div>
                         <!-- /.col -->
                     </div>
@@ -79,31 +79,31 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    var redirect = '/admin'
+    var redirect = '/employee'
     if (urlParams.has('redirect') && urlParams.get('redirect') != '') {
         redirect = urlParams.get('redirect')
     }
-
+    $('#chk_remember').prop('checked', true)
     $('#txt_email').focus();
 
     $('#btn_submit').click(() => {
         var email = $('#txt_email').val(),
-            password = $('#txt_password').val()
+            password = $('#txt_password').val(),
+            remember;
         if (!email) {
             return $(document).Toasts('create', {
-                title: 'Email or Member_id Required!',
+                title: 'Email Required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please Enter Your Email or Member_id',
+                body: 'Please Enter Your Email or Employee ID',
                 class: 'bg-danger',
             });
         } else {
-            email = String(email).trim()
+            email = String(email).trim();
         }
-
         if (!password) {
             return $(document).Toasts('create', {
-                title: 'Password Required!',
+                title: 'Password Required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please Enter Your Password',
@@ -112,12 +112,15 @@
         } else {
             password = String(password)
         }
+        if ($('#chk_remember').prop('checked') == true) {
+            remember = $('#chk_remember').prop('checked')
+        }
         $.post({
             url: '/employee/v1/user/login',
             data: {
                 "username": email,
                 "password": password,
-                "remember": $('#chk_remember').prop('checked')
+                "remember": remember
             },
             success: result => {
                 window.location.href = redirect;
@@ -131,9 +134,6 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
-                if (error.status == 401) {
-                    logout(true)
-                }
             },
             beforeSend: () => {
                 $('#btn_submit').attr('disabled', true)

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Dashboard - Admin- FG Digital</title>
+    <title>Projects - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -40,6 +40,7 @@
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
                 <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
+
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -60,7 +61,7 @@
                         <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
-                        <a href="/employee/profile" id="lbl_profileName" class="d-block">Member Profile</a>
+                        <a href="/employee/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
 
@@ -89,12 +90,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Dashboard</h1>
+                            <h1>Projects</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/employee">Admin</a></li>
-                                <li class="breadcrumb-item active">Dashboard</li>
+                                <li class="breadcrumb-item"><a href="/employee">Home</a></li>
+                                <li class="breadcrumb-item active">Projects</li>
                             </ol>
                         </div>
                     </div>
@@ -107,51 +108,20 @@
                 <div class="container-fluid">
                     <div class="card-body card">
                         <div class="row">
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-info">
-                                    <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Members</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-users"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
-                                </div>
+                            <div class="col-md-12">
+                                <h4 class="header-title">Project</h4>
                             </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-success">
-                                    <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Projects</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-copy"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-warning">
-                                    <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Pending Reviews</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-tasks"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
-                                </div>
-                            </div>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-client?plan_id=${plan_id}`'><i class="fas fa-users"></i> Clients</button>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-info?plan_id=${plan_id}`'><i class="fas fa-info-circle"></i> Info</button>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-service?plan_id=${plan_id}`'><i class="fas fa-cogs"></i> Services</a>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-team?plan_id=${plan_id}`'><i class="fas fa-users"></i> Team</button>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-accounts?plan_id=${plan_id}`'><i class="fas fa-portrait"></i> Social Accounts</button>
+                        </div>
+                        <hr>
+                        <h4 class="header-title">Reviews & Activity</h4>
+                        <div class="row">
+                            <button class="btn btn-outline-success m-1" onclick='window.location.href = `/employee/project-review?plan_id=${plan_id}`'><i class="fas fa-tasks"></i> Review</button>
+                            <button class="btn btn-outline-success m-1" onclick='window.location.href = `/employee/project-activity?plan_id=${plan_id}`'><i class="fas fa-chart-line"></i> Activity</button>
                         </div>
                     </div>
                     <!-- Card body -->
@@ -193,12 +163,28 @@
     <script src="dist/js/demo.js"></script>
     <!-- sweetalert -->
     <script src="dist/js/sweetalert2.js"></script>
-    <!-- Custom JS -->
+    <!-- toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- customJS -->
     <script src="dist/js/employee-logout.js"></script>
     <script src="dist/js/employee-profile.js"></script>
-
 </body>
 <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    plan_id = urlParams.get('plan_id');
+    var dbProject;
+    if (urlParams.has('plan_id')) {
+        if (urlParams.get('plan_id') == '') {
+            window.location.href = '/employee/projects'
+        }
+        getProjectData();
+    } else {
+        window.location.href = '/employee/projects'
+    }
+
+    function getProjectData() {
+
+    }
 </script>
 
 </html>
