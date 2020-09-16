@@ -316,64 +316,6 @@
             class: 'bg-danger',
         });
     });
-
-    $.getJSON('/admin/v1/client/get', (data) => {
-        var dbClient = data.data;
-        if (dbClient) {
-            for (var i = 0; i < dbClient.length; i++) {
-                tempClient = dbClient[i];
-                getClientProject(i, tempClient.client_id);
-            }
-        }
-    }).fail(error => {
-        error = error.responseJSON
-        $(document).Toasts('create', {
-            title: 'Error #' + error.code,
-            autohide: true,
-            delay: 5000,
-            body: error.message,
-            class: 'bg-danger',
-        });
-    });
-
-    function getClientProject(index, client_id) {
-        $.getJSON(`/admin/v1/project/get?client_id=${client_id}`, (data) => {
-            dbProject = data.data;
-            if (dbProject) {
-                for (var i = 0; i < dbProject.length; i++) {
-                    tempProject = dbProject[i];
-                    getPendingReview(i, tempProject.project_id)
-                }
-            }
-        }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
-        });
-    }
-
-    function getPendingReview(index, project_id) {
-        $.getJSON(`/admin/v1/project/fetch/${project_id}?scope=review`, (data) => {
-            var dbReview = data.data.review,
-                Count = 0;
-            if (dbReview) {
-                for (var i = 0; i < dbReview.length; i++) {
-                    tempReview = dbReview[i];
-                    if (tempReview.closed == false) {
-                        Count;
-                    } else {
-                        Count++;
-                    }
-                }
-                $('#lbl_review').html(Count)
-            }
-        });
-    }
 </script>
 
 </html>

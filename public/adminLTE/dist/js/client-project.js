@@ -8,14 +8,7 @@ if (urlParam.has('client_id')) {
             $('#lbl_navClient').html(name)
             $('#lbl_navClient').attr('href', `/admin/client`)
         }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
+            window.location.href = '/admin/client'
         });
     } else {
         window.location.href = '/admin/client'
@@ -31,14 +24,7 @@ if (urlParam.has('plan_id')) {
             $('#lbl_navProjectId').html(`${name || ''} (${plan_id})`);
             $('#lbl_navProjectId').attr('href', `/admin/client/project-dashboard?client_id=${client_id}&plan_id=${plan_id}`);
         }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Error #' + error.code,
-                autohide: true,
-                delay: 5000,
-                body: error.message,
-                class: 'bg-danger',
-            });
+            window.location.href = `/admin/client/project?client_id=${client_id}`
         });
     } else {
         window.location.href = `/admin/client/project?client_id=${client_id}`

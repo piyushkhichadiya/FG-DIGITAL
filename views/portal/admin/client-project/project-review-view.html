@@ -168,6 +168,10 @@
                             </div>
                         </div> -->
                         <div class="row form-group">
+                            <div class="col-md-12">
+                                <p class="float-right ml-2" style="font-size: 13px; color: #999;">Date: <span id="lbl_ReviewDate"></span></p>&nbsp;
+                                <a class="float-right" style="font-size: 13px; color: #999;" id="link_ReviewCreate"></a>
+                            </div>
                             <div class="col-md-3">
                                 <label class="col-md-12 col-form-label">Review Title</label>
                                 <div class="col-md-12">
@@ -189,7 +193,8 @@
                         <div class="row">
                             <div class="col-md-12 form-group">
                                 <button class="btn btn-outline-primary float-right ml-1" id="btn_add"><i class="fas fa-plus"></i> Create</button>
-                                <button class="btn btn-outline-danger float-right ml-2" id="btn_remove" style="display: none;"><i class="fas fa-times-circle"></i> Close</button>
+                                <button class="btn btn-outline-danger float-right ml-2" id="btn_reviewRemove" style="display: none;"><i class="fas fa-trash-alt"></i> Remove</button>
+                                <button class="btn btn-outline-success float-right ml-2" id="btn_remove" style="display: none;"><i class="fas fa-times-circle"></i> Close</button>
                                 <button class="btn btn-outline-primary float-right" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
                             </div>
                         </div>
@@ -279,6 +284,7 @@
         }
         $('#btn_update').show();
         $('#btn_remove').show();
+        $('#btn_reviewRemove').show();
         $('#div_post').show();
         $('#btn_add').hide();
         getReview()
@@ -292,9 +298,31 @@
                 for (var i = 0; i < reviewData.length; i++) {
                     var tempReview = reviewData[i];
                     if (tempReview.review_id == urlParams.get('review_id')) {
+                        var getDate = new Date(tempReview.createdOn),
+                            d = ('0' + getDate.getDate()).slice(-2),
+                            m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                            y = getDate.getFullYear(),
+                            hr = getDate.getHours(),
+                            minutes = ('0' + getDate.getMinutes()).slice(-2);
 
+                        if (hr > 12) {
+                            time = 'PM';
+                            hr = hr - 12;
+                        } else {
+                            time = 'AM'
+                        }
+
+                        var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
                         $('#txt_title').val(tempReview.title);
                         $('#txt_description').val(tempReview.description);
+                        if (tempReview.createdBy == 'EMPLOYEE') {
+                            $('#link_ReviewCreate').html('Created By : ' + tempReview.createdBy + `(${tempReview.createdById})`);
+                            $('#link_ReviewCreate').attr('href', `/admin/employee/view?emp_id=${tempReview.createdById}`)
+                        } else {
+                            $('#link_ReviewCreate').html('Created By : ' + tempReview.createdBy);
+                        }
+
+                        $('#lbl_ReviewDate').html(oldDate)
                         if (tempReview.closed == true) {
                             $('#btn_remove').remove();
                             $('#btn_update').remove();
@@ -325,7 +353,26 @@
                         if (postData) {
                             for (var i = 0; i < postData.length; i++) {
                                 var tempPost = postData[i];
+                                var getDate = new Date(tempPost.createdOn),
+                                    d = ('0' + getDate.getDate()).slice(-2),
+                                    m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                                    y = getDate.getFullYear(),
+                                    hr = getDate.getHours(),
+                                    minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                                if (hr > 12) {
+                                    time = 'PM';
+                                    hr = hr - 12;
+                                } else {
+                                    time = 'AM'
+                                }
+
+                                var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
                                 var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+                                                    <div class="col-md-12">
+                                                        <p class="float-right ml-2" style="font-size: 13px;color: #999; ">Date: <span id="lbl_ReviewDate_${i}"></span></p>&nbsp;
+                                                        <a class="float-right" style="font-size: 13px;color: #999;" id="link_ReviewCreate_${i}"></a>
+                                                    </div>
                                                 <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
                                                 <div class="row" id="div_doc_${i}">
@@ -350,6 +397,13 @@
                                 $(`#btn_removePost_${i}`).remove();
                                 $(`#btn_edit_${tempPost.post_key}`).remove();
                                 $(`#btn_update_${tempPost.post_key}`).remove();
+                                $(`#lbl_ReviewDate_${i}`).html(oldDate);
+                                if (tempPost.createdBy == 'EMPLOYEE') {
+                                    $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy + `(${tempPost.createdById})`)
+                                    $(`#link_ReviewCreate_${i}`).attr('href', `/admin/employee/view?emp_id=${tempPost.createdById}`)
+                                } else {
+                                    $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy)
+                                }
                             }
                         }
                     } else {
@@ -357,7 +411,26 @@
                         if (postData) {
                             for (var i = 0; i < postData.length; i++) {
                                 var tempPost = postData[i];
+                                var getDate = new Date(tempPost.createdOn),
+                                    d = ('0' + getDate.getDate()).slice(-2),
+                                    m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                                    y = getDate.getFullYear(),
+                                    hr = getDate.getHours(),
+                                    minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                                if (hr > 12) {
+                                    time = 'PM';
+                                    hr = hr - 12;
+                                } else {
+                                    time = 'AM'
+                                }
+
+                                var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
                                 var postHtml = `<div style="border: 1px solid #262626; padding:15px; border-radius:5px;">
+                                                    <div class="col-md-12">
+                                                        <p class="float-right ml-2" style="font-size: 13px; color: #999;">Date: <span id="lbl_ReviewDate_${i}"></span></p>&nbsp;
+                                                        <a class="float-right" style="font-size: 13px;color: #999;" id="link_ReviewCreate_${i}"></a>
+                                                    </div>
                                                 <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
                                                 <div class="row" id="div_doc_${i}">
@@ -379,6 +452,14 @@
                                                 </div>
                                                 <hr>`;
                                 $('#div_posts').append(postHtml);
+                                $(`#lbl_ReviewDate_${i}`).html(oldDate)
+                                if (tempPost.createdBy == 'EMPLOYEE') {
+                                    $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy + `(${tempPost.createdById})`)
+                                    $(`#link_ReviewCreate_${i}`).attr('href', `/admin/employee/view?emp_id=${tempPost.createdById}`)
+                                } else {
+                                    $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy)
+                                }
+
                             }
                         }
                     }
@@ -755,7 +836,12 @@
                     class: 'bg-success',
                 });
                 $('#div_posts').empty();
-                getReview()
+                getReview();
+                var unUploaded = $('[id^=unUploaded_]')
+                $('#txt_post').val('');
+                $('#file_post').val('');
+                $(unUploaded).remove();
+                $('#input_plus').show();
             },
             error: error => {
                 error = error.responseJSON
@@ -866,6 +952,48 @@
             }
         })
     }
+
+    $('#btn_reviewRemove').click(() => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Review",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/remove?project_id=${urlParams.get('plan_id')}&review_id=${urlParams.get('review_id')}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Review removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.href = `http://localhost/admin/client/project-review?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`;
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $('btn_reviewRemove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('btn_reviewRemove').removeAttr('disabled')
+                    }
+                });
+            }
+        });
+    });
 
     $('#btn_reOpen').click(() => {
         Swal.fire({

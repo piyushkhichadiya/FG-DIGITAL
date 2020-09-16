@@ -196,7 +196,7 @@
                                                 <div class="col-md-12">
                                                     <div class="form-group">
                                                         <div class="input-group date" id="datetimepicker" data-target-input="nearest">
-                                                            <input type="text" id="txt_date" class="form-control datetimepicker-input" data-target="#datetimepicker" />
+                                                            <input type="text" id="txt_date" class="form-control datetimepicker-input" data-target="#datetimepicker" placeholder="YYYY/MM/DD" />
                                                             <div class="input-group-append" data-target="#datetimepicker" data-toggle="datetimepicker">
                                                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                                             </div>
@@ -297,7 +297,9 @@
     <script src="dist/js/client-project.js"></script>
 </body>
 <script>
-    $('#datetimepicker').datetimepicker();
+    $('#datetimepicker').datetimepicker({
+        format: 'Y/MM/D LT'
+    });
     $(document).on('click', '[data-toggle="lightbox"]', function(event) {
         event.preventDefault();
         $(this).ekkoLightbox();
@@ -369,7 +371,8 @@
                                                     <i class="fa fa-cogs bg-blue"></i>
                                                     <div class="timeline-item">
                                                         <span class="time" id="lbl_headerDate_${i}"></span>
-                                                        <span class="time">Created By : ${tempActivity.createdBy}</span>
+                                                        <a class="time" id="link_createdBy_${i}"></a>
+                                                        <span class="time" id='lbl_createdBy_${i}'></span>
                                                         <h3 class="timeline-header">${tempActivity.title || tempActivity.type}</h3>
                                                         <div class="timeline-body">
                                                             <div class="row form-group">
@@ -441,19 +444,19 @@
                                                         </div>
                                                     </div>
                                                     </div>`;
-
+                        $('#div_activity').append(serviceHtml);
                         if (tempActivity.service_deleted == true) {
                             $(`#btn_update_${i}`).remove();
                             $(`#div_post_${i}`).remove();
                         }
-                        $('#div_activity').append(serviceHtml);
                     }
                     if (tempActivity.type == 'ACTIVITY') {
                         var activityHtml = `<div>
                                             <i class="fa fa-chart-line bg-green"></i>
                                                     <div class="timeline-item">
                                                         <span class="time" id="lbl_headerDate_${i}"></span>
-                                                        <span class="time">Created By : ${tempActivity.createdBy}</span>
+                                                        <a class="time" id="link_createdBy_${i}"></a>
+                                                        <span class="time" id='lbl_createdBy_${i}'></span>
                                                         <h3 class="timeline-header">${tempActivity.title}</h3>
                                                         <div class="timeline-body">
                                                             <div class="row form-group">
@@ -517,12 +520,17 @@
                         $('#div_activity').append(activityHtml);
                         $(`#txt_description_${i}`).val(tempActivity.description)
                     }
-
+                    if (tempActivity.createdBy == 'EMPLOYEE') {
+                        $(`#link_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy + `(${tempActivity.createdById})`);
+                        $(`#link_createdBy_${i}`).attr('href', `/admin/employee/view?emp_id=${tempActivity.createdById}`)
+                    } else {
+                        $(`#lbl_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy)
+                    }
                     $(`#lbl_headerDate_${i}`).html(`Date : ` + oldDate)
                     $(`#txt_description_${i}`).val(tempActivity.description)
 
-                    $(`#reservationdate_${i}`).datetimepicker({
-                        format: 'Y/MM/D'
+                    $(`#datetimepicker_${i}`).datetimepicker({
+                        format: 'Y/MM/D LT'
                     });
                 }
             }

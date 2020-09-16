@@ -232,7 +232,10 @@
                 if (reviewData) {
                     for (var i = 0; i < reviewData.length; i++) {
                         var tempReview = reviewData[i],
-                            button = `<button class='btn btn-info' onclick="window.location.href = '/admin/client/project-reviews-view?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}&review_id=${tempReview.review_id}'"><i class='fas fa-eye'></i> View</button>`;
+                            button = `<div class='btn-group'>
+                                        <button class='btn btn-info m-1' onclick="window.location.href = '/admin/client/project-reviews-view?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}&review_id=${tempReview.review_id}'"><i class='fas fa-eye'></i> View</button>
+                                        <button class='btn btn-danger m-1' id='btn_remove_${i}' onclick=remove(${i},${tempReview.review_id})><i class='fas fa-trash-alt'></i> Remove</button>
+                                       </div>`;
                         if (tempReview.closed == true) {
                             var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-check'></i> Closed</p>`
                         } else {
@@ -259,6 +262,48 @@
             window.location.href = `/admin/client/project?client_id=${urlParams.get('client_id')}`
         }
     });
+
+    function remove(index, review_id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Review",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/remove?project_id=${urlParams.get('plan_id')}&review_id=${review_id}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Review removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_remove_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`btn_remove_${index}`).removeAttr('disabled')
+                    }
+                });
+            }
+        })
+    }
 </script>
 
 </html>
