@@ -226,7 +226,8 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                     }
 
                                     var tempServiceObj = {
-                                        service_id: tempProjectService.service_id
+                                        service_id: tempProjectService.service_id,
+                                        service_name: tempService.title
                                     }
 
                                     if (tempService.criteria) {
@@ -478,7 +479,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                     }
 
                     if (query_ProjectID == tempProjectObj.project_id) {
-                        return response(res, 200, 'success', undefined, { scope: scope, project: tempProjectObj, permission_denied: permissionDeny }, 'E-3.1.1')
+                        return response(res, 200, 'success', undefined, { scope: scope, project: tempProjectObj, permission_denied: permissionDeny, permissionAllowed: tempEmployeePermission }, 'E-3.1.1')
                     }
                 }
             }

@@ -19,7 +19,7 @@ clientAPI.use('/user', require('./components/user'));
 clientAPI.use('/profile', require('./components/profile'));
 
 // 3. CLIENT PROJECT
-// clientAPI.use('/project', require('./components/client-project'));
+clientAPI.use('/project', require('./components/client-project'));
 
 // 400 UNKNOWN APIs
 clientAPI.use('*', (req, res) => {

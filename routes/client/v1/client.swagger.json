@@ -91,7 +91,7 @@
         "/profile/update": {
             "post": {
                 "tags": ["2. Profile"],
-                "summary": "Update Profile Details",
+                "summary": "2.3 Update Profile Details",
                 "parameters": [{
                     "name": "body",
                     "in": "body",
@@ -110,13 +110,27 @@
         },
         "/profile/file/{filename}": {
             "get": {
-                "tags": ["2. Profile"],
-                "summary": "To Get Any file from storage",
+                "tags": ["2. Profile", "Global"],
+                "summary": "2.4 To Get Any file from storage",
                 "parameters": [{
                     "in": "path",
                     "name": "filename",
                     "required": true,
                     "description": "Specify File Name"
+                }],
+                "responses": {}
+            }
+        },
+        "/project/": {
+            "get": {
+                "tags": ["3. Project"],
+                "summary": "3.1 Get All Projects and Plans",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": false,
+                    "type": "integer",
+                    "description": "Project ID to get particular project information"
                 }],
                 "responses": {}
             }

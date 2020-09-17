@@ -141,7 +141,7 @@
                 }, {
                     "in": "query",
                     "name": "scope",
-                    "description": "Scope can help out to get related resource. Separate with space. \n 1. client - Get Client Information \n 2. info - Project Information \n 3. team - Team Members \n 4. service - Allocated Services \n 5. account - All Social Account \n 6. review - Reviews \n 7. Activity - Activity",
+                    "description": "<b>Project ID is required for Scope</b> <br>Scope can help out to get related resource. Separate with space. \n 1. client - Get Client Information \n 2. info - Project Information \n 3. team - Team Members \n 4. service - Allocated Services \n 5. account - All Social Account \n 6. review - Reviews \n 7. Activity - Activity",
                     "schema": {
                         "example": "client info service account activity review team"
                     }
