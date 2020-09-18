@@ -1508,10 +1508,9 @@ clientProjectAPI.post('/review/update-post', (req, res) => {
                 }
 
                 // Append Documents
-                if (tempPost.documents) {
+                if (tempPost.documents && documents && documents.length > 0) {
                     tempPost.documents.push.apply(tempPost.documents, documents)
-
-                } else {
+                } else if (documents && documents.length > 0) {
                     tempPost.documents = documents
                 }
 
