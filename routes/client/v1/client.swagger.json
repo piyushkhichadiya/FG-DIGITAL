@@ -134,6 +134,32 @@
                 }],
                 "responses": {}
             }
+        },
+        "/project/{project_id}": {
+            "get": {
+                "tags": ["3. Project"],
+                "summary": "3.2 Fetch Project Data",
+                "parameters": [{
+                    "in": "path",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "integer",
+                    "description": "Project ID",
+                    "schema": {
+                        "example": 93492065515
+                    }
+                }, {
+                    "in": "query",
+                    "name": "scope",
+                    "required": true,
+                    "type": "string",
+                    "description": "Use scope to get resources and data. Separate with space. \n 1. team - Team Members \n 2. services - Allocated Services \n 3. accounts - All Social Account connected to project \n 4. reviews - Reviews \n 5. Activity - Activity",
+                    "schema": {
+                        "example": "team services accounts reviews activity"
+                    }
+                }],
+                "responses": {}
+            }
         }
     }
 }
