@@ -304,6 +304,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                         if (tempReviewPost.deleted) { continue }
 
                                         var tempPostObj = {
+                                            post_key: dbReviewPostKey[m],
                                             description: tempReviewPost.description,
                                             createdOn: tempReviewPost.createdOn,
                                             createdBy: tempReviewPost.createdBy,
@@ -325,6 +326,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                                 if (tempDocument.deleted) { continue }
 
                                                 var tempReviewPostDocObj = {
+                                                    document_id: dbReviewDocumentKey[l],
                                                     filename: tempDocument.filename,
                                                     createdOn: tempDocument.createdOn || tempReview.createdOn,
                                                     createdBy: tempDocument.createdBy || tempReview.createdBy,
