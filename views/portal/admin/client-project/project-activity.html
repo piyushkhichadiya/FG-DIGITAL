@@ -590,7 +590,7 @@
                 var ext = file.substring(file.lastIndexOf('.') + 1);
                 if (service == true) {
                     if (ext != 'pdf') {
-                        docHtml += `<div class="col-md-2 img_container form-group">
+                        docHtml += `<div class="col-md-2 img_container">
                                     <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' onError=this.href='images/notfound.jpg' data-toggle="lightbox">
                                         <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
@@ -613,7 +613,7 @@
                     }
                 } else {
                     if (ext != 'pdf') {
-                        docHtml += `<div class="col-md-2 img_container form-group">
+                        docHtml += `<div class="col-md-2 img_container">
                                     <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
                                         <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
@@ -684,7 +684,7 @@
                     </div>`;
                 $('#div_image_' + index).prepend(pdf);
             } else {
-                image = `<div  id='div_unUploaded_${i}' class="col-md-2 img_container form-group">
+                image = `<div  id='div_unUploaded_${i}' class="col-md-2 img_container">
                         <div href='${objectURL}' data-toggle="lightbox">
                             <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
@@ -806,7 +806,7 @@
                     </div>`;
                 $('#div_pdf').prepend(pdf);
             } else {
-                image = `<div id='div_uploaded_${i}' class="col-md-2 img_container form-group">
+                image = `<div id='div_uploaded_${i}' class="col-md-2 img_container">
                         <div class='' href='${objectURL}' data-toggle="lightbox">
                             <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
@@ -850,9 +850,8 @@
                 body: 'Please select Activity Type',
                 class: 'bg-danger',
             });
-        } else {
-            formData.append('type', type)
         }
+        formData.append('type', type)
         if (service_id) {
             formData.append('service_id', service_id)
         }
@@ -920,10 +919,9 @@
                     body: 'Please Enter Title for Activity',
                     class: 'bg-danger',
                 });
-            } else {
-                formData.append('title', title)
             }
         }
+        formData.append('title', title)
         var d = new Date();
         var strDate = d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
         if (date) {

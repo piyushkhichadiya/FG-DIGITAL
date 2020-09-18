@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Info - Admin- FG Digital</title>
+    <title>Team - Member - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -89,12 +89,16 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Project Info</h1>
+                            <h1>Project Team</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/employee">Admin</a></li>
-                                <li class="breadcrumb-item active">Info</li>
+                                <li class="breadcrumb-item"><a href="/employee">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/employee/projects">Projects</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="link_navProjects" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item active">Team</li>
                             </ol>
                         </div>
                     </div>
@@ -109,19 +113,21 @@
                         <div class="row">
                             <!-- /.card-header -->
                             <div class="col-md-12">
-                                <table id="tbl_project" class="table table-bordered table-striped w-100">
+                                <table id="tbl_team" class="table table-bordered table-striped w-100">
                                     <thead>
                                         <tr>
-                                            <th>Sr. No.</th>
-                                            <th>Project ID</th>
+                                            <th>No.</th>
+                                            <th>Member ID</th>
                                             <th>Name</th>
-                                            <th>description</th>
-                                            <th>Action</th>
+                                            <th>Profile Image</th>
+                                            <th>Position</th>
+                                            <th>Contact</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr align="center">
-                                            <td colspan="5"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td colspan="6"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
                                             <td hidden></td>
                                             <td hidden></td>
                                             <td hidden></td>
@@ -130,11 +136,12 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th>Sr. No.</th>
-                                            <th>Project ID</th>
+                                            <th>No.</th>
+                                            <th>Member ID</th>
                                             <th>Name</th>
-                                            <th>description</th>
-                                            <th>Action</th>
+                                            <th>Profile Image</th>
+                                            <th>Position</th>
+                                            <th>Contact</th>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -188,6 +195,43 @@
 
 </body>
 <script>
+    var tblTeam = $("#tbl_team").DataTable({
+        "responsive": true,
+    });
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('plan_id')) {
+        if (urlParams.get('plan_id') == '') {
+            window.location.href = '/employee/projects'
+        }
+        getProjectTeam();
+    } else {
+        window.location.href = '/employee/projects'
+    }
+
+    function getProjectTeam() {
+        $.getJSON(`/employee/v1/project/fetch?project_id=${urlParams.get('plan_id')}&scope=team`, (result) => {
+            var data = result.data;
+            var teamData = data.project.team;
+            tblTeam.clear().draw();
+            if (teamData) {
+                for (var i = 0; i < teamData.length; i++) {
+                    var tempTeam = teamData[i];
+                    var image;
+                    if (tempTeam.profile_image) {
+                        image = `<img src='/employee/v1/profile/file/${tempTeam.profile_image}' onError="this.onerror=null;this.src='images/logo-small.png';" style='border-radius: 50%; height:70px;width:70px'>`
+                    } else {
+                        image = `<img src='images/logo-small.png' style='border-radius: 50%; height:70px;width:70px'>`
+                    }
+                    var contact = `<p>${tempTeam.email || ''}(${tempTeam.mobile || ''})</p>`;
+                    tblTeam.row.add([
+                        `${i+1}`, tempTeam.employee_id, tempTeam.name, image, tempTeam.position, contact
+                    ]).draw();
+                }
+            }
+        }).fail(error => {
+            window.location.href = '/employee/projects'
+        });
+    }
 </script>
 
 </html>

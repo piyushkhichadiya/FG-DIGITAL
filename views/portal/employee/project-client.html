@@ -94,7 +94,11 @@
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/employee">Home</a></li>
-                                <li class="breadcrumb-item active">Info</li>
+                                <li class="breadcrumb-item"><a href="/employee/projects">Projects</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="link_navProjects" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item active">Client</li>
                             </ol>
                         </div>
                     </div>
@@ -205,6 +209,8 @@
                     1, dbClient.client_key, dbClient.name, 1
                 ]).draw();
             }
+        }).fail(error => {
+            window.location.href = '/employee/projects'
         });
     }
 </script>

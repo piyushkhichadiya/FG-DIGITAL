@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Dashboard - Admin- FG Digital</title>
+    <title>Dashboard - Member- FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -93,7 +93,7 @@
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/employee">Admin</a></li>
+                                <li class="breadcrumb-item"><a href="/employee">Home</a></li>
                                 <li class="breadcrumb-item active">Dashboard</li>
                             </ol>
                         </div>
@@ -111,8 +111,8 @@
                                 <!-- small card -->
                                 <div class="small-box bg-info">
                                     <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Members</p>
+                                        <h3 id="lbl_project"></h3>
+                                        <p>Total Projects</p>
                                     </div>
                                     <div class="icon">
                                         <i class="fas fa-users"></i>
@@ -126,8 +126,8 @@
                                 <!-- small card -->
                                 <div class="small-box bg-success">
                                     <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Projects</p>
+                                        <h3 id="lbl_review"></h3>
+                                        <p>Pending Reviews</p>
                                     </div>
                                     <div class="icon">
                                         <i class="fas fa-copy"></i>
@@ -139,10 +139,10 @@
                             </div>
                             <div class="col-lg-3 col-6">
                                 <!-- small card -->
-                                <div class="small-box bg-warning">
+                                <div class="small-box bg-indigo">
                                     <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Pending Reviews</p>
+                                        <h3 id="lbl_activity"></h3>
+                                        <p>Recent Activity</p>
                                     </div>
                                     <div class="icon">
                                         <i class="fas fa-tasks"></i>

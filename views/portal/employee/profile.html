@@ -194,14 +194,9 @@
             $('#img_originalProfile').attr('src', '/employee/v1/profile/file/' + dbdata.profile_image).show()
             $('#img_profile').hide()
         }).fail(error => {
-            error = error.responseJSON
-            $(document).Toasts('create', {
-                title: 'Password and Confirm password required',
-                autohide: true,
-                delay: 5000,
-                body: 'Add Password and Confirm Password',
-                class: 'bg-danger',
-            });
+            if (error.status == 404 || error.status == 401) {
+                logout(true)
+            }
         });
     }
 

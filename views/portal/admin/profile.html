@@ -289,11 +289,14 @@
             $('#img_profile').hide()
         }).fail(error => {
             error = error.responseJSON
+            if (error.status == 404 || error.status == 401) {
+                logout(true)
+            }
             $(document).Toasts('create', {
-                title: 'Password and Confirm password required',
+                title: 'Error!',
                 autohide: true,
                 delay: 5000,
-                body: 'Add Password and Confirm Password',
+                body: 'Something went Wrong please login again',
                 class: 'bg-danger',
             });
         });

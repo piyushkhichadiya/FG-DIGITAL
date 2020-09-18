@@ -90,12 +90,16 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Projects</h1>
+                            <h1>Projects Dashboard</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/employee">Home</a></li>
-                                <li class="breadcrumb-item active">Projects</li>
+                                <li class="breadcrumb-item"><a href="/employee/projects">Projects</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="link_navProjects" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item active">Dashboard</li>
                             </ol>
                         </div>
                     </div>
@@ -107,21 +111,34 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="card-body card">
-                        <div class="row">
+                        <div class="row form-group">
                             <div class="col-md-12">
                                 <h4 class="header-title">Project</h4>
                             </div>
-                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-client?plan_id=${plan_id}`'><i class="fas fa-users"></i> Clients</button>
-                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-info?plan_id=${plan_id}`'><i class="fas fa-info-circle"></i> Info</button>
-                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-service?plan_id=${plan_id}`'><i class="fas fa-cogs"></i> Services</a>
-                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-team?plan_id=${plan_id}`'><i class="fas fa-users"></i> Team</button>
-                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-accounts?plan_id=${plan_id}`'><i class="fas fa-portrait"></i> Social Accounts</button>
+                            <div class="col-md-2">
+                                <label class="">Project Name :</label>
+                                <p id='lbl_name'></p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="">Project description :</label>
+                                <p id='lbl_description'></p>
+                            </div>
+                            <div class="col-md-12">
+                                <!-- <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-client?plan_id=${plan_id}`'><i class="fas fa-users"></i> Clients</button> -->
+                                <button class="btn btn-outline-primary m-1" id="btn_clients"><i class="fas fa-users"></i> Clients</button>
+                                <!-- <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-info?plan_id=${plan_id}`'><i class="fas fa-info-circle"></i> Info</button> -->
+                                <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-service?plan_id=${plan_id}`'><i class="fas fa-cogs"></i> Services</a>
+                            <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-team?plan_id=${plan_id}`'><i class="fas fa-user-friends"></i> Team</button>
+                                <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-accounts?plan_id=${plan_id}`'><i class="fas fa-portrait"></i> Social Accounts</button>
+                            </div>
                         </div>
-                        <hr>
-                        <h4 class="header-title">Reviews & Activity</h4>
-                        <div class="row">
-                            <button class="btn btn-outline-success m-1" onclick='window.location.href = `/employee/project-review?plan_id=${plan_id}`'><i class="fas fa-tasks"></i> Review</button>
-                            <button class="btn btn-outline-success m-1" onclick='window.location.href = `/employee/project-activity?plan_id=${plan_id}`'><i class="fas fa-chart-line"></i> Activity</button>
+                        <div id="div_review" style="display: none;;">
+                            <hr>
+                            <h4 class="header-title">Reviews & Activity</h4>
+                            <div class="row">
+                                <button class="btn btn-outline-success m-1" id="btn_review" onclick='window.location.href = `/employee/project-review?plan_id=${plan_id}`' style="display: none;"><i class="fas fa-tasks"></i> Review</button>
+                                <button class="btn btn-outline-success m-1" id="btn_activity" onclick='window.location.href = `/employee/project-activity?plan_id=${plan_id}`' style="display: none;"><i class="fas fa-chart-line"></i> Activity</button>
+                            </div>
                         </div>
                     </div>
                     <!-- Card body -->
@@ -145,6 +162,34 @@
         <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
+
+    <div class="modal fade" id="modal_Social">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Project Clients</h4>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Client ID</label>
+                            <p id="lbl_clientId"></p>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Name</label>
+                            <p id="lbl_ClientName"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
 
     <!-- jQuery -->
     <script src="plugins/jquery/jquery.min.js"></script>
@@ -172,18 +217,53 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     plan_id = urlParams.get('plan_id');
-    var dbProject;
+
+    var dbClient;
     if (urlParams.has('plan_id')) {
         if (urlParams.get('plan_id') == '') {
             window.location.href = '/employee/projects'
         }
-        getProjectData();
+        getProjectClient();
+        getProjectInfo()
     } else {
         window.location.href = '/employee/projects'
     }
 
-    function getProjectData() {
+    function getProjectClient() {
+        $.getJSON(`/employee/v1/project/fetch?project_id=${urlParams.get('plan_id')}&scope=client%20`, (result) => {
+            var data = result.data;
+            dbClient = data.project.client;
+        }).fail(error => {
+            window.location.href = '/employee/projects'
+        });
+    }
 
+    $('#btn_clients').click(() => {
+        $('#modal_Social').modal('show')
+        if (dbClient) {
+            $('#lbl_clientId').html(dbClient.client_key)
+            $('#lbl_ClientName').html(dbClient.name)
+        }
+    });
+
+    function getProjectInfo() {
+        $.getJSON(`/employee/v1/project/fetch?project_id=${urlParams.get('plan_id')}&scope=info`, (result) => {
+            var data = result.data;
+            var infoData = data.project;
+            var permission = data.permissionAllowed;
+            $('#lbl_name').html(infoData.name);
+            $('#lbl_description').html(infoData.description);
+            if (data.permissionAllowed.review == true) {
+                $('#div_review').show();
+                $('#btn_review').show();
+            }
+            if (data.permissionAllowed.activity == true) {
+                $('#div_review').show();
+                $('#btn_activity').show();
+            }
+        }).fail(error => {
+            window.location.href = '/employee/projects'
+        });
     }
 </script>
 
