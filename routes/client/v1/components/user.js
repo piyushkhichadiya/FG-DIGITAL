@@ -26,7 +26,6 @@ userAPI.post('/login', (req, res) => {
 
             for (var i = 0; i < dbClientsKeys.length; i++) {
                 var tempClient = dbClients[dbClientsKeys[i]];
-
                 if (!tempClient.deleted && tempClient.email == email && await bcryptHashCompare(password, tempClient.password)) {
                     // Store Auth Token in Cookie and Session
 

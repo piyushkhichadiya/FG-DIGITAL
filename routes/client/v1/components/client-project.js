@@ -239,6 +239,156 @@ clientProjectAPI.get('/:projectID', (req, res) => {
     return response(res, 200, 'success', undefined, { scopes: scope, data: postData }, 'P')
 });
 
+// 3.3 Review Action
+clientProjectAPI.post('/review/action', (req, res) => {
+    if (!req.body.review_id || isNaN(parseInt(req.body.review_id))) {
+        return response(res, 400, 'required', 'Review Id is required', undefined, 'C-3.3.1')
+    }
+    if (!req.body.post_key) {
+        return response(res, 400, 'required', 'Post Key is required', undefined, 'C-3.3.2')
+    }
+    if (!req.body.status) {
+        return response(res, 400, 'required', 'Status is required it should be "APPROVED or REJECTED or CHANGES"', undefined, 'C-3.3.3')
+    }
+    if (isNaN(parseInt(req.body.project_id)) || !req.body.project_id) {
+        return response(res, 400, 'required', 'Project Id is required', undefined, 'C-3.3.4')
+    }
+    var status = String(req.body.status).trim(),
+        projectID = String(req.body.project_id),
+        reviewID = String(req.body.review_id),
+        postKey = String(req.body.post_key).trim(),
+        getKeys = getProject(projectID)
+    if (!getKeys) {
+        return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'c-3.3.5')
+    }
+
+    if (status != "APPROVED" && status != "REJECTED" && status != "CHANGES") {
+        return response(res, 400, 'invalid', 'Status value is not proper', undefined, 'C-3.3.6')
+
+    }
+    if (!dbAdminSnapshot.clients[getKeys.client_key].plans[getKeys.plan_key].review) {
+        return response(res, 404, 'notFound', 'Incorrect Review ID', undefined, 'c-3.3.7')
+
+    }
+    var dbReview = dbAdminSnapshot.clients[getKeys.client_key].plans[getKeys.plan_key].review,
+        dbReviewKeys = Object.keys(dbReview)
+    for (var i = 0; i < dbReviewKeys.length; i++) {
+        var tempReview = dbReview[dbReviewKeys[i]]
+
+        if (tempReview.review_id == reviewID && !tempReview.deleted && !tempReview.closed) {
+            var tempPost = tempReview.post
+            if (tempPost[postKey]) {
+                var pushData = {
+                    createdBy: 'CLIENT',
+                    createdOn: String(new Date()),
+                    createdById: dbClientAccount.client_id || 0,
+                    status: status
+                }
+                if (req.body.description) {
+                    var description = String(req.body.description)
+                    pushData.description = description
+                }
+                return firebase.ref(`/admin/clients/${getKeys.client_key}/plans/${getKeys.plan_key}/review/${dbReviewKeys[i]}/post/${postKey}/conversations/`).push(pushData).then(() => {
+                    return response(res, 200, 'success', 'Your action recorded successfully', undefined, 'C-3.3.8')
+                })
+            } else {
+                return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'C-3.3.9')
+
+            }
+
+
+        } else if (i == dbReviewKeys.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'C-3.3.10')
+
+        }
+    }
+
+
+});
+
+// 3.4 Review Action Edit
+clientProjectAPI.post('/review/action/edit', (req, res) => {
+    if (!req.body.review_id || isNaN(parseInt(req.body.review_id))) {
+        return response(res, 400, 'required', 'Review Id is required', undefined, 'C-3.4.1')
+    }
+
+    if (!req.body.post_key) {
+        return response(res, 400, 'required', 'Post Key is required', undefined, 'C-3.4.2')
+    }
+
+    if (!req.body.conversation_key) {
+        return response(res, 400, 'required', 'Conversation Key is required', undefined, 'C-3.4.3')
+    }
+
+    if (!req.body.status) {
+        return response(res, 400, 'required', 'Status is required', undefined, 'C-3.4.4')
+    }
+
+    if (isNaN(parseInt(req.body.project_id)) || !req.body.project_id) {
+        return response(res, 400, 'required', 'Project Id is required', undefined, 'C-3.4.5')
+    }
+
+    var status = String(req.body.status).trim(),
+        projectID = String(req.body.project_id),
+        reviewID = String(req.body.review_id),
+        postKey = String(req.body.post_key).trim(),
+        conversationKey = String(req.body.conversation_key).trim(),
+        getKeys = getProject(projectID)
+
+    if (!getKeys) {
+        return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'c-3.4.6')
+    }
+
+    if (status != "APPROVED" && status != "REJECTED" && status != "CHANGES") {
+        return response(res, 400, 'invalid', 'Status value is not proper / it should be "APPROVED or REJECTED or CHANGES"', undefined, 'C-3.4.7')
+    }
+
+    if (!dbAdminSnapshot.clients[getKeys.client_key].plans[getKeys.plan_key].review) {
+        return response(res, 404, 'notFound', 'Incorrect Review ID', undefined, 'c-3.4.8')
+    }
+
+    var dbReview = dbAdminSnapshot.clients[getKeys.client_key].plans[getKeys.plan_key].review,
+        dbReviewKeys = Object.keys(dbReview)
+    for (var i = 0; i < dbReviewKeys.length; i++) {
+        var tempReview = dbReview[dbReviewKeys[i]]
+
+        if (tempReview.review_id == reviewID && !tempReview.deleted && !tempReview.closed) {
+            var tempPost = tempReview.post
+            if (tempPost[postKey]) {
+                var conversation = tempPost[postKey].conversations
+                if (conversation[conversationKey]) {
+                    var tempConversation = conversation[conversationKey]
+
+                    tempConversation.lastModifiedBy = 'CLIENT'
+                    tempConversation.lastModifiedOn = String(new Date())
+                    tempConversation.lastModifiedById = dbClientAccount.client_id || 0
+                    tempConversation.status = status
+
+                    if (req.body.description) {
+                        var description = String(req.body.description)
+                        tempConversation.description = description
+                    }
+                    return firebase.ref(`/admin/clients/${getKeys.client_key}/plans/${getKeys.plan_key}/review/${dbReviewKeys[i]}/post/${postKey}/conversations/${conversationKey}`).update(tempConversation).then(() => {
+                        return response(res, 200, 'success', 'Your action recorded successfully', undefined, 'C-3.4.9')
+                    })
+                } else {
+                    return response(res, 404, 'notfound', 'Incorrect Conversation Key', undefined, 'C-3.4.10')
+
+                }
+
+            } else {
+                return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'C-3.4.11')
+            }
+
+
+        } else if (i == dbReviewKeys.length - 1) {
+            return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'C-3.4.12')
+        }
+    }
+
+
+})
+
 module.exports = clientProjectAPI;
 
 // Project Validator
