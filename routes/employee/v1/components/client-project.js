@@ -193,7 +193,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                     }
 
                     // Service
-                    var activeCriteria = [], // To validate in Activity Data
+                    var activeCriteria = {}, // To validate in Activity Data
                         allServices = {}
 
                     if (tempProject.service) {
@@ -205,8 +205,6 @@ clientProjectAPI.get('/fetch', (req, res) => {
 
                         for (var k = 0; k < dbProjectServiceKey.length; k++) {
                             var tempProjectService = dbProjectService[dbProjectServiceKey[k]]
-
-                            if (tempProjectService.deleted || !tempProjectService.active) { continue }
 
                             // Check Service Status
                             if (dbAdminSnapshot.services) {
@@ -221,9 +219,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                         service_name: tempService.title
                                     }
 
-                                    if (tempService.deleted || tempService.service_id != tempProjectService.service_id) {
-                                        continue
-                                    }
+                                    if (tempService.service_id != tempProjectService.service_id) { continue }
 
                                     var tempServiceObj = {
                                         service_id: tempProjectService.service_id,
@@ -239,6 +235,11 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                         for (var m = 0; m < dbServiceCriteriaKey.length; m++) {
                                             var tempCriteria = dbServiceCriteria[dbServiceCriteriaKey[m]]
 
+                                            activeCriteria[parseInt(tempCriteria.criteria_id)] = {
+                                                criteria: tempCriteria.criteria,
+                                                deleted: tempCriteria.deleted
+                                            }
+
                                             if (tempCriteria.deleted) { continue }
 
                                             tempServiceObj.criteria.push({
@@ -246,11 +247,14 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                                 criteria: tempCriteria.criteria
                                             })
 
-                                            activeCriteria.push(tempCriteria.criteria_id)
+
                                         }
                                     }
 
-                                    tempProjectObj.services.push(tempServiceObj)
+                                    // Check Original Service is deleted or not, Check Service active and not deleted in project
+                                    if (!tempService.deleted && !tempProjectService.deleted && tempProjectService.active) {
+                                        tempProjectObj.services.push(tempServiceObj)
+                                    }
                                 }
                             }
                         }
@@ -410,10 +414,11 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                         for (var l = 0; l < dbActivityCriteriaKey.length; l++) {
                                             var tempActivityCriteria = dbActivityCriteria[dbActivityCriteriaKey[l]];
 
-                                            if (tempActivityCriteria.deleted) { continue }
+                                            if (tempActivityCriteria.deleted || !activeCriteria[tempActivityCriteria.criteria_id]) { continue }
 
                                             var tempCriteriaObj = {
                                                 criteria_id: tempActivityCriteria.criteria_id,
+                                                criteria: activeCriteria[tempActivityCriteria.criteria_id].criteria,
                                                 value: tempActivityCriteria.value,
                                                 createdOn: tempActivityCriteria.createdOn,
                                                 createdBy: tempActivityCriteria.createdBy,
@@ -421,10 +426,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                                 lastModifiedOn: tempActivityCriteria.lastModifiedOn,
                                                 lastModifiedBy: tempActivityCriteria.lastModifiedBy,
                                                 lastModifiedById: tempActivityCriteria.lastModifiedById,
-                                            }
-
-                                            if (!activeCriteria.includes(tempActivityCriteria.criteria_id)) {
-                                                tempCriteriaObj.deleted = true
+                                                deleted: activeCriteria[tempActivityCriteria.criteria_id].deleted,
                                             }
 
                                             // Push Criteria to Temp. Object
