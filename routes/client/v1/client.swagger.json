@@ -91,7 +91,7 @@
         "/profile/update": {
             "post": {
                 "tags": ["2. Profile"],
-                "summary": "Update Profile Details",
+                "summary": "2.3 Update Profile Details",
                 "parameters": [{
                     "name": "body",
                     "in": "body",
@@ -110,13 +110,53 @@
         },
         "/profile/file/{filename}": {
             "get": {
-                "tags": ["2. Profile"],
-                "summary": "To Get Any file from storage",
+                "tags": ["2. Profile", "Global"],
+                "summary": "2.4 To Get Any file from storage",
                 "parameters": [{
                     "in": "path",
                     "name": "filename",
                     "required": true,
                     "description": "Specify File Name"
+                }],
+                "responses": {}
+            }
+        },
+        "/project/": {
+            "get": {
+                "tags": ["3. Project"],
+                "summary": "3.1 Get All Projects and Plans",
+                "parameters": [{
+                    "in": "query",
+                    "name": "project_id",
+                    "required": false,
+                    "type": "integer",
+                    "description": "Project ID to get particular project information"
+                }],
+                "responses": {}
+            }
+        },
+        "/project/{project_id}": {
+            "get": {
+                "tags": ["3. Project"],
+                "summary": "3.2 Fetch Project Data",
+                "parameters": [{
+                    "in": "path",
+                    "name": "project_id",
+                    "required": true,
+                    "type": "integer",
+                    "description": "Project ID",
+                    "schema": {
+                        "example": 93492065515
+                    }
+                }, {
+                    "in": "query",
+                    "name": "scope",
+                    "required": true,
+                    "type": "string",
+                    "description": "Use scope to get resources and data. Separate with space. \n 1. team - Team Members \n 2. services - Allocated Services \n 3. accounts - All Social Account connected to project \n 4. reviews - Reviews \n 5. Activity - Activity",
+                    "schema": {
+                        "example": "team services accounts reviews activity"
+                    }
                 }],
                 "responses": {}
             }

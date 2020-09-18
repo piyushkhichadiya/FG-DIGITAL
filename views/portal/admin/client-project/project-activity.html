@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Project Activity - FG Digital</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="dist/css/ionicons.min.css">
+    <link rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link rel="stylesheet" href="dist/css/ekko-lightbox.css">
+    <style>
+        .middle {
+            transition: .5s ease;
+            opacity: 0;
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 50px;
+        }
+        
+        .img_container:hover .image {
+            opacity: 0.3;
+            cursor: pointer;
+        }
+        
+        .img_container:hover .middle {
+            opacity: 1;
+            cursor: pointer;
+        }
+        
+        .plus {
+            position: absolute;
+            top: 56%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 60px;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini sidebar-collapse">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-success elevation-4">
+            <!-- Brand Logo -->
+            <a href="/admin" class="brand-link">
+                <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FG Digital</span>
+            </a>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                    </div>
+                    <div class="info">
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
+                    </div>
+                </div>
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+                        <li class="nav-item">
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                                <p>Plans</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                                <p>Client</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                                <p>Team</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                                <p>Services</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Project Activity</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navClient" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navProjectId" href=""> </a>
+                                </li>
+                                <li class="breadcrumb-item active">Activity</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+
+                    <!-- Timelime example  -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- The time line -->
+                            <div class="timeline" id="div_activity">
+                                <!-- <div id="div_activity" style="display: none;"></div> -->
+                                <div>
+                                    <i class="fa fa-plus bg-info"></i>
+                                    <div class="timeline-item">
+                                        <h3 class="timeline-header">Add Activity</h3>
+                                        <div class="timeline-body">
+                                            <div class="row form-group">
+                                                <div class="col-md-6">
+                                                    <label class="col-md-1">Type</label>
+                                                    <select class="col-md-8 form-control" id="list_type">
+                                                    <option value="" hidden>Select Type</option>
+                                                    <option value="Service">Service</option>
+                                                    <option value="Activity">Activity</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div id="div_service" style="display: none;">
+                                                <div class="row form-group" id="div_service">
+                                                    <div class="col-md-6">
+                                                        <label class="col-md-1">Services</label>
+                                                        <select class="col-md-8 form-control" id="list_service">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group" id="div_criteria"></div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row form-group">
+                                            <div class="col-md-4">
+                                                <label class="col-md-1" id="lbl_criteria">Date</label>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <div class="input-group date" id="datetimepicker" data-target-input="nearest">
+                                                            <input type="text" id="txt_date" class="form-control datetimepicker-input" data-target="#datetimepicker" placeholder="YYYY/MM/DD" />
+                                                            <div class="input-group-append" data-target="#datetimepicker" data-toggle="datetimepicker">
+                                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-md-6">
+                                                <label class="col-md-1" id="lbl_criteria">Title</label>
+                                                <div class="col-md-10">
+                                                    <input type="text" class="form-control" id="txt_title" placeholder="Enter Title">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-md-6">
+                                                <label class="col-md-1" id="lbl_criteria">Description</label>
+                                                <div class="col-md-10">
+                                                    <textarea type="text" class="form-control" rows="2" id="txt_description" placeholder="Description...."></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" id="div_post"></div>
+                                        <div style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
+                                            <div class="row form-group" id="div_pdf">
+                                                <input type="file" id="file_post" accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
+                                                <div class="col-md-2" id="input_plus" onclick="$('#file_post').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                    <div class="plus">
+                                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-md-12">
+                                                <button class="btn btn-outline-primary float-right m-2" id="btn_add"><i class="fas fa-plus"></i> Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <footer class="main-footer">
+        <div class="float-right d-sm-block">
+            <p id="lbl_ui_version"> VERSION INFO </p>
+        </div>
+        <strong>Copyright &copy <script>
+                document.write(new Date().getFullYear());
+                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+    </footer>
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+    <!-- jQuery -->
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- InputMask -->
+    <script src="plugins/moment/moment.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="dist/js/demo.js"></script>
+    <!-- sweetalert -->
+    <script src="dist/js/sweetalert2.js"></script>
+    <!-- toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- lightBox -->
+    <script src="dist/js/ekko-lightbox.min.js"></script>
+    <!-- ionicon -->
+    <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
+    <!-- Custom JS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
+    <script src="dist/js/client-project.js"></script>
+</body>
+<script>
+    $('#datetimepicker').datetimepicker({
+        format: 'Y/MM/D LT'
+    });
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+        event.preventDefault();
+        $(this).ekkoLightbox();
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    var dbService;
+    var dbProjectService;
+    $.getJSON('/admin/v1/service/get', (result) => {
+        dbService = result.data
+    }).fail(error => {
+        error = error.responseJSON
+        $(document).Toasts('create', {
+            title: 'Error!',
+            autohide: true,
+            delay: 5000,
+            body: 'Service Not Found',
+            class: 'bg-danger',
+        });
+    });
+
+    $.getJSON(`/admin/v1/project/fetch/${urlParams.get('plan_id')}?scope=service`, (result) => {
+        var data = result.data;
+        dbProjectService = data.service;
+    }).fail(error => {
+        error = error.responseJSON
+        $(document).Toasts('create', {
+            title: 'Error!',
+            autohide: true,
+            delay: 5000,
+            body: 'Service Not Found',
+            class: 'bg-danger',
+        });
+    });
+    var plan_id = urlParams.get('plan_id')
+    if (urlParams.has('plan_id')) {
+        if (plan_id == '') {
+            window.location.href = `/admin/client/project?client_id=${urlParams.get('client_id')}`
+        }
+        getactivity(plan_id)
+    }
+
+    function getactivity(plan_id) {
+        $.get(`/admin/v1/project/fetch/${plan_id}?scope=%20activity`, (data) => {
+            var projectData = data.data;
+            activityData = projectData.activity;
+            if (activityData) {
+                for (var i = activityData.length - 1; i >= 0; i--) {
+                    var tempActivity = activityData[i];
+                    var getDate = new Date(tempActivity.date || tempActivity.createdOn),
+                        d = ('0' + getDate.getDate()).slice(-2),
+                        m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                        y = getDate.getFullYear(),
+                        hr = getDate.getHours(),
+                        minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                    if (hr > 12) {
+                        time = 'PM';
+                        hr = hr - 12;
+                    } else {
+                        time = 'AM'
+                    }
+
+                    var date = y + '/' + m + '/' + d;
+                    var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
+
+                    if (tempActivity.type == 'SERVICE') {
+                        var serviceHtml = `<div>
+                                                    <i class="fa fa-cogs bg-blue"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time" id="lbl_headerDate_${i}"></span>
+                                                        <a class="time" id="link_createdBy_${i}"></a>
+                                                        <span class="time" id='lbl_createdBy_${i}'></span>
+                                                        <h3 class="timeline-header">${tempActivity.title || tempActivity.type}</h3>
+                                                        <div class="timeline-body">
+                                                            <div class="row form-group">
+                                                                <div class="col-md-6">
+                                                                    <label class="col-md-1">Type</label>
+                                                                    <input type="text" id="txt_type_${i}" class="form-control col-md-8" value="${tempActivity.type}" placeholder="Type" disabled>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <div class="row form-group">
+                                                                    <div class="col-md-6">
+                                                                        <label class="col-md-1" id="">Services</label>
+                                                                        <input type="text" id="txt_service_${i}" value="${tempActivity.service_name || ''}" class="form-control col-md-8" placeholder="Service Name" disabled>
+                                                                    </div>
+                                                                </div>
+                                                                <div class='row form-group' id="div_criteria_${i}">
+                                                                ${getCriteria(i, tempActivity.criteria, tempActivity.service_deleted)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-4">
+                                                                <label class="col-md-1" id="lbl_criteria">Date</label>
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <div class="input-group date" id="datetimepicker_${i}" data-target-input="nearest">
+                                                                            <input type="text" id="txt_date_${i}" value='${oldDate}' class="form-control datetimepicker-input" data-target="#datetimepicker_${i}" placeholder="YYYY/MM/DD"  />
+                                                                            <div class="input-group-append" data-target="#datetimepicker_${i}" data-toggle="datetimepicker">
+                                                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-6">
+                                                                <label class="col-md-1">Title</label>
+                                                                <div class="col-md-10">
+                                                                    <input type="text" class="form-control" value="${tempActivity.title || ''}" id="txt_title_${i}" placeholder="Enter Title">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-6">
+                                                                <label class="col-md-1">Description</label>
+                                                                <div class="col-md-10">
+                                                                    <textarea type="text" class="form-control" rows="2" id="txt_description_${i}" placeholder="Description...."></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div id='div_border_${i}' style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
+                                                            <div class="row form-group" id="div_image_${i}">
+                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key, tempActivity.service_deleted)}
+                                                                <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
+                                                                <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                                    <div class="plus">
+                                                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-12">
+                                                                <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${date}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    </div>`;
+                        $('#div_activity').append(serviceHtml);
+                        if (tempActivity.service_deleted == true) {
+                            $(`#btn_update_${i}`).remove();
+                            $(`#div_post_${i}`).remove();
+                            if (!tempActivity.documents) {
+                                $(`#div_border_${i}`).remove()
+                            }
+                        }
+                    }
+                    if (tempActivity.type == 'ACTIVITY') {
+                        var activityHtml = `<div>
+                                            <i class="fa fa-chart-line bg-green"></i>
+                                                    <div class="timeline-item">
+                                                        <span class="time" id="lbl_headerDate_${i}"></span>
+                                                        <a class="time" id="link_createdBy_${i}"></a>
+                                                        <span class="time" id='lbl_createdBy_${i}'></span>
+                                                        <h3 class="timeline-header">${tempActivity.title}</h3>
+                                                        <div class="timeline-body">
+                                                            <div class="row form-group">
+                                                                <div class="col-md-6">
+                                                                    <label class="col-md-1">Type</label>
+                                                                    <input type="text" id="txt_type_${i}" class="form-control col-md-8" value="${tempActivity.type}" placeholder="Type" disabled>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <hr>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-4">
+                                                                <label class="col-md-1" id="lbl_criteria">Date</label>
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <div class="input-group date" id="datetimepicker_${i}" data-target-input="nearest">
+                                                                            <input type="text" id="txt_date_${i}" value='${oldDate}' class="form-control datetimepicker-input" data-target="#datetimepicker_${i}" placeholder="YYYY/MM/DD"  />
+                                                                            <div class="input-group-append" data-target="#datetimepicker_${i}" data-toggle="datetimepicker">
+                                                                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-6">
+                                                                <label class="col-md-1">Title</label>
+                                                                <div class="col-md-10">
+                                                                    <input type="text" class="form-control" value="${tempActivity.title}" id="txt_title_${i}" placeholder="Enter Title">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-6">
+                                                                <label class="col-md-1">Description</label>
+                                                                <div class="col-md-10">
+                                                                    <textarea type="text" class="form-control" rows="2" id="txt_description_${i}" placeholder="Description...."></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div id='div_border_${i}' style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
+                                                            <div class="row form-group" id="div_image_${i}">
+                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key)}
+                                                                <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
+                                                                <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                                    <div class="plus">
+                                                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row form-group">
+                                                            <div class="col-md-12">
+                                                                <button class="btn btn-outline-danger float-right m-1 mb-2 mr-2" id="btn_remove_${i}" onclick= removesActivity(${i},'${tempActivity.activity_key}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                                                <button class="btn btn-outline-info float-right m-1 mb-2" id="btn_update_${i}" onclick= updateActivity(${i},'${tempActivity.activity_key}','${date}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                   </div> `;
+                        $('#div_activity').append(activityHtml);
+                        $(`#txt_description_${i}`).val(tempActivity.description)
+                    }
+                    if (tempActivity.createdBy == 'EMPLOYEE') {
+                        $(`#link_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy + `(${tempActivity.createdById})`);
+                        $(`#link_createdBy_${i}`).attr('href', `/admin/employee/view?emp_id=${tempActivity.createdById}`)
+                    } else {
+                        $(`#lbl_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy)
+                    }
+                    $(`#lbl_headerDate_${i}`).html(`Date : ` + oldDate)
+                    $(`#txt_description_${i}`).val(tempActivity.description)
+
+                    $(`#datetimepicker_${i}`).datetimepicker({
+                        format: 'Y/MM/D LT'
+                    });
+                }
+            }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Activity Not Found',
+                class: 'bg-danger',
+            });
+        });
+    }
+
+    function getCriteria(index, criteria, serviceData) {
+        if (criteria) {
+            var criteriaHtml = '';
+            for (var i = 0; i < criteria.length; i++) {
+                tempCriteria = criteria[i];
+                if (serviceData == true) {
+                    criteriaHtml += `<div class="col-md-4" id="div_getJson_${index}_${i}">
+                                        <div class="form-group row">
+                                                <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                            <label id="lbl_getCriteria_${index}_${i}" class="col-md-6 ml-1">${tempCriteria.criteria} : </label>
+                                            <div class="col-md-4">
+                                                <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value" disabled>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                } else {
+                    criteriaHtml += `<div class="col-md-4" id="div_getJson_${index}_${i}">
+                                        <div class="form-group row">
+                                                <input id="txt_getCriteria_${index}_${i}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                            <label id="lbl_getCriteria_${index}_${i}" class="col-md-6 ml-3">${tempCriteria.criteria} : </label>
+                                            <div class="col-md-4">
+                                                <input type="text" id="txt_getValue_${index}_${i}" class="form-control" value="${tempCriteria.value}" placeholder="Value">
+                                            </div>
+                                        </div>
+                                    </div>`;
+                }
+            }
+            return (criteriaHtml)
+        }
+    };
+
+    function getDocument(document, activity_id, service) {
+        if (document) {
+            var docHtml = '';
+            for (var i = 0; i < document.length; i++) {
+                var tempDoc = document[i];
+                var file = tempDoc.filename;
+                var ext = file.substring(file.lastIndexOf('.') + 1);
+                if (service == true) {
+                    if (ext != 'pdf') {
+                        docHtml += `<div class="col-md-2 img_container form-group">
+                                    <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' onError=this.href='images/notfound.jpg' data-toggle="lightbox">
+                                        <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
+                                        <div class="middle">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                </div>`;
+                    } else {
+                        docHtml += `<div class="col-md-2">
+                                    <div>
+                                        <embed src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
+                                        <div class="middle">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <a class="btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                    </div>
+                                </div>`
+                    }
+                } else {
+                    if (ext != 'pdf') {
+                        docHtml += `<div class="col-md-2 img_container form-group">
+                                    <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                        <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
+                                        <div class="middle">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                    </div>
+                                </div>`;
+                    } else {
+                        docHtml += `<div class="col-md-2">
+                                    <div>
+                                        <embed  src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
+                                        <div class="middle">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <a class="col-md-6 btn btn-outline-success btn-block mt-1 btn-xs mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                        <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-xs col-md-6" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                    </div>
+                                </div>`
+                    }
+                }
+            }
+            return (docHtml)
+        } else {
+            return '';
+        }
+    };
+
+    function uploadFile(index, activity_id) {
+        var files = [];
+        for (var i = 0; i < $('#file_post_' + index).get(0).files.length; ++i) {
+            files.push($('#file_post_' + index).get(0).files[i]);
+            var type = files[i].type.split('/').pop().toLowerCase();
+            if (type != "jpeg" && type != "jpg" && type != "png" && type != "pdf") {
+                return $(document).Toasts('create', {
+                    title: 'File Formate not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Formate',
+                    class: 'bg-danger',
+                });
+            }
+            if (files[i].size / 1024 / 1024 > 15) {
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 10 MB',
+                    class: 'bg-danger',
+                });
+            }
+            const objectURL = URL.createObjectURL(files[i])
+            if (type == "pdf") {
+                pdf = `<div id='div_unUploaded_${i}' class="col-md-2">
+                        <div>
+                            <iframe src="${objectURL}" width="100%" height="150px"></iframe>
+                            <div class="middle">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUploaded(index)><i class="fas fa-trash-alt"></i> Remove all</button>
+                        </div>
+                    </div>`;
+                $('#div_image_' + index).prepend(pdf);
+            } else {
+                image = `<div  id='div_unUploaded_${i}' class="col-md-2 img_container form-group">
+                        <div href='${objectURL}' data-toggle="lightbox">
+                            <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
+                            <div class="middle">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUploaded(${index})><i class="fas fa-trash-alt"></i> Remove all</button>
+                        </div>
+                    </div>`;
+                $("#div_image_" + index).prepend(image);
+            }
+            $(`#div_post_${index}`).hide();
+        }
+    }
+
+    function removeUploaded(index) {
+        $('#file_post_' + index).val(null);
+        var unUploaded = $('[id^=div_unUploaded_]')
+        $(unUploaded).remove();
+        $(`#div_post_${index}`).show();
+    }
+
+    $('#list_type').change(() => {
+        if ($('#list_type').val() == 'Service') {
+            $('#div_service').show();
+            if (dbProjectService) {
+                var option = `<option value="" hidden>Select Service</option>`
+                for (var i = 0; i < dbProjectService.length; i++) {
+                    tempService = dbProjectService[i];
+                    if (tempService.active == true) {
+                        option += `<option value="${tempService.service_id}">${getServiceName(tempService.service_id)}</option>`
+                    }
+                    $('#list_service').html(option)
+                }
+
+            }
+        } else {
+            $('#div_service').hide();
+            $('#list_service').val('');
+            $('#div_criteria').empty();
+        }
+    });
+
+    function getServiceName(service_id) {
+        if (dbService) {
+            for (var i = 0; i < dbService.length; i++) {
+                var tempService = dbService[i];
+                if (tempService.service_id == service_id) {
+                    return tempService.title
+                }
+            }
+        }
+    };
+
+    $('#list_service').change(() => {
+        $('#div_criteria').empty();
+        if (dbService) {
+            for (var i = 0; i < dbService.length; i++) {
+                var tempService = dbService[i];
+                if ($('#list_service').val() == tempService.service_id) {
+                    var criteriaData = tempService.criteria
+                    if (criteriaData) {
+                        var criteria = '';
+                        for (var j = 0; j < criteriaData.length; j++) {
+                            var tempCriteria = criteriaData[j];
+                            criteria += `<div class="col-md-4" id='div_json_${j}'>
+                                            <div class="form-group row">
+                                                <input id="txt_criteria_${j}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                                <label id="lbl_criteria_${j}" class="col-md-6 ml-1">${tempCriteria.criteria} : </label>
+                                                <div class="col-md-4">
+                                                    <input type="text" id="txt_value_${j}" class="form-control" placeholder="Value">
+                                                </div>
+                                            </div>
+                                        </div>`
+                        }
+                    }
+                    $('#div_criteria').append(criteria)
+                }
+            }
+        }
+    });
+
+    $("#file_post").change(function() {
+        var files = [];
+        for (var i = 0; i < $(this).get(0).files.length; ++i) {
+            files.push($(this).get(0).files[i]);
+            var type = files[i].type.split('/').pop().toLowerCase();
+            if (type != "jpeg" && type != "jpg" && type != "png" && type != "pdf") {
+                return $(document).Toasts('create', {
+                    title: 'File Formate not Correct ',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Select valid File Formate',
+                    class: 'bg-danger',
+                });
+            }
+            if (files[i].size / 1024 / 1024 > 15) {
+                return $(document).Toasts('create', {
+                    title: 'File is too Large',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'please select file size below 10 MB',
+                    class: 'bg-danger',
+                });
+            }
+            const objectURL = URL.createObjectURL(files[i])
+            if (type == "pdf") {
+                pdf = `<div id='div_uploaded_${i}' class="col-md-2">
+                        <div>
+                            <iframe src="${objectURL}" width="100%" height="150px"></iframe>
+                            <div class="middle">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUnUploaded()><i class="fas fa-trash-alt"></i> Remove all</button>
+                        </div>
+                    </div>`;
+                $('#div_pdf').prepend(pdf);
+            } else {
+                image = `<div id='div_uploaded_${i}' class="col-md-2 img_container form-group">
+                        <div class='' href='${objectURL}' data-toggle="lightbox">
+                            <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
+                            <div class="middle">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" onclick=removeUnUploaded()><i class="fas fa-trash-alt"></i> Remove all</button>
+                        </div>
+                    </div>`;
+                $("#div_pdf").prepend(image);
+            }
+            $('#input_plus').hide();
+        }
+    });
+
+    function removeUnUploaded() {
+        $('#file_post').val(null);
+        var unUploaded = $('[id^=div_uploaded_]')
+        $(unUploaded).remove();
+        $('#input_plus').show();
+    }
+
+    $('#btn_add').click(() => {
+        var type = $('#list_type').val(),
+            service_id = $('#list_service').val(),
+            description = $('#txt_description').val(),
+            title = $('#txt_title').val(),
+            date = $('#txt_date').val();
+        var description = description.trim(),
+            title = title.trim(),
+            date = date.trim();
+
+        formData = new FormData();
+        formData.append('project_id', plan_id)
+        if (!type) {
+            return $(document).Toasts('create', {
+                title: 'Activity type Required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please select Activity Type',
+                class: 'bg-danger',
+            });
+        } else {
+            formData.append('type', type)
+        }
+        if (service_id) {
+            formData.append('service_id', service_id)
+        }
+        if (type == 'Service') {
+            if (service_id) {
+                var criteria = {};
+                var divJson = $('[id^=div_json_]')
+                for (var i = 0; i < divJson.length; i++) {
+                    if ($('#txt_value_' + i).val() != '') {
+                        criteria[i] = {
+                            criteria_id: Number($('#txt_criteria_' + i).val()),
+                            value: String($('#txt_value_' + i).val())
+                        }
+                        if (isNaN(criteria[i].value)) {
+                            return $(document).Toasts('create', {
+                                title: 'Please Enter valid Input',
+                                autohide: true,
+                                delay: 5000,
+                                body: 'Value must be numbers',
+                                class: 'bg-danger',
+                            });
+                        }
+                        if ((criteria[i].value) <= 0) {
+                            return $(document).Toasts('create', {
+                                title: 'Error!',
+                                autohide: true,
+                                delay: 5000,
+                                body: 'Value must be Greater than 0',
+                                class: 'bg-danger',
+                            });
+                        }
+                    }
+                }
+
+                if ((Object.keys(criteria)).length <= 0) {
+                    return $(document).Toasts('create', {
+                        title: 'Criteria Required',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Minimum 1 Criteria is Required',
+                        class: 'bg-danger',
+                    });
+                }
+                criteriaString = JSON.stringify(criteria);
+                formData.append('criteria', criteriaString)
+            } else {
+                return $(document).Toasts('create', {
+                    title: 'Service Required',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please select Service',
+                    class: 'bg-danger',
+                });
+            }
+        }
+        if (description) {
+            formData.append('description', description)
+        }
+        if (type == 'Activity') {
+            if (!title) {
+                return $(document).Toasts('create', {
+                    title: 'Title Required',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter Title for Activity',
+                    class: 'bg-danger',
+                });
+            } else {
+                formData.append('title', title)
+            }
+        }
+        var d = new Date();
+        var strDate = d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+        if (date) {
+            var date = new Date(date),
+                d = date.getDate(),
+                m = date.getMonth() + 1,
+                y = date.getFullYear(),
+                hr = date.getHours().toString().padStart(2, "0"),
+                minutes = date.getMinutes().toString().padStart(2, "0");
+            var newDate = y + "/" + m + "/" + d;
+            var finalDate = y + "/" + m + "/" + d + ' ' + hr + ':' + minutes;
+            if (Date.parse(strDate) < Date.parse(newDate)) {
+                return $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Date must be less than Current Date',
+                    class: 'bg-danger',
+                });
+            }
+            formData.append('date', finalDate)
+        }
+        for (var i = 0; i < $('#file_post')[0].files.length; ++i) {
+            formData.append('file', $('#file_post')[0].files[i]);
+        }
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/activity/add',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Activity Added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Activity added Successfully',
+                    class: 'bg-success',
+                });
+                window.location.reload();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
+            }
+        });
+    });
+
+    function updateActivity(index, activity_id, oldDate) {
+        var getDate = $('#txt_date_' + index).val(),
+            description = String($('#txt_description_' + index).val()).trim(),
+            title = String($('#txt_title_' + index).val()).trim();
+        var formData = new FormData();
+        formData.append('project_id', plan_id)
+        formData.append('activity_key', activity_id)
+        var criteria = {};
+        var divJson = $(`[id^=div_getJson_${index}]`);
+        if ($('#txt_type_' + index).val() == 'SERVICE') {
+            for (var i = 0; i < divJson.length; i++) {
+                criteria[i] = {
+                    criteria_id: Number($(`#txt_getCriteria_${index}_${i}`).val()),
+                    value: String($(`#txt_getValue_${index}_${i}`).val())
+                }
+                if (isNaN(criteria[i].value)) {
+                    return $(document).Toasts('create', {
+                        title: 'Please Enter valid Input',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Value must be numbers',
+                        class: 'bg-danger',
+                    });
+                }
+                if ((criteria[i].value) <= 0) {
+                    return $(document).Toasts('create', {
+                        title: 'Error!',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Value must be Greater than 0',
+                        class: 'bg-danger',
+                    });
+                }
+            }
+            formData.append('criteria', JSON.stringify(criteria))
+        }
+        var d = new Date(oldDate),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+        if (month.length < 2) month = month;
+        if (day.length < 2) day = day;
+        var date = ([year, month, day].join('/'));
+        var getNewDate = new Date(getDate),
+            d = getNewDate.getDate(),
+            m = getNewDate.getMonth() + 1,
+            y = getNewDate.getFullYear(),
+            hr = getNewDate.getHours().toString().padStart(2, "0"),
+            minutes = getNewDate.getMinutes().toString().padStart(2, "0");
+        var newDate = y + '/' + m + '/' + d + ' ' + hr + ':' + minutes;
+        var dateOld = y + '/' + m + '/' + d;
+        if (Date.parse(dateOld) > Date.parse(date)) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Date must be Less than created Date',
+                class: 'bg-danger',
+            });
+        }
+        formData.append('date', newDate)
+        if (description) {
+            formData.append('description', description)
+        }
+        if (title) {
+            formData.append('title', title)
+        }
+        for (var i = 0; i < $('#file_post_' + index)[0].files.length; ++i) {
+            formData.append('file', $('#file_post_' + index)[0].files[i]);
+        }
+        // for (var pair of formData.entries()) {
+        //     console.log(pair[1]);
+        // }
+        // return
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/project/activity/update',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Activity Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Activity updated Successfully',
+                    class: 'bg-success',
+                });
+                window.location.reload();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_update_' + index).attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update_' + index).removeAttr('disabled')
+            }
+        });
+    };
+
+    function removesActivity(index, activity_id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this activity",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.post({
+                    type: 'POST',
+                    url: '/admin/v1/project/activity/remove',
+                    data: {
+                        "project_id": plan_id,
+                        "activity_key": activity_id,
+                    },
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Post Added',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Activity removed Successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_remove_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`#btn_remove_${index}`).removeAttr('disabled')
+                    }
+                });
+            }
+        });
+    }
+
+    function removeFile(filename, activity_id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this File",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.post({
+                    type: 'POST',
+                    url: '/admin/v1/project/activity/remove-file',
+                    data: {
+                        "project_id": plan_id,
+                        "activity_key": activity_id,
+                        "filename": filename
+                    },
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Post Added',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'File removed Successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_removeDoc_${filename}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`#btn_removeDoc_${filename}`).removeAttr('disabled')
+                    }
+                });
+            }
+        });
+    };
+</script>
+
+</html>
+
+</html>

@@ -1,8 +1,10 @@
 const userAPI = require('express').Router(),
     firebase = require('firebase-admin'),
-    { response, bcryptHash, bcryptHashCompare, jwtSign } = require('../../../../functions/functions')
+    { response, bcryptHash, bcryptHashCompare, jwtSign } = require('../../../../functions/functions'),
+    middleware = require('../middleware/admin.middleware')
 
 //----------------------------- CONFIGURATION -------------------------------
+userAPI.use('/create', (req, res, next) => middleware.adminAuthToken(req, res, next)); // Avoid Unauthorized Account Creation
 
 //---------------------------- GLOBAL VARIABLE ------------------------------
 
@@ -12,6 +14,7 @@ const userAPI = require('express').Router(),
 
 // 1.1 CREATE ADMIN
 userAPI.post('/create', (req, res) => {
+
     if (!req.body.email || !req.body.password) {
         return response(res, 400, 'required', 'Email and Password are required.', undefined, 'A-1.1.1');
     }

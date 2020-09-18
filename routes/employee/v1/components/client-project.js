@@ -193,8 +193,8 @@ clientProjectAPI.get('/fetch', (req, res) => {
                     }
 
                     // Service
-                    var activeCriteria = [], // To validate in Activity Data
-                        activeServices = []
+                    var activeCriteria = {}, // To validate in Activity Data
+                        allServices = {}
 
                     if (tempProject.service) {
 
@@ -206,8 +206,6 @@ clientProjectAPI.get('/fetch', (req, res) => {
                         for (var k = 0; k < dbProjectServiceKey.length; k++) {
                             var tempProjectService = dbProjectService[dbProjectServiceKey[k]]
 
-                            if (tempProjectService.deleted || !tempProjectService.active) { continue }
-
                             // Check Service Status
                             if (dbAdminSnapshot.services) {
                                 var dbServices = dbAdminSnapshot.services,
@@ -216,14 +214,16 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                 for (var l = 0; l < dbServicesKey.length; l++) {
                                     var tempService = dbServices[dbServicesKey[l]]
 
-                                    if (tempService.deleted || tempService.service_id != tempProjectService.service_id) {
-                                        continue
+                                    allServices[tempService.service_id] = {
+                                        deleted: tempService.deleted,
+                                        service_name: tempService.title
                                     }
 
-                                    activeServices.push(tempService.service_id)
+                                    if (tempService.service_id != tempProjectService.service_id) { continue }
 
                                     var tempServiceObj = {
-                                        service_id: tempProjectService.service_id
+                                        service_id: tempProjectService.service_id,
+                                        service_name: tempService.title
                                     }
 
                                     if (tempService.criteria) {
@@ -235,6 +235,11 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                         for (var m = 0; m < dbServiceCriteriaKey.length; m++) {
                                             var tempCriteria = dbServiceCriteria[dbServiceCriteriaKey[m]]
 
+                                            activeCriteria[parseInt(tempCriteria.criteria_id)] = {
+                                                criteria: tempCriteria.criteria,
+                                                deleted: tempCriteria.deleted
+                                            }
+
                                             if (tempCriteria.deleted) { continue }
 
                                             tempServiceObj.criteria.push({
@@ -242,11 +247,14 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                                 criteria: tempCriteria.criteria
                                             })
 
-                                            activeCriteria.push(tempCriteria.criteria_id)
+
                                         }
                                     }
 
-                                    tempProjectObj.services.push(tempServiceObj)
+                                    // Check Original Service is deleted or not, Check Service active and not deleted in project
+                                    if (!tempService.deleted && !tempProjectService.deleted && tempProjectService.active) {
+                                        tempProjectObj.services.push(tempServiceObj)
+                                    }
                                 }
                             }
                         }
@@ -300,6 +308,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                         if (tempReviewPost.deleted) { continue }
 
                                         var tempPostObj = {
+                                            post_key: dbReviewPostKey[m],
                                             description: tempReviewPost.description,
                                             createdOn: tempReviewPost.createdOn,
                                             createdBy: tempReviewPost.createdBy,
@@ -321,6 +330,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                                 if (tempDocument.deleted) { continue }
 
                                                 var tempReviewPostDocObj = {
+                                                    document_id: dbReviewDocumentKey[l],
                                                     filename: tempDocument.filename,
                                                     createdOn: tempDocument.createdOn || tempReview.createdOn,
                                                     createdBy: tempDocument.createdBy || tempReview.createdBy,
@@ -390,11 +400,10 @@ clientProjectAPI.get('/fetch', (req, res) => {
 
 
 
-                                if (tempObj.type == 'SERVICE') {
+                                if (tempObj.type == 'SERVICE' && allServices[tempObj.service_id]) {
 
-                                    if (!activeServices.includes(tempObj.service_id)) {
-                                        tempObj.service_deleted = true
-                                    }
+                                    tempObj.service_deleted = allServices[tempObj.service_id].deleted
+                                    tempObj.service_name = allServices[tempObj.service_id].service_name
 
                                     if (tempProjectActivity.criteria) {
                                         var dbActivityCriteria = tempProjectActivity.criteria,
@@ -405,10 +414,11 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                         for (var l = 0; l < dbActivityCriteriaKey.length; l++) {
                                             var tempActivityCriteria = dbActivityCriteria[dbActivityCriteriaKey[l]];
 
-                                            if (tempActivityCriteria.deleted) { continue }
+                                            if (tempActivityCriteria.deleted || !activeCriteria[tempActivityCriteria.criteria_id]) { continue }
 
                                             var tempCriteriaObj = {
                                                 criteria_id: tempActivityCriteria.criteria_id,
+                                                criteria: activeCriteria[tempActivityCriteria.criteria_id].criteria,
                                                 value: tempActivityCriteria.value,
                                                 createdOn: tempActivityCriteria.createdOn,
                                                 createdBy: tempActivityCriteria.createdBy,
@@ -416,10 +426,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                                                 lastModifiedOn: tempActivityCriteria.lastModifiedOn,
                                                 lastModifiedBy: tempActivityCriteria.lastModifiedBy,
                                                 lastModifiedById: tempActivityCriteria.lastModifiedById,
-                                            }
-
-                                            if (!activeCriteria.includes(tempActivityCriteria.criteria_id)) {
-                                                tempCriteriaObj.deleted = true
+                                                deleted: activeCriteria[tempActivityCriteria.criteria_id].deleted,
                                             }
 
                                             // Push Criteria to Temp. Object
@@ -476,7 +483,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                     }
 
                     if (query_ProjectID == tempProjectObj.project_id) {
-                        return response(res, 200, 'success', undefined, { scope: scope, project: tempProjectObj, permission_denied: permissionDeny }, 'E-3.1.1')
+                        return response(res, 200, 'success', undefined, { scope: scope, project: tempProjectObj, permission_denied: permissionDeny, permissionAllowed: tempEmployeePermission }, 'E-3.1.1')
                     }
                 }
             }
@@ -500,6 +507,7 @@ clientProjectAPI.post('/activity/add', (req, res) => {
     if (!req.body.type) {
         return response(res, 400, 'required', 'Type is required', undefined, 'E-3.2.2')
     }
+
     var projectID = String(req.body.project_id).trim(),
         type = String(req.body.type).trim().toUpperCase(),
         getKeyDB = getKeys(projectID)
@@ -887,7 +895,7 @@ clientProjectAPI.post('/activity/update', (req, res) => {
         tempActivity.lastModifiedOn = String(new Date())
 
         return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}`).update(tempActivity).then(() => {
-            return response(res, 200, 'success', 'Activity has been added successfully', undefined, 'E-3.3.11')
+            return response(res, 200, 'success', 'Activity has been updated successfully', undefined, 'E-3.3.11')
         })
     }
 
@@ -1182,8 +1190,6 @@ clientProjectAPI.post('/activity/remove', (req, res) => {
                 tempDocument.lastModifiedOn = String(new Date())
                 unlinkFile(tempDocument.filename);
 
-            } else if (i == activityDocumentsKeys.length - 1) {
-                break;
             }
         }
     }
@@ -1193,7 +1199,7 @@ clientProjectAPI.post('/activity/remove', (req, res) => {
     tempDocument.lastModifiedOn = String(new Date())
     tempActivity.deleted = true
     return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/activity/${activityKey}/`).update(tempActivity).then(() => {
-        return response(res, 200, 'success', 'File has been removed successfully', undefined, 'E-3.5.7')
+        return response(res, 200, 'success', 'Activity has been removed successfully', undefined, 'E-3.5.7')
     })
 
 })
@@ -1304,7 +1310,9 @@ clientProjectAPI.post('/review/add-post', (req, res) => {
     if (!req.body.review_id) {
         return response(res, 400, 'required', 'Review ID is required', undefined, 'E-3.8.2')
     }
-
+    if (!req.body.description && !req.files.file) {
+        return response(res, 400, 'required', 'Description or filename is required', undefined, 'E-3.8.13')
+    }
     var projectID = String(req.body.project_id).trim(),
         getKeyDB = getKeys(projectID),
         reviewID = String(req.body.review_id).trim(),
@@ -1502,10 +1510,9 @@ clientProjectAPI.post('/review/update-post', (req, res) => {
                 }
 
                 // Append Documents
-                if (tempPost.documents) {
+                if (tempPost.documents && documents && documents.length > 0) {
                     tempPost.documents.push.apply(tempPost.documents, documents)
-
-                } else {
+                } else if (documents && documents.length > 0) {
                     tempPost.documents = documents
                 }
 
@@ -1597,7 +1604,7 @@ clientProjectAPI.get('/review/remove-post', (req, res) => {
                         tempReviewPost.lastModifiedById = dbEmployeeAccount.employee_id
 
                         return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postKey}`).update(tempReviewPost).then(() => {
-                            return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'E-3.10.8')
+                            return response(res, 200, 'success', 'Post from Review has been deleted successfully', undefined, 'E-3.10.8')
                         })
                     } else if (i == postDBKey.length - 1) {
                         return response(res, 404, 'notfound', 'Incorrect Post Key', undefined, 'E-3.10.9')
@@ -1699,7 +1706,7 @@ clientProjectAPI.get('/review/open', (req, res) => {
             tempReview.lastModifiedById = dbEmployeeAccount.employee_id
 
             return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKeys[i]}/`).set(tempReview).then(() => {
-                return response(res, 200, 'success', 'Review activated successfully', undefined, 'E-3.12.7')
+                return response(res, 200, 'success', 'Review is opened successfully', undefined, 'E-3.12.7')
             })
         } else if (i == reviewDBKeys.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'E-3.12.8')
@@ -1770,7 +1777,7 @@ clientProjectAPI.get('/review/remove-file', (req, res) => {
                                 tempImage.lastModifiedById = dbEmployeeAccount.employee_id
 
                                 return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${reviewDBKey[j]}/post/${postDBKey[i]}/documents/${documentsDBKeys[k]}/`).update(tempImage).then(() => {
-                                    return response(res, 200, 'success', 'Review has been deleted successfully', undefined, 'E-3.13.8')
+                                    return response(res, 200, 'success', 'File has been deleted successfully', undefined, 'E-3.13.8')
                                 })
                             }
                         }
@@ -1783,6 +1790,75 @@ clientProjectAPI.get('/review/remove-file', (req, res) => {
             }
         } else if (j == reviewDBKey.length - 1) {
             return response(res, 404, 'notfound', 'Incorrect Review ID or FileName', undefined, 'E-3.13.11')
+        }
+    }
+})
+
+// 3.14 Remove Review
+clientProjectAPI.get('/review/remove', (req, res) => {
+    if (!req.query.project_id) {
+        return response(res, 400, 'required', 'Project ID is required', undefined, 'E-3.14.1')
+    }
+
+    if (!req.query.review_id) {
+        return response(res, 400, 'required', 'Review ID is required', undefined, 'E-3.14.2')
+    }
+
+    var projectID = String(req.query.project_id).trim(),
+        reviewID = parseInt(String(req.query.review_id).trim()),
+        getKeyDB = getKeys(projectID)
+
+    if (!getKeyDB) { return response(res, 404, 'notfound', 'Incorrect Project ID', undefined, 'E-3.14.3') }
+    if (!getKeyDB.permission.review) {
+        return response(res, 403, 'insufficientPermissions', 'Employee ID is restricted perform this action', undefined, 'E-3.14.7')
+    }
+
+    if (!dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review) {
+        return response(res, 404, 'notfound', 'Incorrect Review ID', undefined, 'E-3.14.4')
+    }
+
+    var dbClientReview = dbAdminSnapshot.clients[getKeyDB.client_key].plans[getKeyDB.plan_key].review,
+        dbClientReviewKey = Object.keys(dbClientReview)
+
+    for (var i = 0; i < dbClientReviewKey.length; i++) {
+        var tempClientReview = dbClientReview[dbClientReviewKey[i]]
+
+        if (!tempClientReview.deleted && tempClientReview.review_id == reviewID) {
+
+            if (tempClientReview.post) {
+                var dbReviewPost = tempClientReview.post,
+                    dbReviewPostKey = Object.keys(dbReviewPost)
+
+                for (var j = 0; j < dbReviewPostKey.length; j++) {
+                    if (dbReviewPost[dbReviewPostKey[j]].documents) {
+                        var dbPostDocuments = dbReviewPost[dbReviewPostKey[j]].documents,
+                            dbPostDocumentsKey = Object.keys(dbPostDocuments)
+
+                        for (var k = 0; k < dbPostDocumentsKey.length; k++) {
+                            if (dbPostDocuments[dbPostDocumentsKey[k]].deleted) { continue }
+
+                            var tempPostDocument = dbPostDocuments[dbPostDocumentsKey[k]]
+
+                            tempPostDocument.deleted = true
+                            tempPostDocument.lastModifiedOn = String(new Date())
+                            tempPostDocument.lastModifiedBy = 'EMPLOYEE'
+                            tempPostDocument.lastModifiedById = dbEmployeeAccount.employee_id
+                            unlinkFile(tempPostDocument.filename);
+                        }
+                    }
+                }
+            }
+
+            tempClientReview.deleted = true
+            tempClientReview.lastModifiedOn = String(new Date())
+            tempClientReview.lastModifiedBy = 'EMPLOYEE'
+            tempClientReview.lastModifiedById = dbEmployeeAccount.employee_id
+
+            return firebase.ref(`/admin/clients/${getKeyDB.client_key}/plans/${getKeyDB.plan_key}/review/${dbClientReviewKey[i]}/`).set(tempClientReview).then(() => {
+                return response(res, 200, 'success', 'Review has been removed successfully', undefined, 'E-3.14.5')
+            })
+        } else if (i == dbClientReviewKey.length - 1) {
+            return response(res, 404, 'notFound', 'Incorrect Review ID', undefined, 'E-3.14.6')
         }
     }
 })

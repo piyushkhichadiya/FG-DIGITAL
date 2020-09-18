@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Client Projects - FG Digital</title>
+    <title>Project Review - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
@@ -43,7 +45,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="javascript:void(0);" class="brand-link">
+            <a href="/admin" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -52,10 +54,10 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
-                        <a href="javascript:void(0);" class="d-block">Alexander Pierce</a>
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
                 <!-- Sidebar Menu -->
@@ -64,27 +66,27 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
                                 <p>Plans</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
                                 <p>Client</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
                                 <p>Team</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
                                 <p>Services</p>
                             </a>
                         </li>
@@ -101,12 +103,18 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Projects</h1>
+                            <h1>Project Reviews</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-                                <li class="breadcrumb-item active">Projects</li>
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navClient" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navProjectId" href=""> </a>
+                                </li>
+                                <li class="breadcrumb-item active">Reviews</li>
                             </ol>
                         </div>
                     </div>
@@ -120,29 +128,38 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button class="btn btn-outline-primary float-right ml-2 mb-3" onclick="window.location.href = `/admin/client/project-add?client_id=${urlParams.get('client_id')}`" id="btn_add">Add project</button>
-                                    <button class="btn btn-outline-primary float-right mb-3" onclick="window.location.href = `/admin/client/project-info?client_id=${urlParams.get('client_id')}`" id="btn_info">Client Info</button>
+                                    <button class="btn btn-outline-primary float-right mb-3" id="btn_create" onclick="window.location.href = `/admin/client/project-review-view?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}`"><i class="fas fa-plus"></i> Create</button>
                                 </div>
                             </div>
                             <!-- /.card-header -->
                             <div class="col-md-12">
-                                <table id="tbl_project" class="table table-bordered table-striped" style="width: 100%;">
+                                <table id="tbl_review" class="table table-bordered table-striped w-100">
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Project Name</th>
-                                            <th>Started On</th>
+                                            <th>Review ID</th>
+                                            <th>Review Title</th>
+                                            <th>Description</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr align="center">
+                                            <td colspan="6"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                            <td hidden></td>
+                                        </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Project Name</th>
-                                            <th>Started On</th>
+                                            <th>Review ID</th>
+                                            <th>Review Title</th>
+                                            <th>Description</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -161,7 +178,7 @@
         </div>
         <!-- /.content-wrapper -->
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block">
+            <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
             <strong>Copyright &copy <script>
@@ -175,6 +192,7 @@
         <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
+
     <!-- jQuery -->
     <script src="plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
@@ -186,41 +204,106 @@
     <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <!-- AdminLTE App -->
     <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="dist/js/demo.js"></script>
-    <!-- sweetalert -->
+    <!-- sweetalert-->
     <script src="dist/js/sweetalert2.js"></script>
-    <!-- Logout -->
-    <script src="dist/js/logout.js"></script>
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- customJS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
+    <script src="dist/js/client-project.js"></script>
 </body>
 <script>
-    var tblProject = $("#tbl_project").DataTable({
+    var tblReview = $("#tbl_review").DataTable({
         "responsive": true,
     });
-
     const urlParams = new URLSearchParams(window.location.search);
-
     $(document).ready(() => {
-        $.getJSON(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
-            var dataClient = data.data;
-            if (dataClient.plans) {
-                var dataProject = dataClient.plans
-                for (var i = 0; i < dataProject.length; i++) {
-                    var tempProject = dataProject[i];
-                    button = `<button class='btn btn-secondary' onclick="window.location.href ='/admin/client/project-dashboard?project_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Go To Dashboard</button>`
-                    var start_date = new Date(tempProject.start_date);
-                    var d = start_date.getDate();
-                    var m = start_date.getMonth() + 1;
-                    var y = start_date.getFullYear();
-                    tblProject.row.add([
-                        `${i+1}`, tempProject.plan, m + "/" + d + "/" + y, tempProject.status, button
-                    ]).draw();
+        if (urlParams.has('plan_id')) {
+            var planId = urlParams.get('plan_id');
+            $.get(`/admin/v1/project/fetch/${planId}?scope=review`, (data) => {
+                var data = data.data;
+                var reviewData = data.review;
+                tblReview.clear().draw();
+                if (reviewData) {
+                    for (var i = 0; i < reviewData.length; i++) {
+                        var tempReview = reviewData[i],
+                            button = `<div class='btn-group'>
+                                        <button class='btn btn-info m-1' onclick="window.location.href = '/admin/client/project-reviews-view?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}&review_id=${tempReview.review_id}'"><i class='fas fa-eye'></i> View</button>
+                                        <button class='btn btn-danger m-1' id='btn_remove_${i}' onclick=remove(${i},${tempReview.review_id})><i class='fas fa-trash-alt'></i> Remove</button>
+                                       </div>`;
+                        if (tempReview.closed == true) {
+                            var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-check'></i> Closed</p>`
+                        } else {
+                            status = `<p style='color:#007bff; font-size:17px;'><i class='fas fa-stopwatch'></i> Pending</p>`
+                        }
+                        tblReview.row.add([
+                            `${i+1}`, tempReview.review_id, tempReview.title, tempReview.description, status, button
+                        ]).draw();
+                    }
                 }
-            }
-        });
+            }).fail(error => {
+                tblReview.clear().draw();
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            });
+        }
+        if (urlParams.get('plan_id') == '') {
+            window.location.href = `/admin/client/project?client_id=${urlParams.get('client_id')}`
+        }
     });
+
+    function remove(index, review_id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Review",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/project/review/remove?project_id=${urlParams.get('plan_id')}&review_id=${review_id}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Review removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.reload();
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_remove_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`btn_remove_${index}`).removeAttr('disabled')
+                    }
+                });
+            }
+        })
+    }
 </script>
 
 </html>

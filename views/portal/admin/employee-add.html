@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Add Team Member - FG Digital</title>
+    <title>Member Information - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <style>
@@ -43,7 +45,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="javascript:void(0);" class="brand-link">
+            <a href="/admin" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -52,10 +54,10 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
-                        <a href="javascript:void(0);" class="d-block">Alexander Pierce</a>
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
                     </div>
                 </div>
                 <!-- Sidebar Menu -->
@@ -64,27 +66,27 @@
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
                                 <p>Plans</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
                                 <p>Client</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
                                 <p>Team</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="javascript:void(0);" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
                                 <p>Services</p>
                             </a>
                         </li>
@@ -101,13 +103,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Add Member</h1>
+                            <h1 id="lbl_title">Add Member</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
                                 <li class="breadcrumb-item"><a href="/admin">Home</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/employee">Team Member</a></li>
-                                <li class="breadcrumb-item active">Information</li>
+                                <li class="breadcrumb-item active" id="lbl_navTitle">Add</li>
                             </ol>
                         </div>
                     </div>
@@ -132,6 +134,7 @@
                                 <div class="form-group row" id="div_position" style="display: none;">
                                     <label class="col-md-3 col-form-label">Position:</label>
                                     <select class="col-md-7 form-control" id="list_position">
+                                        <option value="">Select Position</option>
                                         <option value="Website Developer">Website Developer</option>
                                         <option value="Marketing Specialist">Marketing Specialist</option>
                                         <option value="Application Developer">Application Developer</option>
@@ -151,7 +154,11 @@
                                 </div>
                                 <div class="form-group row" id="div_password">
                                     <label class="col-md-3 col-form-label">Password:</label>
-                                    <input type="password" class="col-md-7 form-control mr-1 mt-1" id="txt_password" placeholder="Password">
+                                    <input type="password" class="col-md-7 form-control mr-1" id="txt_password" placeholder="Password">
+                                </div>
+                                <div class="form-group row" id="div_contact" style="display:none;">
+                                    <label class="col-md-3 col-form-label">Contact:</label>
+                                    <input type="text" class="form-control col-md-7" id="txt_contact" placeholder="Contact Number">
                                 </div>
                             </div>
                             <div class="col-md-2" align="center" id="div_image" style="display: none;">
@@ -162,7 +169,7 @@
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <button class="btn btn-outline-primary float-right" id="btn_addEmp">Add Member</button>
+                            <button class="btn btn-outline-primary float-right" id="btn_addEmp"><i class="fas fa-plus"></i> Add Member</button>
                         </div>
                         <div id="div_other_details" style="display: none;">
                             <hr>
@@ -179,26 +186,24 @@
                                 <div class="row">
                                     <div class="col-md-3 form-group">
                                         <select class="form-control" id='list_social'>
+                                            <option value="">Select Account</option>
                                             <option value="Stack Overflow">Stack Overflow</option>
                                             <option value="Github">Github</option>
                                             <option value="Hacker Rank">Hacker Rank</option>
                                             <option value="LinkedIn">LinkedIn</option>
                                             <option value="Instagram">Instagram</option>
                                             <option value="Facebook">Facebook</option>
+                                            <option value="Gmail">Gmail</option>
+                                            <option value="WhatsApp">WhatsApp</option>
+                                            <option value="Outlook">Outlook</option>
                                         </select>
                                     </div>
                                     <div class="col-md-5 form-group">
                                         <input type="text" class="form-control" id="txt_link" placeholder="Link or Username">
                                     </div>
                                     <div class="col-md-4 form-group">
-                                        <button class="btn btn-outline-primary col-md-6 m-1" onclick="addSocialAccount()"><i class="fas fa-plus"></i> Add Account</button>
+                                        <button class="btn btn-outline-primary" id="btn_addAccount" onclick="addSocialAccount()"><i class="fas fa-plus"></i> Add Account</button>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row form-group">
-                                <label for="inputEmail3" class="col-md-12 col-form-label">Contact:</label>
-                                <div class="col-md-4">
-                                    <input type="text" class="form-control" id="txt_contact" placeholder="Contact Number">
                                 </div>
                             </div>
                             <div class="row form-group">
@@ -231,7 +236,7 @@
             </div>
             <!-- /.content-wrapper -->
             <footer class="main-footer">
-                <div class="float-right d-none d-sm-block">
+                <div class="float-right d-sm-block">
                     <p id="lbl_ui_version"> VERSION INFO </p>
                 </div>
                 <strong>Copyright &copy <script>
@@ -256,14 +261,17 @@
         <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
         <!-- AdminLTE App -->
         <script src="dist/js/adminlte.min.js"></script>
+        <!-- pace-progress -->
+        <script src="plugins/pace-progress/pace.js"></script>
         <!-- AdminLTE for demo purposes -->
         <script src="dist/js/demo.js"></script>
         <!-- sweetalert -->
         <script src="dist/js/sweetalert2.js"></script>
-        <!-- Logout -->
-        <script src="dist/js/logout.js"></script>
         <!-- toaster -->
         <script src="plugins/toastr/toastr.min.js"></script>
+        <!-- customJS -->
+        <script src="dist/js/logout.js"></script>
+        <script src="dist/js/profile.js"></script>
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
@@ -276,9 +284,12 @@
             $('#btn_addEmp').hide();
             $('#div_position').show();
             $('#div_other_details').show();
+            $('#div_contact').show();
             $('#div_Update_Password').show();
             $('#div_image').show();
             $('#div_password').remove()
+            $('#lbl_navTitle').html('Information')
+            $('#lbl_title').html('Member Information')
         }
     });
 
@@ -305,20 +316,24 @@
                     var socialHTML = `<div class="row">
                 <div class="col-md-3 form-group">
                     <select class="form-control" id='list_social_${i}'>
+                        <option value="" hidden>Select Account</option>
                         <option value="Stack Overflow">Stack Overflow</option>
                         <option value="Github">Github</option>
                         <option value="Hacker Rank">Hacker Rank</option>
                         <option value="LinkedIn">LinkedIn</option>
                         <option value="Instagram">Instagram</option>
                         <option value="Facebook">Facebook</option>
+                        <option value="Gmail">Gmail</option>
+                        <option value="WhatsApp">WhatsApp</option>
+                        <option value="Outlook">Outlook</option>
                     </select>
                     </div>
                     <div class="col-md-5 form-group">
                         <input type="text" class="form-control" id="txt_link_${i}" value="${temp_social.reference}" placeholder="Link or Username">
                     </div>
                     <div class="col-md-4 form-group">
-                        <button class="btn btn-outline-info col-md-6 m-1" onclick=updateSocial(${i},'${temp_social.account_id}')><i class="fas fa-pencil-alt"></i> Update Account</button>
-                        <button class="btn btn-outline-danger col-md-4 m-1" onclick=removeSocial('${temp_social.account_id}')><i class='fas fa-trash-alt'></i> Remove</button>
+                        <button class="btn btn-outline-info " id='btn_update_${i}' onclick=updateSocial(${i},'${temp_social.account_id}')><i class="fas fa-pencil-alt"></i> Update Account</button>
+                        <button class="btn btn-outline-danger  ml-1" id='btn_remove_${i}' onclick=removeSocial(${i},'${temp_social.account_id}')><i class='fas fa-trash-alt'></i> Remove</button>
                     </div>
                     </div>`;
                     $('#div_social').append(socialHTML);
@@ -344,30 +359,44 @@
     $('#btn_addEmp').click(() => {
         var name = $('#txt_name').val(),
             email = $('#txt_email').val(),
-            password = $('#txt_password').val()
+            password = $('#txt_password').val();
+        var name = name.trim(),
+            email = email.trim(),
+            password = password.trim();
         if (!name) {
             return $(document).Toasts('create', {
-                title: 'Name missing',
+                title: 'Name is required',
                 autohide: true,
                 delay: 5000,
-                body: 'Please fill out allfields',
+                body: 'Please fill out all fields',
                 class: 'bg-danger',
             });
         }
         if (!email) {
             return $(document).Toasts('create', {
-                title: 'Email missing',
+                title: 'Email is required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please fill out all fields',
                 class: 'bg-danger',
             });
         } else {
-            email = String(email).trim()
+            var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if (!regex.test(email)) {
+                return $(document).Toasts('create', {
+                    title: 'Email is not in Proper format',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter valid Email Address',
+                    class: 'bg-danger',
+                });
+            } else {
+                email = String(email).trim();
+            }
         }
         if (!password) {
             return $(document).Toasts('create', {
-                title: 'Password missing',
+                title: 'Password is required',
                 autohide: true,
                 delay: 5000,
                 body: 'Please fill out all fields',
@@ -393,7 +422,7 @@
                 });
                 $('#div_password').remove()
                 var memberId = result.data
-                window.location.href = `/admin/employee/add?emp_id=${memberId.member_id}`;
+                window.location.href = `/admin/employee/view?emp_id=${memberId.member_id}`;
             },
             error: error => {
                 error = error.responseJSON
@@ -404,6 +433,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_addEmp').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_addEmp').removeAttr('disabled')
             }
         });
     });
@@ -412,7 +447,7 @@
         $('#file_profile').click();
     })
 
-    $("#file_profile").change(function() {
+    $("#file_profile").change(function(files) {
         if (this.files[0]) {
             var file = this.files[0]
             var type = file.type.split('/').pop().toLowerCase();
@@ -455,8 +490,12 @@
             name = $('#txt_name').val(),
             position = $('#list_position').val(),
             skills = $('#txt_skill').val(),
-            contact = $('#txt_contact').val()
-        formData = new FormData();
+            contact = $('#txt_contact').val();
+        var name = name.trim(),
+            email = email.trim(),
+            skills = skills.trim(),
+            contact = contact.trim();
+        var formData = new FormData();
 
         if (name) {
             formData.append('name', name);
@@ -468,13 +507,42 @@
             formData.append('skills', skills);
         }
         if (email) {
+            var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+            if (!regex.test(email)) {
+                return $(document).Toasts('create', {
+                    title: 'Email is not in Proper format',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Enter valid Email Address',
+                    class: 'bg-danger',
+                });
+            } else {
+                email = String(email).trim();
+            }
             formData.append('email', email);
         }
         if (contact) {
+            if (isNaN(contact)) {
+                return $(document).Toasts('create', {
+                    title: 'Please Enter valid Phone number',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Phone number must be Numeric',
+                    class: 'bg-danger',
+                });
+            }
+            if (contact.length > 10 || contact.length < 10) {
+                return $(document).Toasts('create', {
+                    title: 'Please Enter valid Phone number',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Phone number Must be of 10 Digits',
+                    class: 'bg-danger',
+                });
+            }
             formData.append('mobile', contact);
         }
         if ($('#file_profile')[0].files[0]) {
-
             formData.append('profile_image', $('#file_profile')[0].files[0]);
         }
         $.post({
@@ -491,6 +559,8 @@
                     body: 'Member details has been Successfully Updated',
                     class: 'bg-success',
                 });
+                $('#div_social').empty();
+                getEmployee(emp_id)
             },
             error: error => {
                 error = error.responseJSON
@@ -501,6 +571,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
             }
         });
     });
@@ -536,6 +612,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
                     }
                 });
             }
@@ -543,8 +625,11 @@
     });
 
     $('#btn_updatePassword').click(() => {
-        var password = $('#txt_newPassword').val(),
-            conPassword = $('#txt_cPassword').val()
+        var emp_id = urlParams.get('emp_id'),
+            password = $('#txt_newPassword').val(),
+            conPassword = $('#txt_cPassword').val();
+        var password = password.trim(),
+            conPassword = conPassword.trim();
         if (!password || !conPassword) {
             return $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
@@ -567,8 +652,9 @@
             });
         }
         $.post({
-            url: '/admin/v1/profile/password',
+            url: '/admin/v1/employee/change-password',
             data: {
+                "employee_id": emp_id,
                 "password": password,
             },
             success: result => {
@@ -579,8 +665,8 @@
                     body: 'Your Password has been changed Successfully',
                     class: 'bg-success',
                 });
-                $('#txt_password').val(null)
-                $('#txt_cpassword').val(null)
+                $('#txt_newPassword').val(null)
+                $('#txt_cPassword').val(null)
             },
             error: error => {
                 error = error.responseJSON
@@ -591,6 +677,12 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_updatePassword').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_updatePassword').removeAttr('disabled')
             }
         });
 
@@ -600,6 +692,7 @@
         var emp_id = urlParams.get('emp_id'),
             accountName = $('#list_social').val(),
             reference = $('#txt_link').val();
+        var reference = reference.trim();
         if (!accountName) {
             return $(document).Toasts('create', {
                 title: 'Error!',
@@ -647,23 +740,34 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $('#btn_addAccount').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_addAccount').removeAttr('disabled')
             }
         });
     }
 
     function updateSocial(index, account_id) {
         var accountName = $(`#list_social_${index}`).val(),
-            reference = $(`#txt_link_${index}`).val(),
+            reference = String($(`#txt_link_${index}`).val()).trim(),
             emp_id = urlParams.get('emp_id'),
             formData = new FormData();
         formData.append('employee_id', emp_id)
         formData.append('account_id', account_id)
-        if (accountName) {
-            formData.append('account_name', accountName)
+        formData.append('account_name', accountName)
+        if (!reference) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Reference not found',
+                class: 'bg-danger',
+            });
         }
-        if (reference) {
-            formData.append('reference', reference)
-        }
+        formData.append('reference', reference)
         $.post({
             type: 'POST',
             url: '/admin/v1/employee/social-account/update',
@@ -678,6 +782,8 @@
                     body: 'Social account details has been Successfully Updated',
                     class: 'bg-success',
                 });
+                $('#div_social').empty();
+                getEmployee(emp_id);
             },
             error: error => {
                 error = error.responseJSON
@@ -688,11 +794,17 @@
                     body: error.message,
                     class: 'bg-danger',
                 });
+            },
+            beforeSend: () => {
+                $(`#btn_update_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_update_${index}`).removeAttr('disabled')
             }
         });
     }
 
-    function removeSocial(account_id) {
+    function removeSocial(index, account_id) {
         var emp_id = urlParams.get('emp_id');
         Swal.fire({
             title: 'Are you sure?',
@@ -724,6 +836,12 @@
                             body: error.message,
                             class: 'bg-danger',
                         });
+                    },
+                    beforeSend: () => {
+                        $(`btn_remove_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`btn_remove_${index}`).removeAttr('disabled')
                     }
                 });
             }
