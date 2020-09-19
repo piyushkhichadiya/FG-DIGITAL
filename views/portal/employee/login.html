@@ -87,8 +87,8 @@
     $('#txt_email').focus();
 
     $('#btn_submit').click(() => {
-        var email = $('#txt_email').val(),
-            password = $('#txt_password').val(),
+        var email = ($('#txt_email').val()).trim(),
+            password = ($('#txt_password').val()).trim(),
             remember;
         if (!email) {
             return $(document).Toasts('create', {
@@ -99,7 +99,7 @@
                 class: 'bg-danger',
             });
         } else {
-            email = String(email).trim();
+            email = String(email);
         }
         if (!password) {
             return $(document).Toasts('create', {
