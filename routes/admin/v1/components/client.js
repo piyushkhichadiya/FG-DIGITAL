@@ -3,7 +3,6 @@ const clientAPI = require('express').Router(),
     { response, bcryptHash } = require('../../../../functions/functions'),
     regex = require('../../../../functions/regex')
 
-
 //----------------------------- CONFIGURATION ------------------------------
 
 //---------------------------- GLOBAL VARIABLE -----------------------------
@@ -27,8 +26,6 @@ clientAPI.post('/create', async(req, res) => {
         password = String(req.body.password),
         authToken = (Math.floor(Math.random() * (99999 - 11111) + 11111))
 
-
-    password = await bcryptHash(password)
     if (!regex.email(email)) {
         return response(res, 400, 'invalid', 'Invalid Email', undefined, 'A-4.1.2')
     }
@@ -36,11 +33,12 @@ clientAPI.post('/create', async(req, res) => {
     var pushData = {
         name: name,
         email: email,
-        password: bcryptHash(password),
+        password: await bcryptHash(password),
         createdOn: String(new Date()),
         createdBy: "ADMIN",
         authToken: authToken
     }
+
     if (dbAdminSnapshot.clients) {
         var clientDB = dbAdminSnapshot.clients,
             clientKey = Object.keys(clientDB)
