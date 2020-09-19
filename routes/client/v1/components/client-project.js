@@ -574,7 +574,7 @@ clientProjectAPI.post('/review/action/edit', (req, res) => {
     }
 
     if (!req.body.project_id) {
-        return response(res, 400, 'required', 'Project Id is required', undefined, 'C-3.4.5')
+        return response(res, 400, 'required', 'Project Id is required', undefined, 'C-3.4.4')
     }
 
 
@@ -585,11 +585,11 @@ clientProjectAPI.post('/review/action/edit', (req, res) => {
         getKeys = getProject(projectID)
 
     if (!getKeys) {
-        return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'C-3.4.6')
+        return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'C-3.4.5')
     }
 
     if (!dbAdminSnapshot.clients[getKeys.client_key].plans[getKeys.plan_key].review) {
-        return response(res, 404, 'notFound', 'Incorrect Review ID', undefined, 'c-3.4.8')
+        return response(res, 404, 'notFound', 'Incorrect Review ID', undefined, 'C-3.4.6')
     }
 
     var dbReview = dbAdminSnapshot.clients[getKeys.client_key].plans[getKeys.plan_key].review,
@@ -600,7 +600,7 @@ clientProjectAPI.post('/review/action/edit', (req, res) => {
         if (tempReview.review_id == reviewID && !tempReview.deleted) {
 
             if (tempReview.closed) {
-                return response(res, 403, 'forbidden', 'Addition or Modification on closed review is not allowed', undefined, 'C-3.4.13')
+                return response(res, 403, 'forbidden', 'Addition or Modification on closed review is not allowed', undefined, 'C-3.4.7')
             }
 
             var tempPost = tempReview.post
@@ -616,7 +616,7 @@ clientProjectAPI.post('/review/action/edit', (req, res) => {
                     if (req.body.status && ['ACCEPTED', 'REJECTED', 'COMMENT'].includes(String(req.body.status).trim().toUpperCase())) {
                         tempConversation.status = String(req.body.status).trim().toUpperCase()
                     } else if (req.body.status) {
-                        return response(res, 400, 'invalid', 'Status is required. It should be APPROVED/REJECTED/COMMENT', undefined, 'C-3.4.7')
+                        return response(res, 400, 'invalid', 'Status is required. It should be APPROVED/REJECTED/COMMENT', undefined, 'C-3.4.8')
                     }
 
                     if (req.body.description) {

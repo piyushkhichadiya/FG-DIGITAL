@@ -171,10 +171,10 @@
                     "schema": {
                         "required": ["review_id", "post_key", "status", "project_id"],
                         "properties": {
-                            "review_id": { "type": "number" },
+                            "review_id": { "type": "integer" },
                             "post_key": { "type": "string" },
                             "status": { "type": "string" },
-                            "project_id": { "type": "number" },
+                            "project_id": { "type": "integer" },
                             "description": { "type": "string" }
                         },
                         "example": {
@@ -199,20 +199,20 @@
                     "schema": {
                         "required": ["review_id", "post_key", "project_id", "conversation_key"],
                         "properties": {
-                            "review_id": { "type": "number" },
+                            "review_id": { "type": "integer" },
                             "post_key": { "type": "string" },
                             "conversation_key": { "type": "string" },
                             "status": { "type": "string" },
-                            "project_id": { "type": "number" },
+                            "project_id": { "type": "integer" },
                             "description": { "type": "string" }
                         },
                         "example": {
-                            "review_id": "688642606297",
+                            "review_id": 688642606297,
                             "post_key": "-MFI09sMQLktyYI-yYOf",
                             "conversation_key": "-MHYVxMEOqSDWBrfaX2j",
                             "status": "CHANGES",
-                            "project_id": "93492065515",
-                            "description": "string"
+                            "project_id": 93492065515,
+                            "description": "This is description for conversation update"
                         }
                     }
                 }],
