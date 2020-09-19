@@ -197,7 +197,7 @@
                     "name": "body",
                     "in": "body",
                     "schema": {
-                        "required": ["review_id", "post_key", "status", "project_id", "conversation_key"],
+                        "required": ["review_id", "post_key", "project_id", "conversation_key"],
                         "properties": {
                             "review_id": { "type": "number" },
                             "post_key": { "type": "string" },
@@ -212,7 +212,7 @@
                             "conversation_key": "-MHYVxMEOqSDWBrfaX2j",
                             "status": "CHANGES",
                             "project_id": "93492065515",
-                            "description": "description"
+                            "description": "string"
                         }
                     }
                 }],
