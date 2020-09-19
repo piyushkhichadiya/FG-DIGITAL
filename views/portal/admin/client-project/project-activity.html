@@ -349,7 +349,7 @@
             if (activityData) {
                 for (var i = activityData.length - 1; i >= 0; i--) {
                     var tempActivity = activityData[i];
-                    var getDate = new Date(tempActivity.date || tempActivity.createdOn),
+                    var getDate = new Date(tempActivity.date),
                         d = ('0' + getDate.getDate()).slice(-2),
                         m = ('0' + (getDate.getMonth() + 1)).slice(-2),
                         y = getDate.getFullYear(),
@@ -364,8 +364,8 @@
                     }
 
                     var date = y + '/' + m + '/' + d;
-                    var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
-
+                    var oldDate = (y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time);
+                    console.log(oldDate)
                     if (tempActivity.type == 'SERVICE') {
                         var serviceHtml = `<div>
                                                     <i class="fa fa-cogs bg-blue"></i>
@@ -530,7 +530,9 @@
                     } else {
                         $(`#lbl_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy)
                     }
-                    $(`#lbl_headerDate_${i}`).html(`Date : ` + oldDate)
+                    if (tempActivity.date) {
+                        $(`#lbl_headerDate_${i}`).html(`Date : ` + oldDate)
+                    }
                     $(`#txt_description_${i}`).val(tempActivity.description)
 
                     $(`#datetimepicker_${i}`).datetimepicker({
