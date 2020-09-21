@@ -106,12 +106,6 @@
                     <div class="card-body card">
                         <div class="row">
                             <div class="col-md-3">
-                                <img src="images/logo-small.png" id="img_profile" style="width: 100px;height: 100px; border-radius:50%;">
-                                <img src="" id="img_originalProfile" onerror="this.src='images/logo-small.png'" style="width: 100px;height: 100px; border-radius:50%; display: none"><br>
-                                <i class="fa fa-camera mt-2" id="icon_camera" style="margin-left: 41px;cursor: pointer;"></i>
-                                <input type="file" id="file_profile" accept=".png, .jpg, .jpeg" style="display: none">
-                            </div>
-                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Name</label>
                                     <input type="text" class="form-control" id="txt_username" placeholder="Enter Username">
@@ -191,8 +185,6 @@
             var dbdata = data.data
             $('#txt_username').val(dbdata.name)
             $('#txt_email').val(dbdata.email)
-            $('#img_originalProfile').attr('src', '/client/v1/profile/file/' + dbdata.profile_image).show()
-            $('#img_profile').hide()
         }).fail(error => {
             if (error.status == 404 || error.status == 401) {
                 logout(true)
@@ -200,58 +192,24 @@
         });
     }
 
-    $('#icon_camera,#img_profile,#img_originalProfile').click(() => {
-        $('#file_profile').click();
-    });
-
-    $("#file_profile").change(function() {
-        if (this.files[0]) {
-            var file = this.files[0]
-            var type = file.type.split('/').pop().toLowerCase();
-            if (type != "jpeg" && type != "jpg" && type != "png") {
-                return $(document).Toasts('create', {
-                    title: 'File Formate not Correct ',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'Select valid File Formate',
-                    class: 'bg-danger',
-                });
-
-            }
-            if (file.size > 102400) {
-                return $(document).Toasts('create', {
-                    title: 'File is too Large',
-                    autohide: true,
-                    delay: 5000,
-                    body: 'please select file size below 100 kb',
-                    class: 'bg-danger',
-                });
-            }
-            $('#img_originalProfile').hide()
-            const objectURL = URL.createObjectURL(file)
-            return $('#img_profile').attr('src', objectURL).show();
-        } else {
-            if ($('#img_originalProfile').attr('src') == '') {
-                $('#img_profile').attr('src', 'images/logo-small.png').show()
-                $('#img_originalProfile').hide()
-            } else {
-                $('#img_profile').hide()
-                $('#img_originalProfile').show()
-            }
-        }
-    });
-
     $('#btn_updateProfile').click(() => {
-        var username = $('#txt_username').val()
-        var formData = new FormData();
-        formData.append('name', username);
-        formData.append('profile_image', $('#file_profile')[0].files[0]);
+        var username = ($('#txt_username').val()).trim();
+        if (!username) {
+            return $(document).Toasts('create', {
+                title: 'Name required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please enter name for update',
+                class: 'bg-danger',
+            });
+        }
+        username = String(username)
         $.post({
-            type: 'POST',
             url: '/client/v1/profile/update',
-            data: formData,
-            processData: false,
-            contentType: false,
+            data: {
+                "name": username,
+
+            },
             success: result => {
                 $(document).Toasts('create', {
                     title: 'Updated',
@@ -277,17 +235,8 @@
             },
             complete: () => {
                 $('#btn_updateProfile').removeAttr('disabled')
-            },
-            xhr: () => {
-                var xhr = $.ajaxSettings.xhr();
-                if ($('#file_profile')[0].files[0]) {
-                    xhr.upload.onprogress = function(evt) {
-                        console.log(evt.loaded / evt.total * 100);
-                    };
-                }
-                return xhr;
             }
-        })
+        });
     });
 
     $('#btn_update').click(() => {

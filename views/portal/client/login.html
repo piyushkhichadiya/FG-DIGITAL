@@ -78,6 +78,11 @@
 
 </body>
 <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    var redirect = '/employee'
+    if (urlParams.has('redirect') && urlParams.get('redirect') != '') {
+        redirect = urlParams.get('redirect')
+    }
     $('#chk_remember').prop('checked', true)
     $('#txt_email').focus();
 

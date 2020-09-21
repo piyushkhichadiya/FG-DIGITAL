@@ -48,7 +48,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="/client/projects" class="brand-link">
+            <a href="/client" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -88,12 +88,13 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Projects</h1>
+                            <h1>Projects Dashboard</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/client/projects">Home</a></li>
-                                <li class="breadcrumb-item active">Projects</li>
+                                <li class="breadcrumb-item"><a href="/client">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/client/projects">Projects</a></li>
+                                <li class="breadcrumb-item active">Dashboard</li>
                             </ol>
                         </div>
                     </div>
@@ -105,54 +106,33 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="card-body card">
-                        <div class="row">
-                            <!-- /.card-header -->
-                            <div class="col-md-12">
-                                <table id="tbl_project" class="table table-bordered table-striped w-100">
-                                    <thead>
-                                        <tr>
-                                            <th>No.</th>
-                                            <th>Project ID</th>
-                                            <th>Project Name</th>
-                                            <th>Description</th>
-                                            <th>Amount</th>
-                                            <th>Duration</th>
-                                            <th>Started on</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr align="center">
-                                            <td colspan="9"><img src="images/loader.gif" style="width: 40px;"></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>No.</th>
-                                            <th>Project ID</th>
-                                            <th>Project Name</th>
-                                            <th>Description</th>
-                                            <th>Amount</th>
-                                            <th>Duration</th>
-                                            <th>Started on</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                        <div class="row form-group">
+                            <div class="col-md-2">
+                                <label>Project Name :</label>
                             </div>
-                            <!-- /.card-body -->
+                            <div class="col-md-5">
+                                <p id='lbl_name'></p>
+                                <p id='lbl_description'></p>
+                            </div>
                         </div>
-                        <!-- /.row -->
+                        <div class="row form-group">
+                            <div class="col-md-12">
+                                <h4 class="header-title">Project Management</h4>
+                            </div>
+                            <div class="col-md-12">
+                                <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/client/project-team?plan_id=${plan_id}`'><i class="fas fa-user-friends"></i> Team</button>
+                                <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/client/project-service?plan_id=${plan_id}`'><i class="fas fa-cogs"></i> Services</button>
+                                <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/client/project-accounts?plan_id=${plan_id}`'><i class="fas fa-portrait"></i> Social Accounts</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row form-group">
+                            <h4 class="header-title">Reviews & Activity</h4>
+                            <div class="col-md-12">
+                                <button class="btn btn-outline-success m-1" id="btn_review" onclick='window.location.href = `/client/project-review?plan_id=${plan_id}`'><i class="fas fa-tasks"></i> Review</button>
+                                <button class="btn btn-outline-success m-1" id="btn_activity" onclick='window.location.href = `/client/project-activity?plan_id=${plan_id}`'><i class="fas fa-chart-line"></i> Activity</button>
+                            </div>
+                        </div>
                     </div>
                     <!-- Card body -->
                 </div>
@@ -200,42 +180,26 @@
     <script src="dist/js/client-profile.js"></script>
 </body>
 <script>
-    var tblProject = $("#tbl_project").DataTable({
-        "responsive": true,
-    });
-    $(document).ready(() => {
-        getProject()
-    });
+    const urlParams = new URLSearchParams(window.location.search);
+    plan_id = urlParams.get('plan_id');
+
+    var dbProject;
+    if (urlParams.has('plan_id')) {
+        if (urlParams.get('plan_id') == '') {
+            window.location.href = '/client/'
+        }
+        getProject();
+    } else {
+        window.location.href = '/client/'
+    }
 
     function getProject() {
-        $.getJSON('/client/v1/project/', (result) => {
+        $.getJSON(`/client/v1/project/?project_id=${urlParams.get('plan_id')}`, (result) => {
             var dbProject = result.data;
-            tblProject.clear().draw();
-            if (dbProject) {
-                for (var i = 0; i < dbProject.length; i++) {
-                    var tempProject = dbProject[i];
-                    var button = `<div class=row><button class='btn btn-default bg-olive m-1' onclick="window.location.href ='/client/project-dashboard?plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Dashboard</button>`;
-                    var status = tempProject.status,
-                        date = tempProject.start_date;
-                    if (status == 'scheduled') {
-                        status = `<p style='color:#007bff; font-size:17px;'><i class='fas fa-business-time'></i> Scheduled</p>`
-                    }
-                    if (status == 'running') {
-                        status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-stopwatch'></i> Running</p>`
-                    }
-                    if (status == 'expired') {
-                        status = `<p style='color:#dc3545; font-size:17px;'><i class='fas fa-calendar-times'></i> Expired</p>`
-                    }
-                    var getDate = new Date(date),
-                        d = ('0' + getDate.getDate()).slice(-2),
-                        m = ('0' + (getDate.getMonth() + 1)).slice(-2),
-                        y = getDate.getFullYear();
-                    date = y + '/' + m + '/' + d;
-                    tblProject.row.add([
-                        `${i+1}`, tempProject.project_id, tempProject.project_name, tempProject.project_description, tempProject.price, tempProject.duration, date, status, button
-                    ]).draw();
-                }
-            }
+            $('#lbl_name').html(dbProject.project_name)
+            $('#lbl_description').html(dbProject.project_description)
+        }).fail(error => {
+            window.location.href = '/client/'
         });
     }
 </script>

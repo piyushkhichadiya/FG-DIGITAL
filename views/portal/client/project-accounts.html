@@ -48,7 +48,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="/client/projects" class="brand-link">
+            <a href="/client" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -88,12 +88,16 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1>Projects</h1>
+                            <h1>Projects Social-Accounts</h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/client/projects">Home</a></li>
-                                <li class="breadcrumb-item active">Projects</li>
+                                <li class="breadcrumb-item"><a href="/client">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/client/projects">Projects</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="link_navProjects" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item active">Social-Accounts</li>
                             </ol>
                         </div>
                     </div>
@@ -106,51 +110,86 @@
                 <div class="container-fluid">
                     <div class="card-body card">
                         <div class="row">
-                            <!-- /.card-header -->
-                            <div class="col-md-12">
-                                <table id="tbl_project" class="table table-bordered table-striped w-100">
-                                    <thead>
-                                        <tr>
-                                            <th>No.</th>
-                                            <th>Project ID</th>
-                                            <th>Project Name</th>
-                                            <th>Description</th>
-                                            <th>Amount</th>
-                                            <th>Duration</th>
-                                            <th>Started on</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr align="center">
-                                            <td colspan="9"><img src="images/loader.gif" style="width: 40px;"></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                            <td hidden></td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>No.</th>
-                                            <th>Project ID</th>
-                                            <th>Project Name</th>
-                                            <th>Description</th>
-                                            <th>Amount</th>
-                                            <th>Duration</th>
-                                            <th>Started on</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                            <div class="col-md-3 col-sm-6 col-12">
+                                <div class="info-box bg-info">
+                                    <span class="info-box-icon"><i class="far fa-bookmark"></i></span>
+
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Bookmarks</span>
+                                        <span class="info-box-number">41,410</span>
+
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: 70%"></div>
+                                        </div>
+                                        <span class="progress-description">
+                                    70% Increase in 30 Days
+                                  </span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
                             </div>
-                            <!-- /.card-body -->
+                            <!-- /.col -->
+                            <div class="col-md-3 col-sm-6 col-12">
+                                <div class="info-box bg-success">
+                                    <span class="info-box-icon"><i class="far fa-thumbs-up"></i></span>
+
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Likes</span>
+                                        <span class="info-box-number">41,410</span>
+
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: 70%"></div>
+                                        </div>
+                                        <span class="progress-description">
+                                    70% Increase in 30 Days
+                                  </span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-md-3 col-sm-6 col-12">
+                                <div class="info-box bg-warning">
+                                    <span class="info-box-icon"><i class="far fa-calendar-alt"></i></span>
+
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Events</span>
+                                        <span class="info-box-number">41,410</span>
+
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: 70%"></div>
+                                        </div>
+                                        <span class="progress-description">
+                                    70% Increase in 30 Days
+                                  </span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-md-3 col-sm-6 col-12">
+                                <div class="info-box bg-danger">
+                                    <span class="info-box-icon"><i class="fas fa-comments"></i></span>
+
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Comments</span>
+                                        <span class="info-box-number">41,410</span>
+
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: 70%"></div>
+                                        </div>
+                                        <span class="progress-description">
+                                    70% Increase in 30 Days
+                                  </span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+                            </div>
+                            <!-- /.col -->
                         </div>
                         <!-- /.row -->
                     </div>
@@ -200,44 +239,7 @@
     <script src="dist/js/client-profile.js"></script>
 </body>
 <script>
-    var tblProject = $("#tbl_project").DataTable({
-        "responsive": true,
-    });
-    $(document).ready(() => {
-        getProject()
-    });
-
-    function getProject() {
-        $.getJSON('/client/v1/project/', (result) => {
-            var dbProject = result.data;
-            tblProject.clear().draw();
-            if (dbProject) {
-                for (var i = 0; i < dbProject.length; i++) {
-                    var tempProject = dbProject[i];
-                    var button = `<div class=row><button class='btn btn-default bg-olive m-1' onclick="window.location.href ='/client/project-dashboard?plan_id=${tempProject.project_id}'"><i class="nav-icon fas fa-tachometer-alt"></i> Dashboard</button>`;
-                    var status = tempProject.status,
-                        date = tempProject.start_date;
-                    if (status == 'scheduled') {
-                        status = `<p style='color:#007bff; font-size:17px;'><i class='fas fa-business-time'></i> Scheduled</p>`
-                    }
-                    if (status == 'running') {
-                        status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-stopwatch'></i> Running</p>`
-                    }
-                    if (status == 'expired') {
-                        status = `<p style='color:#dc3545; font-size:17px;'><i class='fas fa-calendar-times'></i> Expired</p>`
-                    }
-                    var getDate = new Date(date),
-                        d = ('0' + getDate.getDate()).slice(-2),
-                        m = ('0' + (getDate.getMonth() + 1)).slice(-2),
-                        y = getDate.getFullYear();
-                    date = y + '/' + m + '/' + d;
-                    tblProject.row.add([
-                        `${i+1}`, tempProject.project_id, tempProject.project_name, tempProject.project_description, tempProject.price, tempProject.duration, date, status, button
-                    ]).draw();
-                }
-            }
-        });
-    }
+    const urlParams = new URLSearchParams(window.location.search);
 </script>
 
 </html>
