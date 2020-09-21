@@ -11,7 +11,10 @@ clientView.use(express.static('public/adminLTE'))
 var routes = ['/login/', '/profile/']
 
 // Project
-routes.push.apply(routes, ['/projects/', '/project/', '/project-activity/', '/project-review', '/project-review-view'])
+routes.push.apply(routes, ['/projects/', '/project/',
+    '/project-dashboard/', '/project-info/', '/project-service/', '/project-team/', '/project-accounts/',
+    '/project-activity/', '/project-review/', '/project-review-view/'
+])
 
 clientView.use(routes, express.static('public/adminLTE'))
 
@@ -27,9 +30,14 @@ clientView.get('/login', (req, res) => { res.sendFile(process.cwd() + '/views/po
 clientView.get('/profile', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/profile.html') });
 
 // Project
-clientView.get(['/projects', '/project'], (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/projects.html') });
-clientView.get('/project-activity', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/activity.html') });
-clientView.get('/project-review', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/review.html') });
-clientView.get('/project-review-view', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/review-view.html') });
+clientView.get(['/', '/projects', '/project'], (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/projects.html') });
+clientView.get('/project-dashboard', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/project-dashboard.html') })
+clientView.get('/project-info', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/project-info.html') })
+clientView.get('/project-activity', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/project-activity.html') });
+clientView.get('/project-review', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/project-review.html') });
+clientView.get('/project-review-view', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/project-review-view.html') });
+clientView.get('/project-team', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/project-team.html') })
+clientView.get('/project-service', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/project-service.html') })
+clientView.get('/project-accounts', (req, res) => { res.sendFile(process.cwd() + '/views/portal/client/project-accounts.html') })
 
 module.exports = clientView;

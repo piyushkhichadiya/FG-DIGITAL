@@ -259,6 +259,7 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                             lastModifiedById: tempReviewPost.lastModifiedById,
                         }
 
+                        // Documents
                         if (tempReviewPost.documents) {
                             var dbPostDocuments = tempReviewPost.documents,
                                 dbPostDocumentsKey = Object.keys(dbPostDocuments)
@@ -287,6 +288,37 @@ projectAPI.get('/fetch/:project_id', (req, res) => {
                             if (tempPostObj.documents.length == 0) {
                                 delete tempPostObj.documents
                             }
+                        }
+
+                        // Conversation
+                        if (tempReviewPost.conversations) {
+                            var dbPostConversations = tempReviewPost.conversations,
+                                dbPostConversationsKey = Object.keys(dbPostConversations)
+
+                            tempPostObj.conversations = []
+
+                            for (var k = 0; k < dbPostConversationsKey.length; k++) {
+                                var tempConversation = dbPostConversations[dbPostConversationsKey[k]]
+
+                                if (tempConversation.deleted) { continue }
+
+                                var tempConversationObj = {
+                                    conversation_key: dbPostConversationsKey[k],
+                                    createdOn: tempConversation.createdOn,
+                                    createdBy: tempConversation.createdBy,
+                                    createdById: tempConversation.createdById,
+                                    lastModifiedOn: tempConversation.lastModifiedOn,
+                                    lastModifiedBy: tempConversation.lastModifiedBy,
+                                    lastModifiedById: tempConversation.lastModifiedById,
+                                    status: tempConversation.status,
+                                    description: tempConversation.description
+                                }
+
+                                // Push to Post Object
+                                tempPostObj.conversations.push(tempConversationObj)
+                            }
+
+                            if (tempPostObj.conversations.length == 0) { delete tempPostObj.conversations }
                         }
 
                         tempJSONObject.posts.push(tempPostObj)

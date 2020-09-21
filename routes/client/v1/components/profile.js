@@ -23,7 +23,7 @@ profileAPI.use((req, res, next) => {
 profileAPI.get('/', (req, res) => {
 
     var tempObj = {
-        client_id: clientAuthToken.client_key,
+        client_key: clientAuthToken.client_key,
         email: dbClientAccount.email,
         name: dbClientAccount.name,
         mobile: dbClientAccount.mobile
