@@ -84,8 +84,7 @@ clientProjectAPI.get('/fetch', (req, res) => {
                         scope.push('client')
 
                         var tempClientObject = {
-                            client_key: dbClientsKey[i],
-                            client_id: tempClient.client_id,
+                            client_id: dbClientsKey[i],
                             name: tempClient.name
                         }
                         tempProjectObj.client = tempClientObject
