@@ -33,7 +33,7 @@
             <!-- Left navbar links -->
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
+                    <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fab fa-bars"></i></a>
                 </li>
             </ul>
 
@@ -58,7 +58,7 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                        <img src="images/profile.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
                         <a href="/client/profile" id="lbl_profileName" class="d-block">Client Profile</a>
@@ -69,10 +69,10 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- <li class="nav-item">
-                            <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
+                            <a href="/employee" class="nav-link"><i class="nav-icon fab fa-tachometer-alt"></i><p>Dashboard</p></a>
                         </li> -->
                         <li class="nav-item">
-                            <a href="/client/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Projects</p></a>
+                            <a href="/client/projects" class="nav-link"><i class="nav-icon fab fa-tags"></i><p>Projects</p></a>
                         </li>
                     </ul>
                 </nav>
@@ -108,92 +108,9 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card-body card">
-                        <div class="row">
-                            <div class="col-md-3 col-sm-6 col-12">
-                                <div class="info-box bg-info">
-                                    <span class="info-box-icon"><i class="far fa-bookmark"></i></span>
-
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Bookmarks</span>
-                                        <span class="info-box-number">41,410</span>
-
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 70%"></div>
-                                        </div>
-                                        <span class="progress-description">
-                                    70% Increase in 30 Days
-                                  </span>
-                                    </div>
-                                    <!-- /.info-box-content -->
-                                </div>
-                                <!-- /.info-box -->
-                            </div>
-                            <!-- /.col -->
-                            <div class="col-md-3 col-sm-6 col-12">
-                                <div class="info-box bg-success">
-                                    <span class="info-box-icon"><i class="far fa-thumbs-up"></i></span>
-
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Likes</span>
-                                        <span class="info-box-number">41,410</span>
-
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 70%"></div>
-                                        </div>
-                                        <span class="progress-description">
-                                    70% Increase in 30 Days
-                                  </span>
-                                    </div>
-                                    <!-- /.info-box-content -->
-                                </div>
-                                <!-- /.info-box -->
-                            </div>
-                            <!-- /.col -->
-                            <div class="col-md-3 col-sm-6 col-12">
-                                <div class="info-box bg-warning">
-                                    <span class="info-box-icon"><i class="far fa-calendar-alt"></i></span>
-
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Events</span>
-                                        <span class="info-box-number">41,410</span>
-
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 70%"></div>
-                                        </div>
-                                        <span class="progress-description">
-                                    70% Increase in 30 Days
-                                  </span>
-                                    </div>
-                                    <!-- /.info-box-content -->
-                                </div>
-                                <!-- /.info-box -->
-                            </div>
-                            <!-- /.col -->
-                            <div class="col-md-3 col-sm-6 col-12">
-                                <div class="info-box bg-danger">
-                                    <span class="info-box-icon"><i class="fas fa-comments"></i></span>
-
-                                    <div class="info-box-content">
-                                        <span class="info-box-text">Comments</span>
-                                        <span class="info-box-number">41,410</span>
-
-                                        <div class="progress">
-                                            <div class="progress-bar" style="width: 70%"></div>
-                                        </div>
-                                        <span class="progress-description">
-                                    70% Increase in 30 Days
-                                  </span>
-                                    </div>
-                                    <!-- /.info-box-content -->
-                                </div>
-                                <!-- /.info-box -->
-                            </div>
-                            <!-- /.col -->
-                        </div>
-                        <!-- /.row -->
+                    <div class="row" id="div_social">
                     </div>
-                    <!-- Card body -->
+                    <!-- /.row -->
                 </div>
                 <!-- /.container-fluid -->
             </section>
@@ -240,6 +157,172 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('plan_id')) {
+        if (urlParams.get('plan_id') == '') {
+            window.location.href = '/client/'
+        }
+        getProjectSocial();
+    } else {
+        window.location.href = '/client/'
+    }
+
+    function getProjectSocial() {
+        $.getJSON(`/client/v1/project/${urlParams.get('plan_id')}?scope=accounts%20`, (result) => {
+            data = result.data;
+            dbSocial = data.data.accounts;
+            if (dbSocial) {
+                var SocialHtml = '';
+                for (var i = 0; i < dbSocial.length; i++) {
+                    var tempSocial = dbSocial[i];
+                    if (tempSocial.account_name == "Instagram") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-info">
+                                                <span class="info-box-icon"><i class="fab fa-instagram"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Instagram</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "Facebook") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-lightblue">
+                                                <span class="info-box-icon"><i class="fab fa-facebook-f"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Facebook</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "WhatsApp") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-success">
+                                                <span class="info-box-icon"><i class="fab fa-whatsapp"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">WhatsApp</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "Stack Overflow") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-maroon">
+                                                <span class="info-box-icon"><i class="fab fa-stack-overflow"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Stack Overflow</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "Github") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-purple">
+                                                <span class="info-box-icon"><i class="fab fa-github"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Github</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "Hacker Rank") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-purple">
+                                                <span class="info-box-icon"><i class="fab fa-hackerrank"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Hacker Rank</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "LinkedIn") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-info">
+                                                <span class="info-box-icon"><i class="fab fa-linkedin-in"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">LinkedIn</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "Gmail") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-danger">
+                                                <span class="info-box-icon"><i class="fab fa-envelope"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Gmail</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "Outlook") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-danger">
+                                                <span class="info-box-icon"><i class="fab fa-envelope"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Outlook</span>
+                                                    <span class="info-box-number">41,410</span>
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width: 70%"></div>
+                                                    </div>
+                                                    <span class="progress-description">70% Increase in 30 Days</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                }
+                $('#div_social').append(SocialHtml)
+            }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+    }
 </script>
 
 </html>

@@ -58,7 +58,7 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                        <img src="images/profile.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
                         <a href="/client/profile" id="lbl_profileName" class="d-block">Client Profile</a>
@@ -108,108 +108,7 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card-body card">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card card-widget widget-user">
-                                    <div class="widget-user-header text-white" style="background: url('../dist/img/photo1.png') center center;">
-                                        <h3 class="widget-user-username text-right">Elizabeth Pierce</h3>
-                                        <h5 class="widget-user-desc text-right">Web Designer</h5>
-                                    </div>
-                                    <div class="widget-user-image">
-                                        <img class="img-circle" src="dist/img/user3-128x128.jpg" alt="User Avatar">
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row">
-                                            <div class="col-sm-4 border-right">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">3,200</h5>
-                                                    <span class="description-text">SALES</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 border-right">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">13,000</h5>
-                                                    <span class="description-text">FOLLOWERS</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">35</h5>
-                                                    <span class="description-text">PRODUCTS</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card card-widget widget-user">
-                                    <div class="widget-user-header text-white" style="background: url('../dist/img/photo1.png') center center;">
-                                        <h3 class="widget-user-username text-right">Elizabeth Pierce</h3>
-                                        <h5 class="widget-user-desc text-right">Web Designer</h5>
-                                    </div>
-                                    <div class="widget-user-image">
-                                        <img class="img-circle" src="dist/img/user3-128x128.jpg" alt="User Avatar">
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row">
-                                            <div class="col-sm-4 border-right">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">3,200</h5>
-                                                    <span class="description-text">SALES</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 border-right">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">13,000</h5>
-                                                    <span class="description-text">FOLLOWERS</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">35</h5>
-                                                    <span class="description-text">PRODUCTS</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card card-widget widget-user">
-                                    <div class="widget-user-header text-white" style="background: url('../dist/img/photo1.png') center center;">
-                                        <h3 class="widget-user-username text-right">Elizabeth Pierce</h3>
-                                        <h5 class="widget-user-desc text-right">Web Designer</h5>
-                                    </div>
-                                    <div class="widget-user-image">
-                                        <img class="img-circle" src="dist/img/user3-128x128.jpg" alt="User Avatar">
-                                    </div>
-                                    <div class="card-footer">
-                                        <div class="row">
-                                            <div class="col-sm-4 border-right">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">3,200</h5>
-                                                    <span class="description-text">SALES</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4 border-right">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">13,000</h5>
-                                                    <span class="description-text">FOLLOWERS</span>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <div class="description-block">
-                                                    <h5 class="description-header">35</h5>
-                                                    <span class="description-text">PRODUCTS</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="row" id="div_team">
                     </div>
                     <!-- Card body -->
                 </div>
@@ -258,6 +157,58 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('plan_id')) {
+        if (urlParams.get('plan_id') == '') {
+            window.location.href = '/client/'
+        }
+        getProjectTeam();
+    } else {
+        window.location.href = '/client/'
+    }
+
+    function getProjectTeam() {
+        $.getJSON(`/client/v1/project/${urlParams.get('plan_id')}?scope=team`, (result) => {
+            data = result.data;
+            dbTeam = data.data.team;
+            if (dbTeam) {
+                var EmpHtml = '';
+                for (var i = 0; i < dbTeam.length; i++) {
+                    tempTeam = dbTeam[i];
+                    EmpHtml += `<div class="col-md-3">
+                                <div class="card card-widget widget-user">
+                                    <div class="widget-user-header bg-info">
+                                        <h3 class="widget-user-username">${tempTeam.name}</h3>
+                                        <h5 class="widget-user-desc">${tempTeam.position || ''}</h5>
+                                    </div>
+                                    <div class="widget-user-image">
+                                        <img class="img-circle elevation-2" src="/client/v1/profile/file/${tempTeam.profile_image}" onerror="this.src='images/logo-small.png'">
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="row justify-content-center">
+                                            <div class="col-sm-6">
+                                                <div class="description-block">
+                                                    <h5 class="description-header">Member ID</h5>
+                                                    <span class="description-text">${tempTeam.employee_id}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                }
+                $('#div_team').append(EmpHtml);
+            }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+    }
 </script>
 
 </html>

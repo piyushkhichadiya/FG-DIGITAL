@@ -58,7 +58,7 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                        <img src="images/profile.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
                         <a href="/client/profile" id="lbl_profileName" class="d-block">Client Profile</a>
@@ -108,10 +108,8 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card-body card">
-
+                    <div class="row" id="div_service">
                     </div>
-                    <!-- Card body -->
                 </div>
                 <!-- /.container-fluid -->
             </section>
@@ -158,6 +156,58 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('plan_id')) {
+        if (urlParams.get('plan_id') == '') {
+            window.location.href = '/client/'
+        }
+        getProjectService();
+    } else {
+        window.location.href = '/client/'
+    }
+
+    function getProjectService() {
+        $.getJSON(`/client/v1/project/${urlParams.get('plan_id')}?scope=services`, (result) => {
+            var data = result.data;
+            var dbService = data.data.services;
+            if (dbService) {
+                var serviceHtml = '';
+                for (var i = 0; i < dbService.length; i++) {
+                    var tempService = dbService[i];
+                    serviceHtml += `<div class="col-md-3">
+                                        <div class="card card-lightblue">
+                                            <div class="card-header">
+                                                <h3 class="card-title">${tempService.service_name}</h3>
+                                            </div>
+                                            <div class="card-body">
+                                               <div id='list_criteria_${i}'>
+                                               ${getCriteria(i, tempService.criteria)}
+                                               </div> 
+                                            </div>
+                                        </div>
+                                    </div>`;
+                }
+                $('#div_service').append(serviceHtml);
+            }
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+    }
+
+    function getCriteria(index, criteria) {
+        var list = '';
+        for (var i = 0; i < criteria.length; i++) {
+            var tempCriteria = criteria[i];
+            list += `<li>${tempCriteria.criteria}</li>`;
+        }
+        return list;
+    }
 </script>
 
 </html>

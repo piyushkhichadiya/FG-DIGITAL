@@ -58,7 +58,7 @@
                 <!-- Sidebar user (optional) -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                        <img src="images/profile.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
                         <a href="/client/profile" id="lbl_profileName" class="d-block">Client Profile</a>
@@ -202,6 +202,25 @@
 <script>
     var tblProject = $("#tbl_project").DataTable({
         "responsive": true,
+        "columns": [{
+            'width': '5%'
+        }, {
+            'width': '10%'
+        }, {
+            'width': '15%'
+        }, {
+            'width': '25%'
+        }, {
+            'width': '5%'
+        }, {
+            'width': '5%'
+        }, {
+            'width': '9%'
+        }, {
+            'width': '8%'
+        }, {
+            'width': '18%'
+        }, ]
     });
     $(document).ready(() => {
         getProject()
@@ -236,6 +255,16 @@
                     ]).draw();
                 }
             }
+        }).fail(error => {
+            tblProject.clear().draw();
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
         });
     }
 </script>
