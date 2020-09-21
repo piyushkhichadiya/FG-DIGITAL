@@ -25,7 +25,8 @@
         "swagger-ui-express": "^4.1.4"
     },
     "devDependencies": {},
-    "contributors": [{
+    "contributors": [
+        {
             "name": "Smit Luvani",
             "email": "svluvani@gmail.com",
             "url": "https://github.com/smit-luvani"
