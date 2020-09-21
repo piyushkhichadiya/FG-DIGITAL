@@ -220,6 +220,19 @@
 <script>
     var tblReview = $("#tbl_review").DataTable({
         "responsive": true,
+        "columns": [{
+                "width": "5%"
+            }, {
+                "width": "15%"
+            }, {
+                "width": "20%"
+            },
+            null, {
+                "width": "10%"
+            }, {
+                "width": "17%"
+            }
+        ]
     });
     const urlParams = new URLSearchParams(window.location.search);
     $(document).ready(() => {

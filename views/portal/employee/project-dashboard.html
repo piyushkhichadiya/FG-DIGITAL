@@ -241,7 +241,7 @@
     $('#btn_clients').click(() => {
         $('#modal_Social').modal('show')
         if (dbClient) {
-            $('#lbl_clientId').html(dbClient.client_key)
+            $('#lbl_clientId').html(dbClient.client_id)
             $('#lbl_ClientName').html(dbClient.name)
         }
     });

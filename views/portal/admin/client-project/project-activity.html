@@ -365,9 +365,8 @@
 
                     var date = y + '/' + m + '/' + d;
                     var oldDate = (y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time);
-                    console.log(oldDate)
                     if (tempActivity.type == 'SERVICE') {
-                        var serviceHtml = `<div>
+                        var serviceHtml = `<div id="div_activity_${i}">
                                                     <i class="fa fa-cogs bg-blue"></i>
                                                     <div class="timeline-item">
                                                         <span class="time" id="lbl_headerDate_${i}"></span>
@@ -428,7 +427,7 @@
                                                         
                                                         <div id='div_border_${i}' style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                                             <div class="row form-group" id="div_image_${i}">
-                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key, tempActivity.service_deleted)}
+                                                                ${getDocument(i,tempActivity.documents, tempActivity.activity_key, tempActivity.service_deleted)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
                                                                 <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                                     <div class="plus">
@@ -455,7 +454,7 @@
                         }
                     }
                     if (tempActivity.type == 'ACTIVITY') {
-                        var activityHtml = `<div>
+                        var activityHtml = `<div id="div_activity_${i}">
                                             <i class="fa fa-chart-line bg-green"></i>
                                                     <div class="timeline-item">
                                                         <span class="time" id="lbl_headerDate_${i}"></span>
@@ -504,7 +503,7 @@
                                                         </div>
                                                         <div id='div_border_${i}' style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                                             <div class="row form-group" id="div_image_${i}">
-                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key)}
+                                                                ${getDocument(i,tempActivity.documents, tempActivity.activity_key)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
                                                                 <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                                     <div class="plus">
@@ -526,7 +525,10 @@
                     }
                     if (tempActivity.createdBy == 'EMPLOYEE') {
                         $(`#link_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy + `(${tempActivity.createdById})`);
-                        $(`#link_createdBy_${i}`).attr('href', `/admin/employee/view?emp_id=${tempActivity.createdById}`)
+                        $(`#link_createdBy_${i}`).attr({
+                            'href': `/admin/employee/view?emp_id=${tempActivity.createdById}`,
+                            'target': '_blank'
+                        })
                     } else {
                         $(`#lbl_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy)
                     }
@@ -583,7 +585,7 @@
         }
     };
 
-    function getDocument(document, activity_id, service) {
+    function getDocument(index, document, activity_id, service) {
         if (document) {
             var docHtml = '';
             for (var i = 0; i < document.length; i++) {
@@ -601,12 +603,9 @@
                                     </div>
                                 </div>`;
                     } else {
-                        docHtml += `<div class="col-md-2">
+                        docHtml += `<div class="col-md-2 img_container">
                                     <div>
-                                        <embed src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
-                                        <div class="middle">
-                                            <i class="fas fa-search"></i>
-                                        </div>
+                                        <img src="images/pdfFile.png" onError=this.src='images/notfound.jpg' id='img_post' style="height: 150px; width: 100%">
                                     </div>
                                     <div class="row">
                                         <a class="btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
@@ -616,27 +615,24 @@
                 } else {
                     if (ext != 'pdf') {
                         docHtml += `<div class="col-md-2 img_container">
-                                    <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                    <div href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
                                         <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
                                             <i class="fas fa-search"></i>
                                         </div>
                                     </div>
                                     <div>
-                                        <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                        <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile(${index},'${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
                                     </div>
                                 </div>`;
                     } else {
-                        docHtml += `<div class="col-md-2">
+                        docHtml += `<div class="col-md-2 img_container">
                                     <div>
-                                        <embed  src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
-                                        <div class="middle">
-                                            <i class="fas fa-search"></i>
-                                        </div>
+                                        <img src="images/pdfFile.png" onError=this.src='images/notfound.jpg' id='img_post' style="height: 150px; width: 100%">
                                     </div>
                                     <div class="row">
-                                        <a class="col-md-6 btn btn-outline-success btn-block mt-1 btn-xs mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
-                                        <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-xs col-md-6" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                        <a class="col-md-6 btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                        <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-sm col-md-6" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile(${index},'${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
                                     </div>
                                 </div>`
                     }
@@ -984,6 +980,10 @@
         });
     });
 
+    function redirect(index) {
+        window.location.href = `${window.location.search}#div_activity_${index}`;
+    }
+
     function updateActivity(index, activity_id, oldDate) {
         var getDate = $('#txt_date_' + index).val(),
             description = String($('#txt_description_' + index).val()).trim(),
@@ -1020,31 +1020,33 @@
             }
             formData.append('criteria', JSON.stringify(criteria))
         }
-        var d = new Date(oldDate),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-        if (month.length < 2) month = month;
-        if (day.length < 2) day = day;
-        var date = ([year, month, day].join('/'));
-        var getNewDate = new Date(getDate),
-            d = getNewDate.getDate(),
-            m = getNewDate.getMonth() + 1,
-            y = getNewDate.getFullYear(),
-            hr = getNewDate.getHours().toString().padStart(2, "0"),
-            minutes = getNewDate.getMinutes().toString().padStart(2, "0");
-        var newDate = y + '/' + m + '/' + d + ' ' + hr + ':' + minutes;
-        var dateOld = y + '/' + m + '/' + d;
-        if (Date.parse(dateOld) > Date.parse(date)) {
-            return $(document).Toasts('create', {
-                title: 'Error!',
-                autohide: true,
-                delay: 5000,
-                body: 'Date must be Less than created Date',
-                class: 'bg-danger',
-            });
+        if (getDate) {
+            var d = new Date(oldDate),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+            if (month.length < 2) month = month;
+            if (day.length < 2) day = day;
+            var date = ([year, month, day].join('/'));
+            var getNewDate = new Date(getDate),
+                d = getNewDate.getDate(),
+                m = getNewDate.getMonth() + 1,
+                y = getNewDate.getFullYear(),
+                hr = getNewDate.getHours().toString().padStart(2, "0"),
+                minutes = getNewDate.getMinutes().toString().padStart(2, "0");
+            var newDate = y + '/' + m + '/' + d + ' ' + hr + ':' + minutes;
+            var dateOld = y + '/' + m + '/' + d;
+            if (Date.parse(dateOld) > Date.parse(date)) {
+                return $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Date must be Less than created Date',
+                    class: 'bg-danger',
+                });
+            }
+            formData.append('date', newDate)
         }
-        formData.append('date', newDate)
         if (description) {
             formData.append('description', description)
         }
@@ -1054,10 +1056,6 @@
         for (var i = 0; i < $('#file_post_' + index)[0].files.length; ++i) {
             formData.append('file', $('#file_post_' + index)[0].files[i]);
         }
-        // for (var pair of formData.entries()) {
-        //     console.log(pair[1]);
-        // }
-        // return
         $.post({
             type: 'POST',
             url: '/admin/v1/project/activity/update',
@@ -1072,7 +1070,7 @@
                     body: 'Activity updated Successfully',
                     class: 'bg-success',
                 });
-                window.location.reload();
+                redirect(index)
             },
             error: error => {
                 error = error.responseJSON
@@ -1141,7 +1139,7 @@
         });
     }
 
-    function removeFile(filename, activity_id) {
+    function removeFile(index, filename, activity_id) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You want to remove this File",
@@ -1166,7 +1164,7 @@
                             body: 'File removed Successfully',
                             class: 'bg-success',
                         });
-                        window.location.reload();
+                        redirect(index)
                     },
                     error: error => {
                         error = error.responseJSON
