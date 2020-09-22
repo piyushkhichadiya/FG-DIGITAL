@@ -83,7 +83,7 @@ profileAPI.post('/update', (req, res) => {
 
     // DB
     firebase.database().ref('/admin/users/' + adminAuthToken.user_key + '/').update(dbUser);
-    return response(res, 200, 'success', undefined, 'A-2.2.4');
+    return response(res, 200, 'success', undefined, undefined, 'A-2.2.4');
 });
 
 // 2.3 CHANGE PASSWORD
