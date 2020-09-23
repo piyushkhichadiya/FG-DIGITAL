@@ -508,7 +508,7 @@ clientProjectAPI.post('/review/action', (req, res) => {
         return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'C-3.3.5')
     }
 
-    if (status != "APPROVED" && status != "REJECTED" && status != "COMMENT") {
+    if (status != "ACCEPTED" && status != "REJECTED" && status != "COMMENT") {
         return response(res, 400, 'invalid', 'Invalid Status', { valid_status: ['ACCEPTED', 'REJECTED', 'COMMENT'] }, 'C-3.3.6')
 
     }
