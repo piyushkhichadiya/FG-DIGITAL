@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Projects - FG Digital</title>
+    <title>Projects Service - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -151,11 +151,27 @@
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
     <!-- customJS -->
-    <script src="dist/js/client-logout.js"></script>
     <script src="dist/js/client-profile.js"></script>
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
+    var color = {
+        "bg": [{
+            "code": "primary"
+        }, {
+            "code": "olive"
+        }, {
+            "code": "indigo"
+        }, {
+            "code": "info"
+        }, {
+            "code": "maroon"
+        }, {
+            "code": "lightblue"
+        }, {
+            "code": "navy"
+        }]
+    }
     if (urlParams.has('plan_id')) {
         if (urlParams.get('plan_id') == '') {
             window.location.href = '/client/'
@@ -174,7 +190,7 @@
                 for (var i = 0; i < dbService.length; i++) {
                     var tempService = dbService[i];
                     serviceHtml += `<div class="col-md-3">
-                                        <div class="card card-lightblue">
+                                        <div class="card card-${getColor(i)}">
                                             <div class="card-header">
                                                 <h3 class="card-title">${tempService.service_name}</h3>
                                             </div>
@@ -207,6 +223,19 @@
             list += `<li>${tempCriteria.criteria}</li>`;
         }
         return list;
+    }
+
+    function getColor(index) {
+        var code = color.bg;
+        if (index > code.length) {
+            index = index - code.length;
+        }
+        for (var i = 0; i < code.length; i++) {
+            tempColor = code[i];
+            if (index == i) {
+                return tempColor.code
+            }
+        }
     }
 </script>
 

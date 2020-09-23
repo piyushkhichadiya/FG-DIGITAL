@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Projects - FG Digital</title>
+    <title>Projects Accounts - FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -152,7 +152,6 @@
     <!-- toaster -->
     <script src="plugins/toastr/toastr.min.js"></script>
     <!-- customJS -->
-    <script src="dist/js/client-logout.js"></script>
     <script src="dist/js/client-profile.js"></script>
 </body>
 <script>
@@ -176,15 +175,10 @@
                     var tempSocial = dbSocial[i];
                     if (tempSocial.account_name == "Instagram") {
                         SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
-                                            <div class="info-box bg-info">
+                                            <div class="info-box bg-maroon">
                                                 <span class="info-box-icon"><i class="fab fa-instagram"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Instagram</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`
@@ -195,11 +189,6 @@
                                                 <span class="info-box-icon"><i class="fab fa-facebook-f"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Facebook</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`
@@ -210,26 +199,16 @@
                                                 <span class="info-box-icon"><i class="fab fa-whatsapp"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">WhatsApp</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`
                     }
                     if (tempSocial.account_name == "Stack Overflow") {
                         SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
-                                            <div class="info-box bg-maroon">
+                                            <div class="info-box bg-danger">
                                                 <span class="info-box-icon"><i class="fab fa-stack-overflow"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Stack Overflow</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`
@@ -240,11 +219,6 @@
                                                 <span class="info-box-icon"><i class="fab fa-github"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Github</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`
@@ -255,11 +229,6 @@
                                                 <span class="info-box-icon"><i class="fab fa-hackerrank"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Hacker Rank</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`
@@ -270,11 +239,6 @@
                                                 <span class="info-box-icon"><i class="fab fa-linkedin-in"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">LinkedIn</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`
@@ -282,29 +246,19 @@
                     if (tempSocial.account_name == "Gmail") {
                         SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
                                             <div class="info-box bg-danger">
-                                                <span class="info-box-icon"><i class="fab fa-envelope"></i></span>
+                                                <span class="info-box-icon"><i class="fas fa-envelope"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Gmail</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`
                     }
                     if (tempSocial.account_name == "Outlook") {
                         SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
-                                            <div class="info-box bg-danger">
-                                                <span class="info-box-icon"><i class="fab fa-envelope"></i></span>
+                                            <div class="info-box bg-info">
+                                                <span class="info-box-icon"><i class="fas fa-envelope"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Outlook</span>
-                                                    <span class="info-box-number">41,410</span>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" style="width: 70%"></div>
-                                                    </div>
-                                                    <span class="progress-description">70% Increase in 30 Days</span>
                                                 </div>
                                             </div>
                                         </div>`

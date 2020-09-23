@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Projects Reviews- FG Digital</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="dist/css/ionicons.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <link rel="stylesheet" href="dist/css/ekko-lightbox.css">
+    <style>
+        .middle {
+            transition: .5s ease;
+            opacity: 0;
+            position: absolute;
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 50px;
+        }
+        
+        .img_container:hover .image {
+            opacity: 0.3;
+            cursor: pointer;
+        }
+        
+        .img_container:hover .middle {
+            opacity: 1;
+            cursor: pointer;
+        }
+        
+        .plus {
+            position: absolute;
+            top: 56%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 60px;
+        }
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini sidebar-collapse">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
+
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-success elevation-4">
+            <!-- Brand Logo -->
+            <a href="/client" class="brand-link">
+                <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FG Digital</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="images/profile.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                    </div>
+                    <div class="info">
+                        <a href="/client/profile" id="lbl_profileName" class="d-block">Client Profile</a>
+                    </div>
+                </div>
+
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- <li class="nav-item">
+                            <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
+                        </li> -->
+                        <li class="nav-item">
+                            <a href="/client/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Projects</p></a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Projects Review</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/client">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/client/projects">Projects</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="link_navProjects" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item"><a id='lbl_navReview' href=''>Reviews</a></li>
+                                <li class="breadcrumb-item active">view</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="row" id="div_review">
+                        <div class="col-md-12">
+                            <div class="card card-widget">
+                                <div class="card-header">
+                                    <div class="user-block">
+                                        <h5 id="lbl_title"></h5>
+                                        <span id="lbl_description"></span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="user-block">
+                                        <h5 id="lbl_title">Conversation</h5>
+                                    </div>
+                                </div>
+                                <div id="div_posts">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
+            </div>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+        </footer>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+
+    <!-- jQuery -->
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="dist/js/demo.js"></script>
+    <!-- sweetalert -->
+    <script src="dist/js/sweetalert2.js"></script>
+    <!-- toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- lightBox -->
+    <script src="dist/js/ekko-lightbox.min.js"></script>
+    <!-- customJS -->
+    <script src="dist/js/client-profile.js"></script>
+</body>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    var dbReview;
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+        event.preventDefault();
+        $(this).ekkoLightbox();
+    });
+    if (urlParams.has('plan_id')) {
+        if (urlParams.get('plan_id') == '') {
+            window.location.href = '/client/'
+        }
+        $('#lbl_navReview').attr('href', `/client/project-review?plan_id=${urlParams.get('plan_id')}`)
+    } else {
+        window.location.href = '/client/'
+    }
+    if (urlParams.has('review_id')) {
+        if (urlParams.get('review_id') == '') {
+            window.location.href = `/client/project-review?plan_id=${urlParams.get('plan_id')}`;
+        }
+        getReviewData();
+    } else {
+        window.location.href = `/client/project-review?plan_id=${urlParams.get('plan_id')}`;
+    }
+
+    function getReviewData() {
+        $.getJSON(`/client/v1/project/${urlParams.get('plan_id')}?scope=reviews`, (result) => {
+            var data = result.data;
+            dbReview = data.data.reviews;
+            for (var i = 0; i < dbReview.length; i++) {
+                var tempReview = dbReview[i];
+                if (tempReview.review_id == urlParams.get('review_id')) {
+                    $('#lbl_description').html(tempReview.description)
+                    $('#lbl_title').html(tempReview.title)
+                    var posts = tempReview.posts
+                    if (posts) {
+                        for (var j = 0; j < posts.length; j++) {
+                            var tempPost = posts[j];
+                            if (tempPost.conversations) {
+                                var postHtml = `<div class="card card-body m-1" style='border:1px solid #999'>
+                                                <p>${tempPost.description || ''}</p>
+                                                <div class="row  form-group" id="div_doc_${j}">
+                                                ${getDocument(tempPost.documents)}
+                                                </div>
+                                                <div class='row'>
+                                                    <div class="col-md-12">
+                                                    <div class="card card-info collapsed-card">
+                                                    <div class="card-header" data-card-widget="collapse">
+                                                        <h3 class="card-title">Comments</h3>
+                                                        <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                        </button>
+                                                        </div>
+                                                    </div>
+                                                    ${getConversation(tempPost.post_key,tempPost.conversations)}
+                                                    </div>
+                                                </div>
+                                                </div> 
+                                            </div>`;
+                                $('#div_posts').append(postHtml);
+                            } else {
+                                var postHtml = `<div class="card card-body m-1" style='border:1px solid #999'>
+                                                <p>${tempPost.description || ''}</p>
+                                                <div class="row  form-group" id="div_doc_${j}">
+                                                ${getDocument(tempPost.documents)}
+                                                </div>
+                                                <div class='row'>
+                                                    <div class="col-md-12">
+                                                    <div class="card card-info collapsed-card" >
+                                                    <div class="card-header" data-card-widget="collapse">
+                                                        <h3 class="card-title">Comments</h3>
+                                                        <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                        </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class='row form-group'>
+                                                            <div class='col-md-1'>
+                                                                <label>Comment</label>
+                                                            </div>
+                                                            <div class='col-md-4'>
+                                                                <input type='text' id='txt_comment_${j}' class='form-control' placeholder='Description'>
+                                                            </div>
+                                                        </div>
+                                                        <div class='row form-group'>
+                                                            <div class='col-md-1'>
+                                                                <label>Status</label>
+                                                            </div>
+                                                            <div class='col-md-2'>
+                                                                <select type='text' id='list_status_${j}' class='form-control' placeholder=''>
+                                                                    <option value='' hidden>Select Status</option>
+                                                                    <option value='APPROVED'>APPROVED</option>
+                                                                    <option value='REJECTED'>REJECTED</option>
+                                                                    <option value='COMMENT'>COMMENT</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class='row'>
+                                                            <div class='col-md-12'>
+                                                                <button class='btn btn-info float-right' id='btn_add_${j}' onclick = addComment(${j},'${tempPost.post_key}')><i class='fas fa-plus'></i> Add</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                                </div> 
+                                            </div>`;
+                                $('#div_posts').append(postHtml);
+                            }
+                        }
+                    }
+                }
+            }
+        }).fail(error => {
+            window.location.href = `/client/project-review?plan_id=${urlParams.get('plan_id')}`;
+        });
+    }
+
+    function getDocument(document) {
+        if (document || '') {
+            var docHtml = '';
+            for (var j = 0; j < document.length; j++) {
+                tempDoc = document[j];
+                docHtml += `<div class="col-md-2">
+                                <div class='img_container' href='/client/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                                    <img src="/client/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' class="image" style="height: 150px; width: 100%">
+                                    <div class="middle">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                </div>
+                            </div>`;
+            }
+            return (docHtml)
+        } else {
+            return ' ';
+        }
+    }
+
+    function getConversation(post_id, conversation) {
+        for (var i = 0; i < conversation.length; i++) {
+            tempConversation = conversation[i];
+            var chatHtml = `<div class="card-body">
+                                <div class='row form-group'>
+                                    <div class='col-md-1'>
+                                        <label>Comment</label>
+                                    </div>
+                                    <div class='col-md-4'>
+                                        <input type='text' id='txt_comment_${tempConversation.conversation_key}' value='${tempConversation.description}' class='form-control' placeholder='Description' disabled>
+                                    </div>
+                                </div>
+                                <div class='row form-group'>
+                                    <div class='col-md-1'>
+                                        <label>Status</label>
+                                    </div>
+                                    <div class='col-md-2'>
+                                        <input type='text' id='txt_status_${tempConversation.conversation_key}' value='${tempConversation.status}' class='form-control' disabled>
+                                        <select type='text' id='list_status_${tempConversation.conversation_key}' class='form-control' style='display:none;'>
+                                            <option value='' hidden>Select Status</option>
+                                            <option value='APPROVED'>APPROVED</option>
+                                            <option value='REJECTED'>REJECTED</option>
+                                            <option value='COMMENT'>COMMENT</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class='row'>
+                                    <div class='col-md-12'>
+                                        <button class='btn btn-default bg-olive float-right' id='btn_edit_${tempConversation.conversation_key}' onclick = editComment('${post_id}','${tempConversation.conversation_key}')><i class='fas fa-pencil-alt'></i> Change</button>
+                                        <button class='btn btn-primary float-right' id='btn_update_${tempConversation.conversation_key}' onclick = updateComment('${post_id}','${tempConversation.conversation_key}') style="display:none;""><i class='fas fa-pencil-alt'></i> Change</button>
+                                    </div>
+                                </div>
+                            </div>`;
+            return chatHtml;
+
+        }
+    }
+
+    function addComment(index, post_id) {
+        var description = String($('#txt_comment_' + index).val()).trim();
+        var status = String($('#list_status_' + index).val());
+        if (!status) {
+            return $(document).Toasts('create', {
+                title: 'Status Required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please select Status',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            type: 'POST',
+            url: '/client/v1/project/review/action',
+            data: {
+                "review_id": urlParams.get('review_id'),
+                "post_key": post_id,
+                "status": status,
+                "project_id": urlParams.get('plan_id'),
+                "description": description,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Status added Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_posts').empty();
+                getReviewData();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_add_' + index).attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add_' + index).removeAttr('disabled')
+            }
+        });
+    }
+
+    function editComment(post_id, conversation_id) {
+        $('#btn_edit_' + conversation_id).hide();
+        $('#btn_update_' + conversation_id).show();
+        $('#txt_status_' + conversation_id).hide();
+        $('#list_status_' + conversation_id).val($('#txt_status_' + conversation_id).val())
+        $('#list_status_' + conversation_id).show();
+        $('#txt_comment_' + conversation_id).removeAttr('disabled')
+    }
+
+    function updateComment(post_id, conversation_id) {
+        var description = String($('#txt_comment_' + conversation_id).val()).trim();
+        var status = String($('#list_status_' + conversation_id).val());
+        $.post({
+            type: 'POST',
+            url: '/client/v1/project/review/action/edit',
+            data: {
+                "review_id": urlParams.get('review_id'),
+                "post_key": post_id,
+                "conversation_key": conversation_id,
+                "status": status,
+                "project_id": urlParams.get('plan_id'),
+                "description": description,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Success',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Status Updated Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_posts').empty();
+                getReviewData();
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_update_' + conversation_id).attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update_' + conversation_id).removeAttr('disabled')
+            }
+        });
+    }
+</script>
+
+</html>
+
+</html>
