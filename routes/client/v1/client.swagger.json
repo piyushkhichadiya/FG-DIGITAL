@@ -173,7 +173,7 @@
                         "properties": {
                             "review_id": { "type": "integer" },
                             "post_key": { "type": "string" },
-                            "status": { "type": "string", "description": "Valid Status: APPROVED | REJECTED | COMMENT" },
+                            "status": { "type": "string", "description": "Valid Status: ACCEPTED | REJECTED | COMMENT" },
                             "project_id": { "type": "integer" },
                             "description": { "type": "string" }
                         },
@@ -202,7 +202,7 @@
                             "review_id": { "type": "integer" },
                             "post_key": { "type": "string" },
                             "conversation_key": { "type": "string" },
-                            "status": { "type": "string", "description": "Valid Status: APPROVED | REJECTED | COMMENT" },
+                            "status": { "type": "string", "description": "Valid Status: ACCEPTED | REJECTED | COMMENT" },
                             "project_id": { "type": "integer" },
                             "description": { "type": "string" }
                         },
