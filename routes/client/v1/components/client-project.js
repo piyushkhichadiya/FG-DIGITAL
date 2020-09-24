@@ -508,8 +508,8 @@ clientProjectAPI.post('/review/action', (req, res) => {
         return response(res, 404, 'notFound', 'Incorrect Project ID', undefined, 'C-3.3.5')
     }
 
-    if (status != "APPROVED" && status != "REJECTED" && status != "COMMENT") {
-        return response(res, 400, 'invalid', 'Status value is not proper', undefined, 'C-3.3.6')
+    if (status != "ACCEPTED" && status != "REJECTED" && status != "COMMENT") {
+        return response(res, 400, 'invalid', 'Invalid Status', { valid_status: ['ACCEPTED', 'REJECTED', 'COMMENT'] }, 'C-3.3.6')
 
     }
     if (!dbAdminSnapshot.clients[getKeys.client_key].plans[getKeys.plan_key].review) {
@@ -616,7 +616,7 @@ clientProjectAPI.post('/review/action/edit', (req, res) => {
                     if (req.body.status && ['ACCEPTED', 'REJECTED', 'COMMENT'].includes(String(req.body.status).trim().toUpperCase())) {
                         tempConversation.status = String(req.body.status).trim().toUpperCase()
                     } else if (req.body.status) {
-                        return response(res, 400, 'invalid', 'Status is required. It should be APPROVED/REJECTED/COMMENT', undefined, 'C-3.4.8')
+                        return response(res, 400, 'invalid', 'Invalid Status', { valid_status: ['ACCEPTED', 'REJECTED', 'COMMENT'] }, 'C-3.4.8')
                     }
 
                     if (req.body.description) {

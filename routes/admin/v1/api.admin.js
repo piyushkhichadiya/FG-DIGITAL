@@ -33,6 +33,17 @@ adminAPI.use('/project', require('./components/client-project'));
 // 7. SERVICES
 adminAPI.use('/service', require('./components/services'));
 
+// VERSION INFORMATION
+adminAPI.use('/version', (req, res) => {
+    return response(res, 200, 'success', undefined, {
+        current_version: "1.0",
+        previous_version: "1.0",
+        info: {
+            "P.Q": "Major.Minor/Patches"
+        }
+    }, 'A-VERSION_INFO')
+})
+
 // 400 UNKNOWN APIs
 adminAPI.use('*', (req, res) => {
     return response(res, 400, 'unknownApi', 'The API that the request is calling is not recognized.', undefined, 'A-API');
