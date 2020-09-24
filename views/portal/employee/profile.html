@@ -118,17 +118,17 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="email" class="form-control col-md-8" id="txt_email" placeholder="Email" disabled>
+                                    <p id="lbl_email"></p>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Mobile</label>
-                                    <input type="text" class="form-control col-md-8" id="txt_mobile" placeholder="Mobile no." disabled>
+                                    <p id="lbl_mobile"></p>
                                 </div>
                                 <div class="form-group">
                                     <label>Position</label>
-                                    <input type="email" class="form-control col-md-8" id="txt_position" placeholder="Position" disabled>
+                                    <p id="lbl_position"></p>
                                 </div>
                             </div>
                         </div>
@@ -137,9 +137,11 @@
                                 <button class="btn btn-outline-primary float-right" id="btn_updateProfile"><i class="fas fa-pencil-alt"></i> Update Profile</button>
                             </div>
                         </div>
-                        <hr>
-                        <h4 class="header-text">Social Accounts</h4>
-                        <div id="div_social">
+                        <div id="div_SocialAccount">
+                            <hr>
+                            <h4 class="header-text">Social Accounts</h4>
+                            <div id="div_social">
+                            </div>
                         </div>
                         <hr>
                         <h4 class="header-text">Update Password</h4>
@@ -148,7 +150,7 @@
                                 <input type="password" class="form-control" id="txt_password" placeholder="Enter New Password">
                             </div>
                             <div class="col-md-3 mt-2">
-                                <input type="password" class="form-control" id="txt_cpassword" placeholder="Confirm Password">
+                                <input type="password" class="form-control" id="txt_cPassword" placeholder="Confirm Password">
                             </div>
                             <div class="col-md-3 mt-2">
                                 <button class="btn btn-outline-primary" id="btn_update"><i class="fas fa-pencil-alt"></i> Update Password</button>
@@ -204,9 +206,9 @@
         $.get("/employee/v1/profile", (data) => {
             var dbData = data.data
             $('#txt_username').val(dbData.name)
-            $('#txt_email').val(dbData.email)
-            $('#txt_position').val(dbData.position)
-            $('#txt_mobile').val(dbData.mobile)
+            $('#lbl_email').html(dbData.email || '-')
+            $('#lbl_position').html(dbData.position || '-')
+            $('#lbl_mobile').html(dbData.mobile || '-')
             $('#img_originalProfile').attr('src', '/employee/v1/profile/file/' + dbData.profile_image).show()
             $('#img_profile').hide()
             var socialData = dbData.social_accounts
@@ -217,15 +219,17 @@
                     socialHtml += ` <div class="row">
                                         <div class="col-md-2 form-group">
                                             <label>Account</label>
-                                            <input type="text" class="form-control" value='${tempSocial.account_name}' placeholder="Account Name">
+                                            <p>${tempSocial.account_name}</p>
                                         </div>
                                         <div class="col-md-3 form-group">
                                             <label>Reference</label>
-                                            <input type="text" class="form-control" value='${tempSocial.reference}' placeholder="Reference" disabled>
+                                            <p>${tempSocial.reference}</p>
                                         </div>
                                     </div>`;
                 }
                 $('#div_social').append(socialHtml);
+            } else {
+                $('#div_SocialAccount').remove();
             }
         }).fail(error => {
             if (error.status == 404 || error.status == 401) {
@@ -326,7 +330,7 @@
 
     $('#btn_update').click(() => {
         var password = ($('#txt_password').val()).trim(),
-            confirm_password = ($('#txt_cpassword').val()).trim();
+            confirm_password = ($('#txt_cPassword').val()).trim();
         if (!password || !confirm_password) {
             return $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
@@ -362,7 +366,7 @@
                     class: 'bg-success',
                 });
                 $('#txt_password').val(null)
-                $('#txt_cpassword').val(null)
+                $('#txt_cPassword').val(null)
             },
             error: error => {
                 error = error.responseJSON

@@ -306,6 +306,8 @@
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+
+
     var dbService;
     var dbProjectService;
     $.getJSON('/admin/v1/service/get', (result) => {
@@ -339,10 +341,10 @@
         if (plan_id == '') {
             window.location.href = `/admin/client/project?client_id=${urlParams.get('client_id')}`
         }
-        getactivity(plan_id)
+        getActivity(plan_id)
     }
 
-    function getactivity(plan_id) {
+    function getActivity(plan_id) {
         $.get(`/admin/v1/project/fetch/${plan_id}?scope=%20activity`, (data) => {
             var projectData = data.data;
             activityData = projectData.activity;
@@ -540,6 +542,11 @@
                     $(`#datetimepicker_${i}`).datetimepicker({
                         format: 'Y/MM/D LT'
                     });
+                }
+
+                if (urlParams.has('scrollTo') && urlParams.get('scrollTo')) {
+                    console.log(urlParams.get('scrollTo'))
+                    window.location.href = '#' + urlParams.get('scrollTo')
                 }
             }
         }).fail(error => {
@@ -981,10 +988,11 @@
     });
 
     function redirect(index) {
-        window.location.href = `${window.location.search}#div_activity_${index}`;
+        window.location.href = `/admin/client/project-activity?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}&scrollTo=div_activity_${index}`;
     }
 
     function updateActivity(index, activity_id, oldDate) {
+
         var getDate = $('#txt_date_' + index).val(),
             description = String($('#txt_description_' + index).val()).trim(),
             title = String($('#txt_title_' + index).val()).trim();

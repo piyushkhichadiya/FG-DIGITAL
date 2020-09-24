@@ -121,12 +121,14 @@
                                             <th>Name</th>
                                             <th>Profile Image</th>
                                             <th>Position</th>
+                                            <th>Email</th>
                                             <th>Contact</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr align="center">
-                                            <td colspan="6"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td colspan="7"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
                                             <td hidden></td>
                                             <td hidden></td>
                                             <td hidden></td>
@@ -141,6 +143,7 @@
                                             <th>Name</th>
                                             <th>Profile Image</th>
                                             <th>Position</th>
+                                            <th>Email</th>
                                             <th>Contact</th>
                                         </tr>
                                     </tfoot>
@@ -197,6 +200,21 @@
 <script>
     var tblTeam = $("#tbl_team").DataTable({
         "responsive": true,
+        "columns": [{
+            "width": "7%",
+            "className": 'text-center'
+        }, {
+            "width": "10%"
+        }, {
+            "width": "20%"
+        }, {
+            "width": "15%",
+            "className": 'text-center'
+        }, {
+            "width": "15%"
+        }, {
+            "width": "20%"
+        }, null, ]
     });
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('plan_id')) {
@@ -222,9 +240,8 @@
                     } else {
                         image = `<img src='images/logo-small.png' style='border-radius: 50%; height:70px;width:70px'>`
                     }
-                    var contact = `<p>${tempTeam.email || ''}(${tempTeam.mobile || ''})</p>`;
                     tblTeam.row.add([
-                        `${i+1}`, tempTeam.employee_id, tempTeam.name, image, tempTeam.position, contact
+                        `${i+1}`, tempTeam.employee_id, tempTeam.name, image, tempTeam.position, tempTeam.email, tempTeam.mobile
                     ]).draw();
                 }
             }

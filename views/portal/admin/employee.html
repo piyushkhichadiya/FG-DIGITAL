@@ -130,7 +130,7 @@
                                 <table id="tbl_emp" class="table table-bordered table-striped w-100">
                                     <thead>
                                         <tr>
-                                            <th>Sr. No.</th>
+                                            <th>No.</th>
                                             <th>ID</th>
                                             <th>Profile Image</th>
                                             <th>Name</th>
@@ -150,7 +150,7 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th>Sr. No.</th>
+                                            <th>No.</th>
                                             <th>ID</th>
                                             <th>Profile Image</th>
                                             <th>Name</th>
@@ -213,6 +213,21 @@
     var tblEmp = $("#tbl_emp").DataTable({
         "responsive": true,
         "pageLength": 25,
+        "columns": [{
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "10%",
+        }, {
+            "width": "15%",
+            "className": 'text-center'
+        }, {
+            "width": "25%",
+        }, {
+            "width": "25%",
+        }, {
+            "width": "20%",
+        }]
     });
 
     $(document).ready(() => {

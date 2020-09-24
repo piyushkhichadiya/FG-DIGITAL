@@ -215,6 +215,21 @@
 <script>
     var tblProject = $("#tbl_project").DataTable({
         "responsive": true,
+        "columns": [{
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "10%",
+        }, {
+            "width": "35%",
+        }, {
+            "width": "10%",
+        }, {
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "20%",
+        }, ]
     });
 
     const urlParams = new URLSearchParams(window.location.search);
