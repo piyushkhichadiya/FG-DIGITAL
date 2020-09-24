@@ -114,84 +114,19 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                    <div class="card-body card">
+                    <div class="card-body">
                         <div class="row">
                             <div class="col-lg-3 col-6">
                                 <!-- small card -->
-                                <div class="small-box bg-info">
-                                    <div class="inner">
-                                        <h3 id="lbl_teamLength"></h3>
-                                        <p>Team Members</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-users"></i>
-                                    </div>
-                                    <a href="/admin/employee" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-danger">
-                                    <div class="inner">
-                                        <h3 id="lbl_expProject"></h3>
-                                        <p>Expired Projects</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-copy"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-warning">
-                                    <div class="inner">
-                                        <h3 id="lbl_project"></h3>
-                                        <p>Running Projects</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-purple">
-                                    <div class="inner">
-                                        <h3 id="lbl_review"></h3>
-                                        <p>Pending Reviews</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-search"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-olive">
-                                    <div class="inner">
-                                        <h3 id="lbl_service"></h3>
-                                        <p>Total Service</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-cogs"></i>
-                                    </div>
-                                    <a href="/admin/services/" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-navy">
+                                <div class="small-box bg-lightblue">
                                     <div class="inner">
                                         <h3 id="lbl_plans"></h3>
-                                        <p>Total Plans</p>
+                                        <p>Total Clients</p>
                                     </div>
                                     <div class="icon">
                                         <i class="fas fa-tasks"></i>
                                     </div>
-                                    <a href="/admin/plan/" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
+                                    <a href="/admin/client" class="small-box-footer">Click here <i class="fas fa-arrow-circle-right"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -241,71 +176,9 @@
 
 </body>
 <script>
-    $.getJSON('/admin/v1/employee/get', (data) => {
-        var dbEmp = data.data;
-        $('#lbl_teamLength').html(dbEmp.length)
-    }).fail(error => {
-        error = error.responseJSON
-        $(document).Toasts('create', {
-            title: 'Error #' + error.code,
-            autohide: true,
-            delay: 5000,
-            body: error.message,
-            class: 'bg-danger',
-        });
-    });
-
-    $.getJSON('/admin/v1/service/get', (data) => {
-        var dbService = data.data;
-        $('#lbl_service').html(dbService.length)
-    }).fail(error => {
-        error = error.responseJSON
-        $(document).Toasts('create', {
-            title: 'Error #' + error.code,
-            autohide: true,
-            delay: 5000,
-            body: error.message,
-            class: 'bg-danger',
-        });
-    });
-
-    $.getJSON('/admin/v1/plan/get', (data) => {
-        var dbPlan = data.data;
-        $('#lbl_plans').html(dbPlan.length)
-    }).fail(error => {
-        error = error.responseJSON
-        $(document).Toasts('create', {
-            title: 'Error #' + error.code,
-            autohide: true,
-            delay: 5000,
-            body: error.message,
-            class: 'bg-danger',
-        });
-    });
-
     $.getJSON('/admin/v1/client/get', (data) => {
-        var dbClient = data.data,
-            ExpCount = 0,
-            RunCount = 0;
-        if (dbClient) {
-            for (var i = 0; i < dbClient.length; i++) {
-                tempClient = dbClient[i];
-                if (tempClient.plans) {
-                    var plans = tempClient.plans
-                    for (var j = 0; j < plans.length; j++) {
-                        tempPlan = plans[j];
-                        if (tempPlan.status == "expired") {
-                            ExpCount++;
-                        }
-                        if (tempPlan.status == "running") {
-                            RunCount++;
-                        }
-                    }
-                }
-            }
-            $('#lbl_expProject').html(ExpCount);
-            $('#lbl_project').html(RunCount);
-        }
+        var dbClient = data.data;
+        $('#lbl_plans').html(dbClient.length)
     }).fail(error => {
         error = error.responseJSON
         $(document).Toasts('create', {

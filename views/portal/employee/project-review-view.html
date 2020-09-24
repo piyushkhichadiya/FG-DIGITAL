@@ -76,7 +76,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="/employee" class="brand-link">
+            <a href="/employee/projects" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -96,11 +96,11 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard</p>
                             </a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a href="/employee/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i>
                                 <p>Plans</p>
@@ -144,6 +144,7 @@
                     <div class="card-body card">
                         <div class="row form-group">
                             <div class="col-md-12">
+                                <a style="font-size: 13px; color: #999; display: none;" id="lbl_reviewClose"></a>
                                 <p class="float-right ml-2" style="font-size: 13px; color: #999;"><span id="lbl_ReviewDate"></span></p>&nbsp;
                                 <a class="float-right" style="font-size: 13px; color: #999;" id="link_ReviewCreate"></a>
                             </div>
@@ -151,12 +152,14 @@
                                 <label class="col-md-12 col-form-label">Review Title</label>
                                 <div class="col-md-12">
                                     <input type="text" class="form-control" id="txt_title" placeholder="Title">
+                                    <p id="lbl_title"></p>
                                 </div>
                             </div>
                             <div class="col-md-5">
-                                <label class="col-md-12 col-form-label">Description</label>
+                                <label class="col-md-12 col-form-label" id="lbl_description_label">Description</label>
                                 <div class="col-md-12">
                                     <textarea class="form-control" id="txt_description" rows="2" placeholder="Description ..."></textarea>
+                                    <p id="lbl_description"></p>
                                 </div>
                             </div>
                             <div class="col-md-4 mt-2">
@@ -304,8 +307,19 @@
                             $('#txt_post').remove();
                             $('#div_closeMessage').show();
                             $('#div_closeButton').show();
-                            $('#txt_title').attr('disabled', true)
-                            $('#txt_description').attr('disabled', true)
+                            $('#txt_title').remove();
+                            $('#txt_description').remove();
+                            $('#lbl_title').html(tempReview.title)
+                            if (!tempReview.description) {
+                                $('#lbl_description_label').remove();
+                            }
+                            $('#lbl_description').html(tempReview.description)
+                            $('#lbl_reviewClose').show();
+                            if (tempReview.lastModifiedBy == 'EMPLOYEE') {
+                                $('#lbl_reviewClose').html('Closed By : ' + tempReview.lastModifiedBy + `(${tempReview.lastModifiedById})`);
+                            } else {
+                                $('#lbl_reviewClose').html('Closed By : ' + tempReview.lastModifiedBy);
+                            }
                         }
                         getPost(urlParams.get('review_id'))
                     }
@@ -321,34 +335,76 @@
             for (var k = 0; k < dbReview.length; k++) {
                 var tempReview = dbReview[k];
                 if (tempReview.review_id == review_id) {
-                    if (tempReview.closed == true) {
-                        var postData = tempReview.post
-                        if (postData) {
-                            for (var i = 0; i < postData.length; i++) {
-                                var tempPost = postData[i];
-                                var getDate = new Date(tempPost.createdOn),
-                                    d = ('0' + getDate.getDate()).slice(-2),
-                                    m = ('0' + (getDate.getMonth() + 1)).slice(-2),
-                                    y = getDate.getFullYear(),
-                                    hr = getDate.getHours(),
-                                    minutes = ('0' + getDate.getMinutes()).slice(-2);
+                    var postData = tempReview.post
+                    if (postData) {
+                        for (var i = 0; i < postData.length; i++) {
+                            var tempPost = postData[i];
+                            var getDate = new Date(tempPost.createdOn),
+                                d = ('0' + getDate.getDate()).slice(-2),
+                                m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                                y = getDate.getFullYear(),
+                                hr = getDate.getHours(),
+                                minutes = ('0' + getDate.getMinutes()).slice(-2);
 
-                                if (hr > 12) {
-                                    time = 'PM';
-                                    hr = hr - 12;
-                                } else {
-                                    time = 'AM'
-                                }
-
-                                var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
-                                var postHtml = `<div style="border: 1px solid #999; padding:15px; border-radius:5px;">
+                            if (hr > 12) {
+                                time = 'PM';
+                                hr = hr - 12;
+                            } else {
+                                time = 'AM'
+                            }
+                            var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
+                            if (tempReview.closed == true) {
+                                if (tempPost.conversations) {
+                                    var postHtml = `<div style="border: 1px solid #999; padding:15px; border-radius:5px;">
                                                     <div class="col-md-12">
                                                         <p class="float-right ml-2" style="font-size: 13px;color: #999; ">Date: <span id="lbl_ReviewDate_${i}"></span></p>&nbsp;
                                                         <a class="float-right" style="font-size: 13px;color: #999;" id="link_ReviewCreate_${i}"></a>
                                                     </div>
                                                 <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
                                                 <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
-                                                <div class="row" id="div_doc_${i}">
+                                                <div class="row form-group" id="div_doc_${i}">
+                                                    ${getDocument(i , tempPost.documents,tempReview.closed)}
+                                                    <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                                                    <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                        <div class="plus">
+                                                            <ion-icon name="add-circle-outline"></ion-icon>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-9" >
+                                                            <div class="card card-lightblue collapsed-card">
+                                                                <div class="card-header" data-card-widget="collapse">
+                                                                    <h3 class="card-title">Client Review</h3>
+                                                                    <div class="card-tools">
+                                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                                    </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    ${getConversation(tempPost.post_key,tempPost.conversations)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        </div><div class='col-md-6'>
+                                                        <button class="btn btn-outline-danger float-right m-1" id="btn_removePost_${i}" onclick=removePost(${i},'${tempPost.post_key}')><i class="fas fa-trash-alt"></i> Remove Post</button>
+                                                        <button class="btn btn-outline-primary float-right m-1" id="btn_edit_${i}" onclick=editPost(${i},'${tempPost.post_key}')><i class="fas fa-pencil-alt"></i> Edit Post</button>
+                                                        <button class="btn btn-outline-info float-right m-1" id="btn_update_${i}" onclick=updatePost(${i},'${tempPost.post_key}') style="display:none;"><i class="fas fa-check"></i> Save Changes</button>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <hr>`;
+                                    $('#div_posts').append(postHtml);
+                                } else {
+                                    var postHtml = `<div style="border: 1px solid #999; padding:15px; border-radius:5px;">
+                                                    <div class="col-md-12">
+                                                        <p class="float-right ml-2" style="font-size: 13px;color: #999; ">Date: <span id="lbl_ReviewDate_${i}"></span></p>&nbsp;
+                                                        <a class="float-right" style="font-size: 13px;color: #999;" id="link_ReviewCreate_${i}"></a>
+                                                    </div>
+                                                <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
+                                                <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
+                                                <div class="row form-group" id="div_doc_${i}">
                                                     ${getDocument(i , tempPost.documents,tempReview.closed)}
                                                     <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
                                                     <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
@@ -366,7 +422,8 @@
                                                 </div>
                                                 </div>
                                                 <hr>`;
-                                $('#div_posts').append(postHtml);
+                                    $('#div_posts').append(postHtml);
+                                }
                                 $(`#btn_removePost_${i}`).remove();
                                 $(`#btn_edit_${i}`).remove();
                                 $(`#btn_update_${tempPost.post_key}`).remove();
@@ -376,29 +433,52 @@
                                 } else {
                                     $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy)
                                 }
-                            }
-                        }
-                    } else {
-                        var postData = tempReview.post
-                        if (postData) {
-                            for (var i = 0; i < postData.length; i++) {
-                                var tempPost = postData[i];
-                                var getDate = new Date(tempPost.createdOn),
-                                    d = ('0' + getDate.getDate()).slice(-2),
-                                    m = ('0' + (getDate.getMonth() + 1)).slice(-2),
-                                    y = getDate.getFullYear(),
-                                    hr = getDate.getHours(),
-                                    minutes = ('0' + getDate.getMinutes()).slice(-2);
 
-                                if (hr > 12) {
-                                    time = 'PM';
-                                    hr = hr - 12;
+                            } else {
+                                if (tempPost.conversations) {
+                                    var postHtml = `<div style="border: 1px solid #999; padding:15px; border-radius:5px;">
+                                                    <div class="col-md-12">
+                                                        <p class="float-right ml-2" style="font-size: 13px; color: #999;">Date: <span id="lbl_ReviewDate_${i}"></span></p>&nbsp;
+                                                        <a class="float-right" style="font-size: 13px;color: #999;" id="link_ReviewCreate_${i}"></a>
+                                                    </div>
+                                                <label id="lbl_post_${i}">${getDescription(tempPost.description)}</label>
+                                                <textarea class="form-control mb-2" id="txt_post_${i}" rows="2" placeholder="" style="display: none;"></textarea>
+                                                <div class="row" id="div_doc_${i}">
+                                                    ${getDocument(i , tempPost.documents,tempReview.closed)}
+                                                    <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempPost.post_key}') accept=".png, .jpg, .jpeg," style="display: none;" multiple>
+                                                    <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="display:none; height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
+                                                        <div class="plus">
+                                                            <ion-icon name="add-circle-outline"></ion-icon>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-9" >
+                                                            <div class="card card-lightblue collapsed-card">
+                                                                <div class="card-header" data-card-widget="collapse">
+                                                                    <h3 class="card-title">Client Review</h3>
+                                                                    <div class="card-tools">
+                                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                                    </button>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    ${getConversation(tempPost.post_key,tempPost.conversations)}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        </div><div class='col-md-6'>
+                                                        <button class="btn btn-outline-danger float-right m-1" id="btn_removePost_${i}" onclick=removePost(${i},'${tempPost.post_key}')><i class="fas fa-trash-alt"></i> Remove Post</button>
+                                                        <button class="btn btn-outline-primary float-right m-1" id="btn_edit_${i}" onclick=editPost(${i},'${tempPost.post_key}')><i class="fas fa-pencil-alt"></i> Edit Post</button>
+                                                        <button class="btn btn-outline-info float-right m-1" id="btn_update_${i}" onclick=updatePost(${i},'${tempPost.post_key}') style="display:none;"><i class="fas fa-check"></i> Save Changes</button>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                                <hr>`;
+                                    $('#div_posts').append(postHtml);
                                 } else {
-                                    time = 'AM'
-                                }
-
-                                var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
-                                var postHtml = `<div style="border: 1px solid #999; padding:15px; border-radius:5px;">
+                                    var postHtml = `<div style="border: 1px solid #999; padding:15px; border-radius:5px;">
                                                     <div class="col-md-12">
                                                         <p class="float-right ml-2" style="font-size: 13px; color: #999;">Date: <span id="lbl_ReviewDate_${i}"></span></p>&nbsp;
                                                         <a class="float-right" style="font-size: 13px;color: #999;" id="link_ReviewCreate_${i}"></a>
@@ -423,7 +503,8 @@
                                                 </div>
                                                 </div>
                                                 <hr>`;
-                                $('#div_posts').append(postHtml);
+                                    $('#div_posts').append(postHtml);
+                                }
                                 $(`#lbl_ReviewDate_${i}`).html(oldDate)
                                 if (tempPost.createdBy == 'EMPLOYEE') {
                                     $(`#link_ReviewCreate_${i}`).html('Created By : ' + tempPost.createdBy + `(${tempPost.createdById})`)
@@ -436,6 +517,30 @@
                     }
                 }
             }
+        }
+    }
+
+    function getConversation(post_id, conversation) {
+        for (var i = 0; i < conversation.length; i++) {
+            var tempConversation = conversation[i];
+            console.log(tempConversation)
+            var commentHtml = `<div class='row'>
+                                    <div class='col-md-3'>
+                                        <label>Comment : </label>
+                                    </div>
+                                    <div class='col-md-9'>
+                                        <p>${tempConversation.description ||''}</p>
+                                    </div>
+                                </div>
+                                <div class='row'>
+                                    <div class='col-md-3'>
+                                        <label>Status : </label>
+                                    </div>
+                                    <div class='col-md-9'>
+                                        <p>${tempConversation.status}</p>
+                                    </div>
+                                </div>`;
+            return commentHtml;
         }
     }
 

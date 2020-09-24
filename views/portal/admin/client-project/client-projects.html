@@ -215,9 +215,28 @@
 <script>
     var tblProject = $("#tbl_project").DataTable({
         "responsive": true,
+        "columns": [{
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "10%",
+        }, {
+            "width": "35%",
+        }, {
+            "width": "10%",
+        }, {
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "20%",
+        }, ]
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+    var dbClient;
+    $.getJSON(`/admin/v1/project/get?client_id=${urlParams.get('client_id')}`, (result) => {
+        dbClient = result.data
+    });
 
     $(document).ready(() => {
 
@@ -261,9 +280,16 @@
                     if (status == 'expired') {
                         status = `<p style='color:#dc3545; font-size:17px;'><i class='fas fa-calendar-times'></i> Expired</p>`
                     }
-                    tblProject.row.add([
-                        `${i+1}`, tempProject.project_id, tempProject.plan, y + "/" + m + "/" + d, status, button
-                    ]).draw();
+                    if (dbClient) {
+                        for (var j = 0; j < dbClient.length; j++) {
+                            tempClient = dbClient[j]
+                            if (tempProject.project_id == tempClient.project_id) {
+                                tblProject.row.add([
+                                    `${i+1}`, tempProject.project_id, tempClient.project_name || '', y + "/" + m + "/" + d, status, button
+                                ]).draw();
+                            }
+                        }
+                    }
                 }
             }
         }).fail(error => {

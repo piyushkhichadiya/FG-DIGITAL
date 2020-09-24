@@ -48,7 +48,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="/employee" class="brand-link">
+            <a href="/employee/projects" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -70,9 +70,9 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a href="/employee/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Projects</p></a>
                         </li>
@@ -112,17 +112,16 @@
                 <div class="container-fluid">
                     <div class="card-body card">
                         <div class="row form-group">
-                            <div class="col-md-12">
-                                <h4 class="header-title">Project</h4>
-                            </div>
                             <div class="col-md-2">
-                                <label class="">Project Name :</label>
-                                <p id='lbl_name'></p>
+                                <label>Project Information :</label>
                             </div>
-                            <div class="col-md-6">
-                                <label class="">Project description :</label>
+                            <div class="col-md-5">
+                                <p id='lbl_name'></p>
                                 <p id='lbl_description'></p>
                             </div>
+                        </div>
+                        <h4 class="header-title">Project Management</h4>
+                        <div class="row form-group">
                             <div class="col-md-12">
                                 <!-- <button class="btn btn-outline-primary m-1" onclick='window.location.href = `/employee/project-client?plan_id=${plan_id}`'><i class="fas fa-users"></i> Clients</button> -->
                                 <button class="btn btn-outline-primary m-1" id="btn_clients"><i class="fas fa-users"></i> Clients</button>
@@ -241,7 +240,7 @@
     $('#btn_clients').click(() => {
         $('#modal_Social').modal('show')
         if (dbClient) {
-            $('#lbl_clientId').html(dbClient.client_key)
+            $('#lbl_clientId').html(dbClient.client_id)
             $('#lbl_ClientName').html(dbClient.name)
         }
     });

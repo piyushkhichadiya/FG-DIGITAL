@@ -294,16 +294,17 @@
     var tblTeam = $("#tbl_Team").DataTable({
         "responsive": true,
         "columns": [{
-                "width": "5%"
+                "width": "7%"
             }, {
-                "width": "10%"
+                "width": "15%",
+                "className": 'text-center'
             },
             null, {
-                "width": "15%"
+                "width": "20%",
+                "className": 'text-center'
             }, {
-                "width": "30%"
+                "width": "25%"
             }
-
         ]
     });
 
@@ -363,7 +364,7 @@
                         }
                     }
                     if (active == true) {
-                        var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-hourglass-start'></i> Active</p>`
+                        var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-circle'></i> Active</p>`
                     } else {
                         status = `<p style='color:#ff0000; font-size:17px;'><i class='fas fa-ban'></i> Deactivated</p>`
                     }

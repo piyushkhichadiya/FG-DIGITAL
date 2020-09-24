@@ -44,7 +44,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="/employee" class="brand-link">
+            <a href="/employee/projects" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -67,9 +67,9 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
-                        </li>
+                        </li> -->
                         <li class="nav-item">
                             <a href="/employee/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Projects</p></a>
                         </li>
@@ -113,18 +113,34 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">Username</label>
-                                    <input type="text" class="form-control" id="txt_username" placeholder="Enter Username">
+                                    <label>Name</label>
+                                    <input type="text" class="form-control col-md-8" id="txt_username" placeholder="Enter Username">
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputEmail1">Email</label>
-                                    <input type="email" class="form-control" id="txt_email" placeholder="" disabled>
+                                    <label>Email</label>
+                                    <p id="lbl_email"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Mobile</label>
+                                    <p id="lbl_mobile"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Position</label>
+                                    <p id="lbl_position"></p>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <button class="btn btn-outline-primary float-right" id="btn_updateProfile"><i class="fas fa-pencil-alt"></i> Update Profile</button>
+                            </div>
+                        </div>
+                        <div id="div_SocialAccount">
+                            <hr>
+                            <h4 class="header-text">Social Accounts</h4>
+                            <div id="div_social">
                             </div>
                         </div>
                         <hr>
@@ -134,7 +150,7 @@
                                 <input type="password" class="form-control" id="txt_password" placeholder="Enter New Password">
                             </div>
                             <div class="col-md-3 mt-2">
-                                <input type="password" class="form-control" id="txt_cpassword" placeholder="Confirm Password">
+                                <input type="password" class="form-control" id="txt_cPassword" placeholder="Confirm Password">
                             </div>
                             <div class="col-md-3 mt-2">
                                 <button class="btn btn-outline-primary" id="btn_update"><i class="fas fa-pencil-alt"></i> Update Password</button>
@@ -188,11 +204,33 @@
 
     function getProfile() {
         $.get("/employee/v1/profile", (data) => {
-            var dbdata = data.data
-            $('#txt_username').val(dbdata.name)
-            $('#txt_email').val(dbdata.email)
-            $('#img_originalProfile').attr('src', '/employee/v1/profile/file/' + dbdata.profile_image).show()
+            var dbData = data.data
+            $('#txt_username').val(dbData.name)
+            $('#lbl_email').html(dbData.email || '-')
+            $('#lbl_position').html(dbData.position || '-')
+            $('#lbl_mobile').html(dbData.mobile || '-')
+            $('#img_originalProfile').attr('src', '/employee/v1/profile/file/' + dbData.profile_image).show()
             $('#img_profile').hide()
+            var socialData = dbData.social_accounts
+            var socialHtml = ' ';
+            if (socialData) {
+                for (var i = 0; i < socialData.length; i++) {
+                    tempSocial = socialData[i]
+                    socialHtml += ` <div class="row">
+                                        <div class="col-md-2 form-group">
+                                            <label>Account</label>
+                                            <p>${tempSocial.account_name}</p>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Reference</label>
+                                            <p>${tempSocial.reference}</p>
+                                        </div>
+                                    </div>`;
+                }
+                $('#div_social').append(socialHtml);
+            } else {
+                $('#div_SocialAccount').remove();
+            }
         }).fail(error => {
             if (error.status == 404 || error.status == 401) {
                 logout(true)
@@ -292,7 +330,7 @@
 
     $('#btn_update').click(() => {
         var password = ($('#txt_password').val()).trim(),
-            confirm_password = ($('#txt_cpassword').val()).trim();
+            confirm_password = ($('#txt_cPassword').val()).trim();
         if (!password || !confirm_password) {
             return $(document).Toasts('create', {
                 title: 'Password and Confirm password required',
@@ -328,7 +366,7 @@
                     class: 'bg-success',
                 });
                 $('#txt_password').val(null)
-                $('#txt_cpassword').val(null)
+                $('#txt_cPassword').val(null)
             },
             error: error => {
                 error = error.responseJSON

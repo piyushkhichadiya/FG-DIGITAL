@@ -249,6 +249,17 @@
 <script>
     var tblService = $("#tbl_Service").DataTable({
         "responsive": true,
+        "columns": [{
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "30%",
+        }, {
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "20%",
+        }, ]
     });
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -294,7 +305,7 @@
                                     </div>`,
                         active = tempService.active;
                     if (active == true) {
-                        var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-hourglass-start'></i> Active</p>`
+                        var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-circle'></i> Active</p>`
                     } else {
                         status = `<p style='color:#ff0000; font-size:17px;'><i class='fas fa-ban'></i> Deactivated</p>`
                     }

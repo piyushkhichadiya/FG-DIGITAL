@@ -15,7 +15,7 @@ $.get('/employee/v1/profile', (data) => {
 if (urlParam.has('plan_id')) {
     $.getJSON(`/employee/v1/project/fetch?project_id=${urlParam.get('plan_id')}&scope=info%20`, (result) => {
         var projectData = result.data.project;
-        $('#link_navProjects').html(projectData.name + ` (${projectData.project_id})`);
+        $('#link_navProjects').html(projectData.name || '' + ` (${projectData.project_id})`);
         $('#link_navProjects').attr('href', `/employee/project-dashboard/?plan_id=${urlParam.get('plan_id')}`);
     }).fail(error => {
         window.location.href = '/employee/projects'
