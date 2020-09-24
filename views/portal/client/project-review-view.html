@@ -144,6 +144,9 @@
                         <div class="col-md-12">
                             <div class="card card-widget">
                                 <div class="card-header">
+                                    <div class="col-md-12">
+                                        <p class="float-right text-success" id="lbl_closed" style='display:none;'>This Review is closed <i class='fas fa-check'></i></p>
+                                    </div>
                                     <div class="user-block">
                                         <h5 id="lbl_title"></h5>
                                         <span id="lbl_description"></span>
@@ -236,6 +239,9 @@
             for (var i = 0; i < dbReview.length; i++) {
                 var tempReview = dbReview[i];
                 if (tempReview.review_id == urlParams.get('review_id')) {
+                    if (tempReview.closed == true) {
+                        $('#lbl_closed').show();
+                    }
                     $('#lbl_description').html(tempReview.description)
                     $('#lbl_title').html(tempReview.title)
                     var posts = tempReview.posts
@@ -258,14 +264,23 @@
                                                         </button>
                                                         </div>
                                                     </div>
-                                                    ${getConversation(tempPost.post_key,tempPost.conversations)}
+                                                    ${getConversation(tempPost.post_key,tempPost.conversations,tempReview.closed)}
                                                     </div>
                                                 </div>
                                                 </div> 
                                             </div>`;
                                 $('#div_posts').append(postHtml);
                             } else {
-                                var postHtml = `<div class="card card-body m-1" style='border:1px solid #999'>
+                                if (tempReview.closed == true) {
+                                    var postHtml = `<div class="card card-body m-1" style='border:1px solid #999'>
+                                                        <p>${tempPost.description || ''}</p>
+                                                        <div class="row  form-group" id="div_doc_${j}">
+                                                            ${getDocument(tempPost.documents)}
+                                                        </div>
+                                                    </div>`;
+                                    $('#div_posts').append(postHtml);
+                                } else {
+                                    var postHtml = `<div class="card card-body m-1" style='border:1px solid #999'>
                                                 <p>${tempPost.description || ''}</p>
                                                 <div class="row  form-group" id="div_doc_${j}">
                                                 ${getDocument(tempPost.documents)}
@@ -296,7 +311,7 @@
                                                             <div class='col-md-2'>
                                                                 <select type='text' id='list_status_${j}' class='form-control' placeholder=''>
                                                                     <option value='' hidden>Select Status</option>
-                                                                    <option value='APPROVED'>APPROVED</option>
+                                                                    <option value='ACCEPTED'>ACCEPTED</option>
                                                                     <option value='REJECTED'>REJECTED</option>
                                                                     <option value='COMMENT'>COMMENT</option>
                                                                 </select>
@@ -312,7 +327,8 @@
                                                 </div>
                                                 </div> 
                                             </div>`;
-                                $('#div_posts').append(postHtml);
+                                    $('#div_posts').append(postHtml);
+                                }
                             }
                         }
                     }
@@ -343,16 +359,37 @@
         }
     }
 
-    function getConversation(post_id, conversation) {
+    function getConversation(post_id, conversation, closed) {
         for (var i = 0; i < conversation.length; i++) {
             tempConversation = conversation[i];
-            var chatHtml = `<div class="card-body">
+            if (closed == true) {
+                chatHtml = `<div class="card-body">
+                                <div class='row form-group'>
+                                    <div class='col-md-1'>
+                                        <label>Comment : </label>
+                                    </div>
+                                    <div class='col-md-4'>
+                                        <p>${tempConversation.description || ''}</p>
+                                    </div>
+                                </div>
+                                <div class='row form-group'>
+                                    <div class='col-md-1'>
+                                        <label>Status : </label>
+                                    </div>
+                                    <div class='col-md-2'>
+                                        <p>${tempConversation.status}</p>
+                                    </div>
+                                </div>
+                            </div>`;
+                return chatHtml;
+            } else {
+                chatHtml = `<div class="card-body">
                                 <div class='row form-group'>
                                     <div class='col-md-1'>
                                         <label>Comment</label>
                                     </div>
                                     <div class='col-md-4'>
-                                        <input type='text' id='txt_comment_${tempConversation.conversation_key}' value='${tempConversation.description}' class='form-control' placeholder='Description' disabled>
+                                        <input type='text' id='txt_comment_${tempConversation.conversation_key}' value='${tempConversation.description || ''}' class='form-control' placeholder='Description' disabled>
                                     </div>
                                 </div>
                                 <div class='row form-group'>
@@ -363,7 +400,7 @@
                                         <input type='text' id='txt_status_${tempConversation.conversation_key}' value='${tempConversation.status}' class='form-control' disabled>
                                         <select type='text' id='list_status_${tempConversation.conversation_key}' class='form-control' style='display:none;'>
                                             <option value='' hidden>Select Status</option>
-                                            <option value='APPROVED'>APPROVED</option>
+                                            <option value='ACCEPTED'>ACCEPTED</option>
                                             <option value='REJECTED'>REJECTED</option>
                                             <option value='COMMENT'>COMMENT</option>
                                         </select>
@@ -376,8 +413,8 @@
                                     </div>
                                 </div>
                             </div>`;
-            return chatHtml;
-
+                return chatHtml;
+            }
         }
     }
 

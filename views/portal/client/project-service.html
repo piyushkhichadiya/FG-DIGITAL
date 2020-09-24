@@ -155,23 +155,7 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    var color = {
-        "bg": [{
-            "code": "primary"
-        }, {
-            "code": "olive"
-        }, {
-            "code": "indigo"
-        }, {
-            "code": "info"
-        }, {
-            "code": "maroon"
-        }, {
-            "code": "lightblue"
-        }, {
-            "code": "navy"
-        }]
-    }
+
     if (urlParams.has('plan_id')) {
         if (urlParams.get('plan_id') == '') {
             window.location.href = '/client/'
@@ -190,7 +174,7 @@
                 for (var i = 0; i < dbService.length; i++) {
                     var tempService = dbService[i];
                     serviceHtml += `<div class="col-md-3">
-                                        <div class="card card-${getColor(i)}">
+                                        <div class="card card-${getColor()}">
                                             <div class="card-header">
                                                 <h3 class="card-title">${tempService.service_name}</h3>
                                             </div>
@@ -225,17 +209,9 @@
         return list;
     }
 
-    function getColor(index) {
-        var code = color.bg;
-        if (index > code.length) {
-            index = index - code.length;
-        }
-        for (var i = 0; i < code.length; i++) {
-            tempColor = code[i];
-            if (index == i) {
-                return tempColor.code
-            }
-        }
+    function getColor() {
+        var color = ["lightblue", "olive", "maroon"]
+        return color[Math.floor(Math.random() * (color.length - 0) + 0)];
     }
 </script>
 

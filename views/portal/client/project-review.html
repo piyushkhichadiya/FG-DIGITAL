@@ -118,13 +118,15 @@
                                             <th>Review ID</th>
                                             <th>Review Title</th>
                                             <th>Description</th>
+                                            <th>Create Date</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr align="center">
-                                            <td colspan="6"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td colspan="7"><img src="images/loader.gif" style="width: 40px;"></td>
+                                            <td hidden></td>
                                             <td hidden></td>
                                             <td hidden></td>
                                             <td hidden></td>
@@ -138,6 +140,7 @@
                                             <th>Review ID</th>
                                             <th>Review Title</th>
                                             <th>Description</th>
+                                            <th>Create Date</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -193,6 +196,21 @@
 <script>
     var tblReview = $("#tbl_review").DataTable({
         "responsive": true,
+        "columns": [{
+                "width": "5%"
+            }, {
+                "width": "10%"
+            }, {
+                "width": "20%"
+            },
+            null, {
+                "width": "10%"
+            }, {
+                "width": "10%"
+            }, {
+                "width": "10%"
+            },
+        ]
     });
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -221,8 +239,13 @@
                     } else {
                         status = `<p style='color:#007bff; font-size:17px;'><i class='fas fa-stopwatch'></i> Pending</p>`
                     }
+                    var getDate = new Date(tempReview.createdOn),
+                        d = ('0' + getDate.getDate()).slice(-2),
+                        m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                        y = getDate.getFullYear();
+                    var date = y + '/' + m + '/' + d
                     tblReview.row.add([
-                        `${i+1}`, tempReview.review_id, tempReview.title, tempReview.description, status, button
+                        `${i+1}`, tempReview.review_id, tempReview.title, tempReview.description, date, status, button
                     ]).draw();
                 }
 

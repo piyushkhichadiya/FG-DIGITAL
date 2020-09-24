@@ -156,23 +156,7 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    var color = {
-        "bg": [{
-            "code": "primary"
-        }, {
-            "code": "olive"
-        }, {
-            "code": "indigo"
-        }, {
-            "code": "info"
-        }, {
-            "code": "maroon"
-        }, {
-            "code": "lightblue"
-        }, {
-            "code": "navy"
-        }]
-    }
+
     if (urlParams.has('plan_id')) {
         if (urlParams.get('plan_id') == '') {
             window.location.href = '/client/'
@@ -192,7 +176,7 @@
                     tempTeam = dbTeam[i];
                     EmpHtml += `<div class="col-md-3">
                                 <div class="card card-widget widget-user">
-                                    <div class="widget-user-header bg-${getColor(i)}">
+                                    <div class="widget-user-header bg-${getColor()}">
                                         <h3 class="widget-user-username">${tempTeam.name}</h3>
                                         <h5 class="widget-user-desc">${tempTeam.position || ''}</h5>
                                     </div>
@@ -226,17 +210,9 @@
         });
     }
 
-    function getColor(index) {
-        var code = color.bg
-        if (index > code.length) {
-            index = index - code.length;
-        }
-        for (var i = 0; i < code.length; i++) {
-            tempColor = code[i];
-            if (index == i) {
-                return tempColor.code
-            }
-        }
+    function getColor() {
+        var color = ["lightblue", "olive", "maroon"]
+        return color[Math.floor(Math.random() * (color.length - 0) + 0)];
     }
 </script>
 

@@ -197,7 +197,8 @@
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    var plan_id = urlParams.get('plan_id')
+    var plan_id = urlParams.get('plan_id');
+    // var dbTeam;
     $(document).on('click', '[data-toggle="lightbox"]', function(event) {
         event.preventDefault();
         $(this).ekkoLightbox();
@@ -211,11 +212,27 @@
         window.location.href = '/client/'
     }
 
+    // $.getJSON(`/client/v1/project/${urlParams.get('plan_id')}?scope=team`, (result) => {
+    //     var data = result.data;
+    //     dbTeam = data.data.team;
+    // }).fail(error => {
+    //     error = error.responseJSON
+    //     $(document).Toasts('create', {
+    //         title: 'Error!',
+    //         autohide: true,
+    //         delay: 5000,
+    //         body: 'Team Data Not Found',
+    //         class: 'bg-danger',
+    //     });
+    // });
+
     function getActivity() {
         $.get(`/client/v1/project/${urlParams.get('plan_id')}?scope=activity`, (data) => {
             var projectData = data.data;
             activityData = projectData.data.activity;
             if (activityData) {
+                // paginate(activityData, 5, 1)
+                // console.log(paginate(activityData, 5, 1))
                 for (var i = activityData.length - 1; i >= 0; i--) {
                     var tempActivity = activityData[i];
                     var getDate = new Date(tempActivity.date || tempActivity.createdOn),
@@ -233,7 +250,7 @@
                     }
                     var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
                     if (tempActivity.type == 'SERVICE') {
-                        var serviceHtml = `<div class="card card-widget">
+                        var serviceHtml = `<div class="card card-widget collapsed-card">
                                                 <div class="card-header bg-lightblue" data-card-widget="collapse">
                                                     <div class="user-block">
                                                         <img class="img-circle" src="images/settings.png" alt="User Image">
@@ -241,11 +258,21 @@
                                                         <span class="description" style='color:#FFF' id='lbl_headerDate_${i}'>Created By : ADMIN &nbsp; Date : 2020/09/16 03:24 PM</span>
                                                     </div>
                                                     <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
                                                     </button>
                                                     </div>
                                                 </div>
                                                 <div class="card-body">
+                                                    <div class="row form-group" id='div_title_${i}' style='display:none;'>
+                                                        <div class="col-md-12">
+                                                            <p id='lbl_title_${i}'></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-12" id='div_description_${i}' style='display:none;'>
+                                                            <p id='lbl_description_${i}'></p>
+                                                        </div>
+                                                    </div>
                                                     <div class="row form-group">
                                                         <div class="col-md-5">
                                                             <label><i class="fas fa-cogs"></i> Service</label>
@@ -261,16 +288,6 @@
                                                             ${getCriteria(i,tempActivity.criteria,tempActivity.service_id)}
                                                         </div>
                                                     </div>
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <label>Title : &nbsp;<span style='font-weight:500;'>${tempActivity.title||''}</span></label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row form-group">
-                                                        <div class="col-md-12">
-                                                            <label>Description : &nbsp;<span style='font-weight:500;'>${tempActivity.description||''}</span></label>
-                                                        </div>
-                                                    </div>
                                                     <div class="card card-body m-1" id="div_doc_${i}"  style='border:1px solid #999'>
                                                         <div class="row">
                                                             ${getDocument(tempActivity.documents, tempActivity.activity_key)}
@@ -279,12 +296,9 @@
                                                 </div>
                                             </div>`;
                         $('#div_activity').append(serviceHtml);
-                        if (!tempActivity.documents) {
-                            $(`#div_doc_${i}`).remove();
-                        }
                     }
                     if (tempActivity.type == 'ACTIVITY') {
-                        var activityHtml = `<div class="card card-widget">
+                        var activityHtml = `<div class="card card-widget collapsed-card">
                                                 <div class="card-header bg-purple" data-card-widget="collapse">
                                                     <div class="user-block">
                                                         <img class="img-circle" src="images/line-graph.png" alt="User Image">
@@ -292,24 +306,24 @@
                                                         <span class="description" style='color:#FFF' id='lbl_headerDate_${i}'>Created By : ADMIN &nbsp; Date : 2020/09/16 03:24 PM</span>
                                                     </div>
                                                     <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
                                                     </button>
                                                     </div>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row form-group">
-                                                        <div class="col-md-5">
-                                                            <label><i class="fas fa-chart-line"></i> Activity</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
                                                         <div class="col-md-12">
-                                                            <label>Title : &nbsp;<span style='font-weight:500;'>${tempActivity.title||''}</span></label>
+                                                            <p id='lbl_title_${i}'></p>
                                                         </div>
                                                     </div>
                                                     <div class="row form-group">
-                                                        <div class="col-md-12">
-                                                            <label>Description : &nbsp;<span style='font-weight:500;'>${tempActivity.description ||''}</span></label>
+                                                        <div class="col-md-12" id='div_description_${i}' style='display:none;'>
+                                                            <p id='lbl_description_${i}'></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-md-5">
+                                                            <label><i class="fas fa-chart-line"></i> Activity</label>
                                                         </div>
                                                     </div>
                                                     <div class="card card-body m-1" id="div_doc_${i}">
@@ -320,21 +334,24 @@
                                                 </div>
                                             </div> `;
                         $('#div_activity').append(activityHtml);
-                        if (!tempActivity.documents) {
-                            $(`#div_doc_${i}`).remove()
-                        }
-                        $(`#txt_description_${i}`).val(tempActivity.description)
+
                     }
                     if (tempActivity.createdBy == 'EMPLOYEE') {
                         $(`#lbl_headerDate_${i}`).html('Created By : ' + tempActivity.createdBy + `(${tempActivity.createdById})` + '&nbsp; ' + `Date : ` + oldDate)
                     } else {
                         $(`#lbl_headerDate_${i}`).html('Created By : ' + tempActivity.createdBy + '&nbsp; ' + `Date : ` + oldDate)
                     }
-                    $(`#txt_description_${i}`).val(tempActivity.description)
-
-                    $(`#datetimepicker_${i}`).datetimepicker({
-                        format: 'Y/MM/D LT'
-                    });
+                    if (tempActivity.description) {
+                        $(`#div_description_${i}`).show();
+                        $(`#lbl_description_${i}`).html('<b>Description : </b>&nbsp;' + tempActivity.description)
+                    }
+                    if (tempActivity.title) {
+                        $(`#div_title_${i}`).show();
+                        $(`#lbl_title_${i}`).html('<b>Name :</b> &nbsp;' + tempActivity.title)
+                    }
+                    if (!tempActivity.documents) {
+                        $(`#div_doc_${i}`).remove();
+                    }
                 }
             }
         }).fail(error => {
@@ -349,17 +366,25 @@
         });
     }
 
+    function paginate(array, page_size, page_number) {
+        return array.slice((page_number - 1) * page_size, page_number * page_size);
+    }
+    // console.log(paginate([1, 2, 3, 4, 5, 6], 5, 1));
+
     function getCriteria(index, criteriaData, service_id) {
         if (criteriaData) {
             var criteriaHtml = '';
             for (var i = 0; i < criteriaData.length; i++) {
                 var tempCriteria = criteriaData[i];
-                criteriaHtml += `<li>${tempCriteria.criteria} : ${tempCriteria.value}</li>`;
+                criteriaHtml += `<p><i class='fas fa-check'></i>&nbsp; ${tempCriteria.criteria} : ${tempCriteria.value}</p>`;
             }
             return criteriaHtml
         }
     }
 
+    // function getEmpName(employee_id) {
+    //     console.log(employee_id, dbTeam);
+    // }
 
     function getDocument(document, activity_id) {
         if (document) {
