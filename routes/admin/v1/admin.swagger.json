@@ -11,6 +11,9 @@
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "tags": [{
+            "name": "Global",
+            "description": "Some APIs may require authentication"
+        }, {
             "name": "1. User Account",
             "description": "APIs for user related functionality before get authenticated"
         }, {
@@ -37,6 +40,13 @@
         }
     ],
     "paths": {
+        "/version": {
+            "get": {
+                "tags": ["Global"],
+                "summary": "Get Version Information of API",
+                "responses": {}
+            }
+        },
         "/user/create": {
             "post": {
                 "tags": ["1. User Account"],
