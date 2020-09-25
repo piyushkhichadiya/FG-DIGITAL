@@ -14,10 +14,10 @@ var express = require('express'),
 //--------------------------- CONFIGURATION ---------------------------
 
 // Set Static Assets
-app.use(express.static('public'))
+app.use(express.static('public/static'))
 
 // Set Fav Icon for APIs & UI
-app.use(favicon(path.join(__dirname, 'public/static/images/logo-small.png')))
+app.use(favicon(path.join(__dirname, 'public/static/assets/img/white-logo.png')))
 
 // Syntax Error Handling [ex. JSON]
 app.use(bodyParser.json(), bodyParser.urlencoded({ extended: false }), (error, req, res, next) => {
@@ -138,7 +138,6 @@ app.use('/employee/v1', require('./routes/employee/v1/api.employee'))
 app.use('/client/v1', require('./routes/client/v1/api.client'))
 
 // Views
-app.use('/', require('./routes/static.view'))
 app.use('/admin', require('./routes/admin/view.route'))
 app.use('/employee', require('./routes/employee/view.route.js'))
 app.use('/client', require('./routes/client/view.route.js'))
