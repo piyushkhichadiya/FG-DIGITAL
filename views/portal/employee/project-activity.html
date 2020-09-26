@@ -24,6 +24,10 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="dist/css/ekko-lightbox.css">
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
         .middle {
             transition: .5s ease;
             opacity: 0;
@@ -520,10 +524,10 @@
                                     if (!addedServiceCriteria[service_id].includes(tempCriteria.criteria_id)) {
                                         unCapturedHtml += `<div class="col-md-4" id="div_getJson_${index}_${t}">
                                                     <div class="form-group row">
-                                                            <input id="txt_getCriteria_${index}_${t}_${t+1}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                                            <input id="txt_getCriteria_${index}_${s}_${t}" value="${tempCriteria.criteria_id}" style="display:none;">
                                                         <label id="lbl_getCriteria_${index}_${s}_${t}" class="col-md-6 ml-3">${tempCriteria.criteria} : </label>
                                                         <div class="col-md-4">
-                                                            <input type="text" id="txt_getValue_${index}_${t}_${t+1}" class="form-control" placeholder="Value">
+                                                            <input type="text" id="txt_getValue_${index}_${s}_${t}" class="form-control" placeholder="Value">
                                                         </div>
                                                     </div>
                                                 </div>`;

@@ -24,6 +24,10 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="dist/css/ekko-lightbox.css">
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
         .middle {
             transition: .5s ease;
             opacity: 0;
@@ -558,10 +562,10 @@
                                     if (!addedServiceCriteria[service_id].includes(tempCriteria.criteria_id)) {
                                         unCapturedHtml += `<div class="col-md-4" id="div_getJson_${index}_${t}">
                                                     <div class="form-group row">
-                                                            <input id="txt_getCriteria_${index}_${t+1}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                                            <input id="txt_getCriteria_${index}_${t}" value="${tempCriteria.criteria_id}" style="display:none;">
                                                         <label id="lbl_getCriteria_${index}_${s}_${t}" class="col-md-6 ml-3">${tempCriteria.criteria} : </label>
                                                         <div class="col-md-4">
-                                                            <input type="text" id="txt_getValue_${index}_${t+1}" class="form-control" placeholder="Value">
+                                                            <input type="text" id="txt_getValue_${index}_${t}" class="form-control" placeholder="Value">
                                                         </div>
                                                     </div>
                                                 </div>`;
@@ -934,6 +938,7 @@
                 }
                 criteriaString = JSON.stringify(criteria);
                 formData.append('criteria', criteriaString)
+
             } else {
                 return $(document).Toasts('create', {
                     title: 'Service Required',
@@ -1034,33 +1039,30 @@
         var criteria = {};
         var divJson = $(`[id^=div_getJson_${index}]`);
         if ($('#txt_type_' + index).val() == 'SERVICE') {
-            for (var i = 0; i < divJson.length + 1; i++) {
-                criteria[i] = {
+            for (var i = 0; i < divJson.length; i++) {
+                if ($(`#txt_getValue_${index}_${i}`).val() != '') {
+                    criteria[i] = {
                         criteria_id: Number($(`#txt_getCriteria_${index}_${i}`).val()),
-                        value: String($(`#txt_getValue_${index}_${i}`).val()),
+                        value: String($(`#txt_getValue_${index}_${i}`).val())
                     }
-                    // if (isNaN(criteria[i].value)) {
-                    //     return $(document).Toasts('create', {
-                    //         title: 'Please Enter valid Input',
-                    //         autohide: true,
-                    //         delay: 5000,
-                    //         body: 'Value must be numbers',
-                    //         class: 'bg-danger',
-                    //     });
-                    // }
-                    // if ((criteria[i].value) <= 0) {
-                    //     return $(document).Toasts('create', {
-                    //         title: 'Error!',
-                    //         autohide: true,
-                    //         delay: 5000,
-                    //         body: 'Value must be Greater than 0',
-                    //         class: 'bg-danger',
-                    //     });
-                    // }
+                    if (isNaN(criteria[i].value)) {
+                        return $(document).Toasts('create', {
+                            title: 'Please Enter valid Input',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Value must be numbers',
+                            class: 'bg-danger',
+                        });
+                    }
+                }
             }
-            return console.log(criteria)
             formData.append('criteria', JSON.stringify(criteria))
+
         }
+        for (var pair of formData.entries()) {
+            console.log(pair[1]);
+        }
+        return
         if (getDate) {
             var d = new Date(oldDate),
                 month = '' + (d.getMonth() + 1),
