@@ -43,7 +43,7 @@ servicesAPI.get(['/', '/get'], (req, res) => {
         if (req.query.service_id) {
             return response(res, 404, 'notFound', 'Incorrect Service ID', undefined, 'A-7.2.1')
         }
-        return response(res, 200, 'success', undefined, [], undefined, 'A-7.2.2');
+        return response(res, 200, 'success', undefined, undefined, 'A-7.2.2');
     }
 
     var dbServices = dbAdminSnapshot.services,
