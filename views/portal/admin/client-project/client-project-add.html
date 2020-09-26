@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Add Project - FG Digital</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="dist/css/ionicons.min.css">
+    <link rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <!-- Tempusdominus Bbootstrap 4 -->
+    <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <style>
+
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini sidebar-collapse">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-success elevation-4">
+            <!-- Brand Logo -->
+            <a href="/admin" class="brand-link">
+                <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FG Digital</span>
+            </a>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                    </div>
+                    <div class="info">
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
+                    </div>
+                </div>
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+                        <li class="nav-item">
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                                <p>Plans</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                                <p>Client</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                                <p>Team</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                                <p>Services</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+            <a class="brand-link"></a>
+            <a href="https://fitnesswithgomzi.com/admin" target="_blank" class="brand-link">
+                <img src="images/fwg.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FWG</span>
+            </a>
+        </aside>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 id="lbl_project">Add Project</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item">
+                                    <a id="lbl_navClient" href=""></a>
+                                </li>
+                                <li class="breadcrumb-item" id="list_navPlan" style="display: none;">
+                                    <a id="lbl_navProjectId" href=""> </a>
+                                </li>
+                                <li class="breadcrumb-item active" id="lbl_navProject">Add Project</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="card-body card">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Plan Name:</label>
+                                    <select class="form-control" id="list_planName">
+                                    </select>
+                                    <input type="text" id="txt_planName" class="form-control" placeholder="Amount" style="display:none;">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label>Amount:</label>
+                                    <input type="text" id="txt_amount" class="form-control" placeholder="Amount">
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <label>Days:</label>
+                                    <input type="text" id="txt_days" class="form-control" placeholder="Day">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label>Start Date:</label>
+                            <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input col-md-3" id="txt_startDate" data-target="#reservationdate" placeholder="YYYY/MM/DD" />
+                                <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-md-12">
+                                <button class="btn btn-outline-primary float-right" id="btn_add"><i class="fas fa-plus"></i> Add Project</button>
+                                <button class="btn btn-outline-danger float-right ml-2" id="btn_remove" style="display: none;"><i class="fas fa-trash-alt"></i> Remove</button>
+                                <button class="btn btn-outline-primary float-right" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card body -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
+            </div>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
+        </footer>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+    <!-- jQuery -->
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- InputMask -->
+    <script src="plugins/moment/moment.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="dist/js/demo.js"></script>
+    <!-- sweetalert -->
+    <script src="dist/js/sweetalert2.js"></script>
+    <!-- toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- custom JS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
+</body>
+<script>
+    $('#reservationdate').datetimepicker({
+        format: 'Y/MM/D'
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    var planData
+    $(document).ready(() => {
+        var plan_id = urlParams.get('plan_id'),
+            client_id = urlParams.get('client_id');
+        if (urlParams.has('plan_id')) {
+            if (urlParams.get('plan_id') == '') {
+                return window.location.href = `/admin/client/project-add?client_id=${urlParams.get('client_id')}`
+            }
+            $('#div_projectInfo').show();
+            $('#btn_add').hide();
+            $('#btn_update').show();
+            $('#btn_remove').show();
+            $('#lbl_navProject').html('View Project')
+            $('#lbl_project').html('View Project')
+            $('#list_navPlan').show();
+            $.get(`/admin/v1/project/fetch/${plan_id}?scope=info`, (data) => {
+                var name = data.data.info.project_name
+                $('#lbl_navProjectId').html(`${name || ''} (${plan_id})`);
+                $('#lbl_navProjectId').attr('href', `/admin/client/project-dashboard?client_id=${client_id}&plan_id=${plan_id}`);
+            }).fail(error => {
+                window.location.href = `/admin/client/project?client_id=${client_id}`
+            });
+        }
+
+        $.get(`/admin/v1/plan/get`, (data) => {
+            planData = data.data;
+            var options = '<option value="">Select Plan</option>'
+            $(planData).each(function(index, value) {
+                options += '<option value="' + value.plan_name + '">' + value.plan_name + '</option>';
+            });
+            $('#list_planName').html(options);
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+
+        $.get(`/admin/v1/client/get?client_id=${urlParams.get('client_id')}`, (data) => {
+            var data = data.data;
+            var name = data.name;
+            $('#lbl_navClient').html(name)
+            $('#lbl_navClient').attr('href', `/admin/client`)
+            if (data.plans) {
+                var planData = data.plans;
+                for (var i = 0; i < planData.length; i++) {
+                    var tempPlan = planData[i]
+                    if (urlParams.get('plan_id') == tempPlan.project_id) {
+                        var plan = tempPlan.plan,
+                            price = tempPlan.price,
+                            start_date = tempPlan.start_date,
+                            days = tempPlan.duration;
+                    }
+                }
+                var start_date = new Date(start_date),
+                    d = start_date.getDate(),
+                    m = start_date.getMonth() + 1,
+                    y = start_date.getFullYear();
+                if (urlParams.has('plan_id')) {
+                    $('#list_planName').remove();
+                    $('#txt_planName').show();
+                    $('#txt_planName').val(plan);
+                    $('#txt_planName').attr('disabled', true);
+                }
+                $('#txt_amount').val(price);
+                $('#txt_days').val(days);
+                if (isNaN(start_date)) {
+                    $('#txt_startDate').val('');
+                } else {
+                    $('#txt_startDate').val(y + "/" + m + "/" + d);
+                }
+
+            };
+
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+    });
+
+    $("#list_planName").change(function() {
+        var planName = $(this).val();
+        var amount, days;
+        for (var i = 0; i < planData.length; i++) {
+            var tempPlan = planData[i];
+            if (tempPlan.plan_name == planName) {
+                $('#txt_amount').val(tempPlan.price);
+                $('#txt_days').val(tempPlan.days);
+                return
+            }
+        }
+
+    });
+
+    $('#btn_add').click(() => {
+        var plan = $('#list_planName').val(),
+            clientId = urlParams.get('client_id'),
+            day = $('#txt_days').val(),
+            amount = $('#txt_amount').val(),
+            startDate = $('#txt_startDate').val();
+        var day = day.trim(),
+            amount = amount.trim(),
+            startDate = startDate.trim();
+        if (!plan) {
+            return $(document).Toasts('create', {
+                title: 'Plan required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Select Plan',
+                class: 'bg-danger',
+            });
+        }
+        if (!amount || isNaN(amount)) {
+            return $(document).Toasts('create', {
+                title: 'Amount required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please enter valid plan amount',
+                class: 'bg-danger',
+            });
+        }
+        if (amount <= 0) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Amount must be greater than 0',
+                class: 'bg-danger',
+            });
+        }
+        if (!day || isNaN(day)) {
+            return $(document).Toasts('create', {
+                title: 'Days required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please enter valid days',
+                class: 'bg-danger',
+            });
+        }
+        if (day <= 0) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Days must be greater than 0',
+                class: 'bg-danger',
+            });
+        }
+        if (!startDate) {
+            return $(document).Toasts('create', {
+                title: 'Duration required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Project start date',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            url: '/admin/v1/client/plan/add',
+            data: {
+                "client_id": clientId,
+                "plan": plan,
+                "start_date": startDate,
+                "duration": day,
+                "price": amount,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Client added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Client Added Successfully',
+                    class: 'bg-success',
+                });
+                var project_id = result.data
+                window.location.href = `/admin/client/project-add?client_id=${clientId}&plan_id=${project_id.project_id}`
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
+            }
+        });
+    });
+
+    $('#btn_update').click(() => {
+        var clientId = urlParams.get('client_id'),
+            project_id = urlParams.get('plan_id'),
+            name = $('#txt_planName').val(),
+            day = $('#txt_days').val(),
+            amount = $('#txt_amount').val(),
+            startDate = $('#txt_startDate').val();
+        var day = day.trim(),
+            amount = amount.trim(),
+            startDate = startDate.trim();
+        if (amount) {
+            if (!isNaN(amount)) {
+                if (amount <= 0) {
+                    return $(document).Toasts('create', {
+                        title: 'Error!',
+                        autohide: true,
+                        delay: 5000,
+                        body: 'Amount must be greater than 0',
+                        class: 'bg-danger',
+                    });
+                }
+            }
+        }
+        if (day) {
+            if (!isNaN(day)) {
+                if (!isNaN(day)) {
+                    if (day <= 0) {
+                        return $(document).Toasts('create', {
+                            title: 'Error!',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'days must be greater than 0',
+                            class: 'bg-danger',
+                        });
+                    }
+                }
+            }
+        }
+        if (startDate) {
+            startDate;
+        }
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/client/plan/update',
+            data: {
+                "client_id": clientId,
+                "project_id": project_id,
+                "plan": name,
+                "start_date": startDate,
+                "duration": day,
+                "price": amount,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Plan Details Updated',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
+            }
+        });
+    });
+    $('#btn_remove').click(() => {
+        var clientId = urlParams.get('client_id'),
+            project_id = urlParams.get('plan_id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this Project",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.post({
+                    type: 'POST',
+                    url: '/admin/v1/client/plan/remove',
+                    data: {
+                        "client_id": clientId,
+                        "project_id": project_id,
+                    },
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Removed',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Plan Details Removed Successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.href = `/admin/client/project?client_id=${clientId}`
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
+                    }
+                });
+            }
+        })
+    });
+</script>
+
+</html>

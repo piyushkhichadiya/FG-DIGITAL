@@ -1,1 +1,4 @@
 node_modules/*
+config/secrets.js
+package-lock.json
+.vscode

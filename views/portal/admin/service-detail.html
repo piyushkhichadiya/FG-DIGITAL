@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Service Details - FG Digital</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="dist/css/ionicons.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <style>
+
+    </style>
+</head>
+
+<body class="hold-transition sidebar-mini sidebar-collapse">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-success elevation-4">
+            <!-- Brand Logo -->
+            <a href="/admin" class="brand-link">
+                <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FG Digital</span>
+            </a>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+                    </div>
+                    <div class="info">
+                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
+                    </div>
+                </div>
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+                        <li class="nav-item">
+                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i>
+                                <p>Plans</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i>
+                                <p>Client</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i>
+                                <p>Team</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i>
+                                <p>Services</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+            <a class="brand-link"></a>
+            <a href="https://fitnesswithgomzi.com/admin" target="_blank" class="brand-link">
+                <img src="images/fwg.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FWG</span>
+            </a>
+        </aside>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 id="lbl_title">Create Service</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+                                <li class="breadcrumb-item active"><a href="/admin/services">Services</a></li>
+                                <li class="breadcrumb-item active" id="lbl_navTitle">Create</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="card-body card">
+                        <div class="row form-group">
+                            <div class="col-md-6">
+                                <input type="text" class="col-md-8 form-control" id="txt_service" placeholder="Service Name">
+                            </div>
+                            <div class="col-md-6">
+                                <button class="btn btn-outline-primary float-right ml-1" id="btn_update" style="display: none;"><i class="fas fa-pencil-alt"></i> Update</button>
+                                <button class="btn btn-outline-primary float-right" id="btn_create"> <i class="fas fa-plus"></i> Create</button>
+                            </div>
+                        </div>
+                        <div id="div_Criteria" style="display: none;">
+                            <h4 class="header-title">Criteria</h4>
+                            <div id="div_criteriaAdd"></div>
+                            <div class="row form-group">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="txt_Criteria" placeholder="">
+                                </div>
+                                <div class="col-md-8 form-group">
+                                    <button class="btn btn-outline-primary" id="btn_add"><i class="fas fa-plus"></i> Add</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="div_Remove" style="display: none;">
+                            <div class="col-md-12">
+                                <button class="btn btn-outline-danger float-right" id="btn_remove"><i class="fas fa-trash-alt"></i> Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card body -->
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
+            </div>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
+        </footer>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+    <!-- jQuery -->
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/adminlte.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="dist/js/demo.js"></script>
+    <!-- sweetalert -->
+    <script src="dist/js/sweetalert2.js"></script>
+    <!-- toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- customJS -->
+    <script src="dist/js/logout.js"></script>
+    <script src="dist/js/profile.js"></script>
+</body>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    $(document).ready(() => {
+        if (urlParams.has('service_id')) {
+            if (urlParams.get('service_id') == '') {
+                return window.location.href = '/admin/services'
+            }
+            getService(urlParams.get('service_id'))
+            $('#btn_create').hide();
+            $('#btn_update').show();
+            $('#div_Remove').show();
+            $('#div_Criteria').show();
+            $('#lbl_navTitle').html('Details');
+            $('#lbl_title').html('Service Details');
+        }
+    });
+
+    function getService(service_id) {
+        $.get(`/admin/v1/service/get?service_id=${service_id}`, (data) => {
+            var dataService = data.data
+            $('#txt_service').val(dataService.title)
+
+            if (dataService.criteria) {
+                var criteriaData = dataService.criteria
+                for (var i = 0; i < criteriaData.length; i++) {
+                    var temp_criteria = criteriaData[i]
+                    var serviceHTML = `<div class="row form-group">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="txt_Criteria_${i}" placeholder="">
+                                </div>
+                                <div class="col-md-8 form-group">
+                                    <button class="btn btn-outline-info" id="btn_UpdateCriteria_${i}" onclick=updateCriteria(${i},'${temp_criteria.criteria_id}')><i class="fas fa-pencil-alt"></i> Update</button>
+                                    <button class="btn btn-outline-danger" id="btn_removeCriteria_${i}" onclick=removeCriteria(${i},'${temp_criteria.criteria_id}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                </div>
+                            </div>`;
+                    $('#div_criteriaAdd').append(serviceHTML);
+                    $(`#txt_Criteria_${i}`).val(temp_criteria.criteria)
+                }
+            }
+        }).fail(error => {
+            error = error.responseJSON
+            if (error.status == 404) {
+                window.location.href = '/admin/services'
+            } else {
+                $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Service Not Found',
+                    class: 'bg-danger',
+                });
+            }
+        });
+    }
+
+    $('#btn_create').click(() => {
+        var name = $('#txt_service').val();
+        var name = name.trim();
+        if (!name) {
+            return $(document).Toasts('create', {
+                title: 'Service Name required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Service name',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            url: '/admin/v1/service/create',
+            data: {
+                "title": name,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Service Created',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Service created Successfully',
+                    class: 'bg-success',
+                });
+                var serviceId = result.data
+                window.location.href = `/admin/service/create?service_id=${serviceId.service_id}`;
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_create').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_create').removeAttr('disabled')
+            }
+        });
+
+    });
+
+    $('#btn_update').click(() => {
+        var service_id = urlParams.get('service_id'),
+            name = $('#txt_service').val();
+        var name = name.trim();
+        if (!name) {
+            return $(document).Toasts('create', {
+                title: 'Service Name required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Service name',
+                class: 'bg-danger',
+            });
+        };
+        $.post({
+            type: 'POST',
+            url: '/admin/v1/service/update',
+            data: {
+                "service_id": service_id,
+                "title": name,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Service Updated',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
+            }
+        });
+    });
+
+    $('#btn_remove').click(() => {
+        var service_id = urlParams.get('service_id')
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to remove this service",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/service/remove?service_id=${service_id}`,
+                    success: function() {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Service removed successfully',
+                            class: 'bg-success',
+                        });
+                        window.location.href = '/admin/services'
+                    },
+                    error: function(error) {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $('#btn_remove').attr('disabled', true)
+                    },
+                    complete: () => {
+                        $('#btn_remove').removeAttr('disabled')
+                    }
+                });
+            }
+        })
+    });
+
+    $('#btn_add').click(() => {
+        var service_id = urlParams.get('service_id'),
+            criteria = $('#txt_Criteria').val();
+        var criteria = criteria.trim();
+        if (!criteria) {
+            return $(document).Toasts('create', {
+                title: 'Criteria required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please Enter Criteria',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            url: '/admin/v1/service/criteria/add',
+            data: {
+                "service_id": service_id,
+                "criteria": criteria
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Added',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Criteria added Successfully',
+                    class: 'bg-success',
+                });
+                $('#div_criteriaAdd').empty();
+                getService(service_id);
+                $('#txt_Criteria').val('');
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_add').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_add').removeAttr('disabled')
+            }
+        });
+    })
+
+    function updateCriteria(index, criteria_id) {
+        var service_id = urlParams.get('service_id'),
+            criteria = $(`#txt_Criteria_${index}`).val();
+        var criteria = criteria.trim();
+        if (!criteria) {
+            return $(document).Toasts('create', {
+                title: 'Criteria required',
+                autohide: true,
+                delay: 5000,
+                body: 'Enter Criteria for Update',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            url: '/admin/v1/service/criteria/update',
+            data: {
+                "service_id": service_id,
+                "criteria_id": criteria_id,
+                "criteria": criteria
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Criteria Updated Successfully',
+                    class: 'bg-success',
+                });
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $(`#btn_UpdateCriteria_${index}`).attr('disabled', true)
+            },
+            complete: () => {
+                $(`#btn_UpdateCriteria_${index}`).removeAttr('disabled')
+            }
+        });
+    }
+
+    function removeCriteria(index, criteria_id) {
+        var service_id = urlParams.get('service_id')
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You have want to remove this Crieteria",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Remove'
+        }).then((result) => {
+            if (result.value) {
+                $.get({
+                    url: `/admin/v1/service/criteria/remove?service_id=${service_id}&criteria_id=${criteria_id}`,
+                    success: result => {
+                        $(document).Toasts('create', {
+                            title: 'Success',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Criteria removed successfully',
+                            class: 'bg-success',
+                        });
+                        $('#div_criteriaAdd').empty();
+                        getService(service_id);
+                    },
+                    error: error => {
+                        error = error.responseJSON
+                        $(document).Toasts('create', {
+                            title: 'Error #' + error.code,
+                            autohide: true,
+                            delay: 5000,
+                            body: error.message,
+                            class: 'bg-danger',
+                        });
+                    },
+                    beforeSend: () => {
+                        $(`#btn_removeCriteria_${index}`).attr('disabled', true)
+                    },
+                    complete: () => {
+                        $(`#btn_removeCriteria_${index}`).removeAttr('disabled')
+                    }
+                });
+            }
+        })
+    }
+</script>
+
+</html>
