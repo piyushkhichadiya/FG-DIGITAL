@@ -15,3 +15,8 @@ $.get('/admin/v1/profile', (data) => {
 if ($.fn.dataTable && $.fn.dataTable.ext && $.fn.dataTable.ext.errMode) {
     $.fn.dataTable.ext.errMode = 'none';
 }
+
+$.get('/admin/v1/version', (data) => {
+    var data = data.data
+    $('#lbl_ui_version').html('v' + data.current_version)
+});

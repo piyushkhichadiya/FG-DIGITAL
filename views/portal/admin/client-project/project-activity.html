@@ -127,6 +127,11 @@
                 <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
+            <a class="brand-link"></a>
+            <a href="https://fitnesswithgomzi.com/admin" target="_blank" class="brand-link">
+                <img src="images/fwg.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FWG</span>
+            </a>
         </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -243,25 +248,21 @@
                         </div>
                     </div>
                 </div>
+            </section>
+            <!-- /.content -->
         </div>
-
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-    <footer class="main-footer">
-        <div class="float-right d-sm-block">
-            <p id="lbl_ui_version"> VERSION INFO </p>
-        </div>
-        <strong>Copyright &copy <script>
-                document.write(new Date().getFullYear());
-                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
-    </footer>
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
+            </div>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
+        </footer>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
@@ -390,7 +391,8 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class='row form-group' id="div_criteria_${i}">
-                                                                ${getCriteria(i, tempActivity.criteria, tempActivity.service_deleted)}
+                                                                ${getCriteria(i, tempActivity.criteria, tempActivity.service_id,tempActivity.service_deleted)}
+                                                                ${unCapturedCriteria(tempActivity.service_id, 'div_criteria_'+i,i) ||''}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -455,6 +457,7 @@
                             }
                         }
                     }
+
                     if (tempActivity.type == 'ACTIVITY') {
                         var activityHtml = `<div id="div_activity_${i}">
                                             <i class="fa fa-chart-line bg-green"></i>
@@ -544,8 +547,32 @@
                     });
                 }
 
+                function unCapturedCriteria(service_id, divID, index) {
+                    if (dbService && addedServiceCriteria[service_id]) {
+                        for (var s = 0; s < dbService.length; s++) {
+                            if (dbService[s].service_id == service_id && dbService[s].criteria) {
+                                var dbServiceCriteria = dbService[s].criteria
+                                var unCapturedHtml = '';
+                                for (var t = 0; t < dbServiceCriteria.length; t++) {
+                                    var tempCriteria = dbServiceCriteria[t];
+                                    if (!addedServiceCriteria[service_id].includes(tempCriteria.criteria_id)) {
+                                        unCapturedHtml += `<div class="col-md-4" id="div_getJson_${index}_${t}">
+                                                    <div class="form-group row">
+                                                            <input id="txt_getCriteria_${index}_${t+1}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                                        <label id="lbl_getCriteria_${index}_${s}_${t}" class="col-md-6 ml-3">${tempCriteria.criteria} : </label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" id="txt_getValue_${index}_${t+1}" class="form-control" placeholder="Value">
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+                                    }
+                                }
+                                return unCapturedHtml;
+                            }
+                        }
+                    }
+                }
                 if (urlParams.has('scrollTo') && urlParams.get('scrollTo')) {
-                    console.log(urlParams.get('scrollTo'))
                     window.location.href = '#' + urlParams.get('scrollTo')
                 }
             }
@@ -561,11 +588,16 @@
         });
     }
 
-    function getCriteria(index, criteria, serviceData) {
+    // For DB Criteria
+    var addedServiceCriteria = {};
+
+    function getCriteria(index, criteria, service_id, serviceData) {
         if (criteria) {
             var criteriaHtml = '';
+            addedServiceCriteria[service_id] = []
             for (var i = 0; i < criteria.length; i++) {
                 tempCriteria = criteria[i];
+                addedServiceCriteria[service_id].push(tempCriteria.criteria_id)
                 if (serviceData == true) {
                     criteriaHtml += `<div class="col-md-4" id="div_getJson_${index}_${i}">
                                         <div class="form-group row">
@@ -1002,30 +1034,31 @@
         var criteria = {};
         var divJson = $(`[id^=div_getJson_${index}]`);
         if ($('#txt_type_' + index).val() == 'SERVICE') {
-            for (var i = 0; i < divJson.length; i++) {
+            for (var i = 0; i < divJson.length + 1; i++) {
                 criteria[i] = {
-                    criteria_id: Number($(`#txt_getCriteria_${index}_${i}`).val()),
-                    value: String($(`#txt_getValue_${index}_${i}`).val())
-                }
-                if (isNaN(criteria[i].value)) {
-                    return $(document).Toasts('create', {
-                        title: 'Please Enter valid Input',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Value must be numbers',
-                        class: 'bg-danger',
-                    });
-                }
-                if ((criteria[i].value) <= 0) {
-                    return $(document).Toasts('create', {
-                        title: 'Error!',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Value must be Greater than 0',
-                        class: 'bg-danger',
-                    });
-                }
+                        criteria_id: Number($(`#txt_getCriteria_${index}_${i}`).val()),
+                        value: String($(`#txt_getValue_${index}_${i}`).val()),
+                    }
+                    // if (isNaN(criteria[i].value)) {
+                    //     return $(document).Toasts('create', {
+                    //         title: 'Please Enter valid Input',
+                    //         autohide: true,
+                    //         delay: 5000,
+                    //         body: 'Value must be numbers',
+                    //         class: 'bg-danger',
+                    //     });
+                    // }
+                    // if ((criteria[i].value) <= 0) {
+                    //     return $(document).Toasts('create', {
+                    //         title: 'Error!',
+                    //         autohide: true,
+                    //         delay: 5000,
+                    //         body: 'Value must be Greater than 0',
+                    //         class: 'bg-danger',
+                    //     });
+                    // }
             }
+            return console.log(criteria)
             formData.append('criteria', JSON.stringify(criteria))
         }
         if (getDate) {

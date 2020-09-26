@@ -117,15 +117,13 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Account ID</th>
                                             <th>Account Name</th>
                                             <th>Reference</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr align="center">
-                                            <td colspan="4"><img src="images/loader.gif" style="width: 40px;"></td>
-                                            <td hidden></td>
+                                            <td colspan="3"><img src="images/loader.gif" style="width: 40px;"></td>
                                             <td hidden></td>
                                             <td hidden></td>
                                         </tr>
@@ -133,7 +131,6 @@
                                     <tfoot>
                                         <tr>
                                             <th>No.</th>
-                                            <th>Account ID</th>
                                             <th>Account Name</th>
                                             <th>Reference</th>
                                         </tr>
@@ -155,7 +152,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
 
         <!-- Control Sidebar -->
@@ -192,15 +189,13 @@
     var tblAccount = $("#tbl_account").DataTable({
         "responsive": true,
         "columns": [{
-                "width": "10%",
-                "className": 'text-center'
-            }, {
-                "width": "20%"
-            }, {
-                "width": "25%"
-            },
-            null,
-        ]
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "20%"
+        }, {
+            "width": "50%"
+        }, ]
     });
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('plan_id')) {
@@ -221,7 +216,7 @@
                 for (var i = 0; i < accountData.length; i++) {
                     var tempAccount = accountData[i];
                     tblAccount.row.add([
-                        `${i+1}`, tempAccount.account_key, tempAccount.account_name, tempAccount.reference
+                        `${i+1}`, tempAccount.account_name, tempAccount.reference
                     ]).draw();
                 }
             }

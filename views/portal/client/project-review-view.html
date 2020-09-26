@@ -100,7 +100,7 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- <li class="nav-item">
-                            <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
+                            <a href="/client" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
                         </li> -->
                         <li class="nav-item">
                             <a href="/client/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Projects</p></a>
@@ -145,7 +145,10 @@
                             <div class="card card-widget">
                                 <div class="card-header">
                                     <div class="col-md-12">
-                                        <p class="float-right text-success" id="lbl_closed" style='display:none;'>This Review is closed <i class='fas fa-check'></i></p>
+                                        <a id="lbl_reviewClose" class="" style="font-size: 13px; color: #999; display: none;"></a>
+                                        <p class="float-right ml-2" style="font-size: 13px; color: #999;"><span id="lbl_ReviewDate"></span></p>&nbsp;
+                                        <a class='float-right' style="font-size: 13px; color: #999;" id="link_ReviewCreate"></a><br>
+                                        <p class="float-right text-success" id="lbl_closed" style='display:none;'>This Review is closed <i class='fas fa-check'></i> &nbsp;</p>
                                     </div>
                                     <div class="user-block">
                                         <h5 id="lbl_title"></h5>
@@ -173,7 +176,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
 
         <!-- Control Sidebar -->
@@ -241,54 +244,119 @@
                 if (tempReview.review_id == urlParams.get('review_id')) {
                     if (tempReview.closed == true) {
                         $('#lbl_closed').show();
+                        $('#lbl_reviewClose').show();
+                        if (tempReview.lastModifiedBy == 'EMPLOYEE') {
+                            $('#lbl_reviewClose').html('Closed By : ' + tempReview.lastModifiedBy + `(${tempReview.lastModifiedById})`);
+                            $('#lbl_reviewClose').attr({
+                                'href': `/client/project-team?plan_id=${urlParams.get('plan_id')}`,
+                                'target': '_blank'
+                            })
+                        } else {
+                            $('#lbl_reviewClose').html('Closed By : ' + tempReview.lastModifiedBy);
+                        }
                     }
                     $('#lbl_description').html(tempReview.description)
                     $('#lbl_title').html(tempReview.title)
+                    if (tempReview.createdBy == 'EMPLOYEE') {
+                        $('#link_ReviewCreate').html('Created By : ' + tempReview.createdBy + `(${tempReview.createdById})`);
+                        $('#link_ReviewCreate').attr({
+                            'href': `/client/project-team?plan_id=${urlParams.get('plan_id')}`,
+                            'target': '_blank'
+                        })
+                    } else {
+                        $('#link_ReviewCreate').html('Created By : ' + tempReview.createdBy);
+                    }
+                    var getDate = new Date(tempReview.createdOn),
+                        d = ('0' + getDate.getDate()).slice(-2),
+                        m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                        y = getDate.getFullYear(),
+                        hr = getDate.getHours(),
+                        minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                    if (hr > 12) {
+                        time = 'PM';
+                        hr = hr - 12;
+                    } else {
+                        time = 'AM'
+                    }
+                    var date = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
+                    $('#lbl_ReviewDate').html('Date : ' + date)
                     var posts = tempReview.posts
                     if (posts) {
                         for (var j = 0; j < posts.length; j++) {
                             var tempPost = posts[j];
+                            var getDate = new Date(tempPost.createdOn),
+                                d = ('0' + getDate.getDate()).slice(-2),
+                                m = ('0' + (getDate.getMonth() + 1)).slice(-2),
+                                y = getDate.getFullYear(),
+                                hr = getDate.getHours(),
+                                minutes = ('0' + getDate.getMinutes()).slice(-2);
+
+                            if (hr > 12) {
+                                time = 'PM';
+                                hr = hr - 12;
+                            } else {
+                                time = 'AM'
+                            }
+                            var date = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
                             if (tempPost.conversations) {
                                 var postHtml = `<div class="card card-body m-1" style='border:1px solid #999'>
-                                                <p>${tempPost.description || ''}</p>
-                                                <div class="row  form-group" id="div_doc_${j}">
-                                                ${getDocument(tempPost.documents)}
+                                                    <div class='col-md-12'>
+                                                        <p class="float-right ml-2" style="font-size: 13px; color: #999;"><span id="lbl_PostDate_${j}"></span></p>&nbsp;
+                                                        <a class='float-right' style="font-size: 13px; color: #999;" id="link_PostCreate_${j}"></a><br>
+                                                        </div>
+                                                        <div class='col-md-12'>
+                                                    <p id='lbl_icon_${j}' class='float-right'>${getIcon(tempPost.conversations)}</p>
+                                                    <p>${tempPost.description || ''}</p>
+                                                    </div>
+                                                    <div class="row  form-group" id="div_doc_${j}">
+                                                    ${getDocument(tempPost.documents)}
                                                 </div>
                                                 <div class='row'>
-                                                    <div class="col-md-12">
-                                                    <div class="card card-info collapsed-card">
-                                                    <div class="card-header" data-card-widget="collapse">
-                                                        <h3 class="card-title">Comments</h3>
-                                                        <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
-                                                        </button>
+                                                        <div class="col-md-12">
+                                                            <div class="card card-success">
+                                                                <div class="card-header" data-card-widget="collapse" style='background-color:#a8c944'>
+                                                                <h3 class="card-title">Comments</h3>
+                                                                <div class="card-tools">
+                                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        ${getConversation(j,tempPost.post_key,tempPost.conversations,tempReview.closed)}
                                                         </div>
-                                                    </div>
-                                                    ${getConversation(tempPost.post_key,tempPost.conversations,tempReview.closed)}
-                                                    </div>
                                                 </div>
                                                 </div> 
                                             </div>`;
                                 $('#div_posts').append(postHtml);
+
                             } else {
                                 if (tempReview.closed == true) {
                                     var postHtml = `<div class="card card-body m-1" style='border:1px solid #999'>
+                                                    <div class='col-md-12'>
+                                                        <p class="float-right ml-2" style="font-size: 13px; color: #999;"><span id="lbl_PostDate_${j}">abcd</span></p>&nbsp;
+                                                        <a class='float-right' style="font-size: 13px; color: #999;" id="link_PostCreate_${j}"></a><br>
                                                         <p>${tempPost.description || ''}</p>
+                                                    </div>
                                                         <div class="row  form-group" id="div_doc_${j}">
                                                             ${getDocument(tempPost.documents)}
                                                         </div>
                                                     </div>`;
                                     $('#div_posts').append(postHtml);
+
                                 } else {
                                     var postHtml = `<div class="card card-body m-1" style='border:1px solid #999'>
-                                                <p>${tempPost.description || ''}</p>
+                                                    <div class='col-md-12'>
+                                                        <p class="float-right ml-2" style="font-size: 13px; color: #999;"><span id="lbl_PostDate_${j}">abcd</span></p>&nbsp;
+                                                        <a class='float-right' style="font-size: 13px; color: #999;" id="link_PostCreate_${j}">abcd</a><br>
+                                                        <p>${tempPost.description || ''}</p>
+                                                    </div>
                                                 <div class="row  form-group" id="div_doc_${j}">
                                                 ${getDocument(tempPost.documents)}
                                                 </div>
                                                 <div class='row'>
                                                     <div class="col-md-12">
-                                                    <div class="card card-info collapsed-card" >
-                                                    <div class="card-header" data-card-widget="collapse">
+                                                    <div class="card card-success collapsed-card">
+                                                    <div class="card-header" data-card-widget="collapse" style='background-color:#a8c944'>
                                                         <h3 class="card-title">Comments</h3>
                                                         <div class="card-tools">
                                                         <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
@@ -301,7 +369,7 @@
                                                                 <label>Comment</label>
                                                             </div>
                                                             <div class='col-md-4'>
-                                                                <input type='text' id='txt_comment_${j}' class='form-control' placeholder='Description'>
+                                                                <input type='text' id='txt_comment_${j}' class='form-control' placeholder='Comment'>
                                                             </div>
                                                         </div>
                                                         <div class='row form-group'>
@@ -312,14 +380,13 @@
                                                                 <select type='text' id='list_status_${j}' class='form-control' placeholder=''>
                                                                     <option value='' hidden>Select Status</option>
                                                                     <option value='ACCEPTED'>ACCEPTED</option>
-                                                                    <option value='REJECTED'>REJECTED</option>
                                                                     <option value='COMMENT'>COMMENT</option>
                                                                 </select>
                                                             </div>
                                                         </div>
                                                         <div class='row'>
                                                             <div class='col-md-12'>
-                                                                <button class='btn btn-info float-right' id='btn_add_${j}' onclick = addComment(${j},'${tempPost.post_key}')><i class='fas fa-plus'></i> Add</button>
+                                                                <button class='btn btn-info float-right' id='btn_add_${j}' onclick = addComment(${j},'${tempPost.post_key}')>Send&nbsp; <i class='fas fa-angle-right'></i></button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -329,6 +396,16 @@
                                             </div>`;
                                     $('#div_posts').append(postHtml);
                                 }
+                            }
+                            $(`#lbl_PostDate_${j}`).html(date);
+                            if (tempPost.createdBy == 'EMPLOYEE') {
+                                $(`#link_PostCreate_${j}`).html('Created By : ' + tempPost.createdBy + `(${tempPost.createdById})`)
+                                $(`#link_PostCreate_${j}`).attr({
+                                    'href': `/client/project-team?plan_id=${urlParams.get('plan_id')}`,
+                                    'target': '_blank'
+                                })
+                            } else {
+                                $(`#link_PostCreate_${j}`).html('Created By : ' + tempPost.createdBy)
                             }
                         }
                     }
@@ -351,6 +428,9 @@
                                         <i class="fas fa-search"></i>
                                     </div>
                                 </div>
+                                    <div class="row">
+                                        <a class="btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/client/v1/profile/file/${tempDoc.filename}" download="/client/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                    </div>
                             </div>`;
             }
             return (docHtml)
@@ -359,7 +439,19 @@
         }
     }
 
-    function getConversation(post_id, conversation, closed) {
+    function getIcon(conversation) {
+        for (var i = 0; i < conversation.length; i++) {
+            tempConversation = conversation[i];
+            if (tempConversation.status == 'ACCEPTED') {
+                return `<i class='fas fa-check text-success' style='font-size:30px;'></i>`
+            }
+            if (tempConversation.status == 'COMMENT') {
+                return `<i class='fas fa-comment-dots text-primary' style='font-size:30px;'></i>`
+            }
+        }
+    }
+
+    function getConversation(index, post_id, conversation, closed) {
         for (var i = 0; i < conversation.length; i++) {
             tempConversation = conversation[i];
             if (closed == true) {
@@ -389,7 +481,7 @@
                                         <label>Comment</label>
                                     </div>
                                     <div class='col-md-4'>
-                                        <input type='text' id='txt_comment_${tempConversation.conversation_key}' value='${tempConversation.description || ''}' class='form-control' placeholder='Description' disabled>
+                                        <input type='text' id='txt_comment_${tempConversation.conversation_key}' value='${tempConversation.description || ''}' class='form-control' placeholder='Comment' disabled>
                                     </div>
                                 </div>
                                 <div class='row form-group'>
@@ -401,7 +493,6 @@
                                         <select type='text' id='list_status_${tempConversation.conversation_key}' class='form-control' style='display:none;'>
                                             <option value='' hidden>Select Status</option>
                                             <option value='ACCEPTED'>ACCEPTED</option>
-                                            <option value='REJECTED'>REJECTED</option>
                                             <option value='COMMENT'>COMMENT</option>
                                         </select>
                                     </div>
@@ -409,7 +500,7 @@
                                 <div class='row'>
                                     <div class='col-md-12'>
                                         <button class='btn btn-default bg-olive float-right' id='btn_edit_${tempConversation.conversation_key}' onclick = editComment('${post_id}','${tempConversation.conversation_key}')><i class='fas fa-pencil-alt'></i> Change</button>
-                                        <button class='btn btn-primary float-right' id='btn_update_${tempConversation.conversation_key}' onclick = updateComment('${post_id}','${tempConversation.conversation_key}') style="display:none;""><i class='fas fa-pencil-alt'></i> Change</button>
+                                        <button class='btn btn-info float-right' id='btn_update_${tempConversation.conversation_key}' onclick = updateComment('${post_id}','${tempConversation.conversation_key}') style="display:none;""><i class='fas fa-pencil-alt'></i> Update</button>
                                     </div>
                                 </div>
                             </div>`;
@@ -429,6 +520,17 @@
                 body: 'Please select Status',
                 class: 'bg-danger',
             });
+        }
+        if (status == 'COMMENT') {
+            if (!description) {
+                return $(document).Toasts('create', {
+                    title: 'Comment Required',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Add comment for post',
+                    class: 'bg-danger',
+                });
+            }
         }
         $.post({
             type: 'POST',
@@ -482,6 +584,17 @@
     function updateComment(post_id, conversation_id) {
         var description = String($('#txt_comment_' + conversation_id).val()).trim();
         var status = String($('#list_status_' + conversation_id).val());
+        if (status == 'COMMENT') {
+            if (!description) {
+                return $(document).Toasts('create', {
+                    title: 'Comment Required',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Please Add comment for post',
+                    class: 'bg-danger',
+                });
+            }
+        }
         $.post({
             type: 'POST',
             url: '/client/v1/project/review/action/edit',

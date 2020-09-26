@@ -14,7 +14,7 @@ $.get('/client/v1/profile', (data) => {
 if (urlParam.has('plan_id')) {
     $.getJSON(`/client/v1/project/?project_id=${urlParam.get('plan_id')}`, (result) => {
         var projectData = result.data;
-        $('#link_navProjects').html(projectData.name || '' + ` (${projectData.project_id})`);
+        $('#link_navProjects').html(`${projectData.project_name || ''}  (${urlParam.get('plan_id')})`);
         $('#link_navProjects').attr('href', `/client/project-dashboard/?plan_id=${urlParam.get('plan_id')}`);
     }).fail(error => {
         window.location.href = '/employee/projects'
@@ -61,3 +61,8 @@ function session_expire() {
         }
     });
 }
+
+$.get('/client/v1/version', (data) => {
+    var data = data.data
+    $('#lbl_ui_version').html('v' + data.current_version)
+});

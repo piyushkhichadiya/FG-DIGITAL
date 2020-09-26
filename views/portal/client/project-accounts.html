@@ -121,7 +121,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
 
         <!-- Control Sidebar -->
@@ -179,7 +179,7 @@
                                                 <span class="info-box-icon"><i class="fab fa-instagram"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Instagram</span>
-                                                    <span class="info-box-number">${tempSocial.reference}</span>
+                                                    <a href='${tempSocial.reference}' target='_blank'><span class="info-box-number text-white">${tempSocial.reference}</span></a>
                                                 </div>
                                             </div>
                                         </div>`
@@ -190,7 +190,7 @@
                                                 <span class="info-box-icon"><i class="fab fa-facebook-f"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Facebook</span>
-                                                    <span class="info-box-number">${tempSocial.reference}</span>
+                                                    <a href='${tempSocial.reference}' target='_blank'><span class="info-box-number text-white">${tempSocial.reference}</span></a>
                                                 </div>
                                             </div>
                                         </div>`
@@ -201,7 +201,7 @@
                                                 <span class="info-box-icon"><i class="fab fa-whatsapp"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">WhatsApp</span>
-                                                    <span class="info-box-number">${tempSocial.reference}</span>
+                                                    <a href='https://wa.me/91${tempSocial.reference}' target='_blank'><span class="info-box-number text-white">${tempSocial.reference}</span></a>
                                                 </div>
                                             </div>
                                         </div>`
@@ -245,7 +245,7 @@
                                                 <span class="info-box-icon"><i class="fab fa-linkedin-in"></i></span>
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">LinkedIn</span>
-                                                    <span class="info-box-number">${tempSocial.reference}</span>
+                                                    <a href='${tempSocial.reference}' target='_blank'><span class="info-box-number text-white">${tempSocial.reference}</span></a>
                                                 </div>
                                             </div>
                                         </div>`
@@ -268,6 +268,17 @@
                                                 <div class="info-box-content">
                                                     <span class="info-box-text">Outlook</span>
                                                     <span class="info-box-number">${tempSocial.reference}</span>
+                                                </div>
+                                            </div>
+                                        </div>`
+                    }
+                    if (tempSocial.account_name == "Twitter") {
+                        SocialHtml += `<div class="col-md-3 col-sm-6 col-12">
+                                            <div class="info-box bg-lightblue">
+                                                <span class="info-box-icon"><i class="fab fa-twitter"></i></span>
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Twitter</span>
+                                                    <a href='${tempSocial.reference}' target='_blank'><span class="info-box-number text-white">${tempSocial.reference}</span></a>
                                                 </div>
                                             </div>
                                         </div>`

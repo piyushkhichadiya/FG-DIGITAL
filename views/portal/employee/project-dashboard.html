@@ -151,7 +151,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
 
         <!-- Control Sidebar -->
@@ -171,12 +171,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <label>Client ID</label>
-                            <p id="lbl_clientId"></p>
+                        <div class="col-md-2">
+                            <label>Name : &nbsp;</label>
                         </div>
-                        <div class="col-md-6">
-                            <label>Name</label>
+                        <div class="col-md-4">
                             <p id="lbl_ClientName"></p>
                         </div>
                     </div>
@@ -240,7 +238,6 @@
     $('#btn_clients').click(() => {
         $('#modal_Social').modal('show')
         if (dbClient) {
-            $('#lbl_clientId').html(dbClient.client_id)
             $('#lbl_ClientName').html(dbClient.name)
         }
     });

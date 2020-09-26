@@ -121,7 +121,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
 
         <!-- Control Sidebar -->
@@ -176,7 +176,7 @@
                     tempTeam = dbTeam[i];
                     EmpHtml += `<div class="col-md-3">
                                 <div class="card card-widget widget-user">
-                                    <div class="widget-user-header bg-${getColor()}">
+                                    <div class="widget-user-header" style="background-color: ${getColor()};">
                                         <h3 class="widget-user-username">${tempTeam.name}</h3>
                                         <h5 class="widget-user-desc">${tempTeam.position || ''}</h5>
                                     </div>
@@ -211,7 +211,7 @@
     }
 
     function getColor() {
-        var color = ["lightblue", "olive", "maroon"]
+        var color = ["#008dd2", "#ef7f1b", "#a8c944"]
         return color[Math.floor(Math.random() * (color.length - 0) + 0)];
     }
 </script>

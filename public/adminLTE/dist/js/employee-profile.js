@@ -13,9 +13,9 @@ $.get('/employee/v1/profile', (data) => {
 });
 
 if (urlParam.has('plan_id')) {
-    $.getJSON(`/employee/v1/project/fetch?project_id=${urlParam.get('plan_id')}&scope=info%20`, (result) => {
+    $.getJSON(`/employee/v1/project/fetch?project_id=${urlParam.get('plan_id')}&scope=info`, (result) => {
         var projectData = result.data.project;
-        $('#link_navProjects').html(projectData.name || '' + ` (${projectData.project_id})`);
+        $('#link_navProjects').html(`${projectData.name || ''} (${urlParam.get('plan_id')})`);
         $('#link_navProjects').attr('href', `/employee/project-dashboard/?plan_id=${urlParam.get('plan_id')}`);
     }).fail(error => {
         window.location.href = '/employee/projects'
@@ -26,3 +26,8 @@ if (urlParam.has('plan_id')) {
 if ($.fn.dataTable && $.fn.dataTable.ext && $.fn.dataTable.ext.errMode) {
     $.fn.dataTable.ext.errMode = 'none';
 }
+
+$.get('/employee/v1/version', (data) => {
+    var data = data.data
+    $('#lbl_ui_version').html('v' + data.current_version)
+});

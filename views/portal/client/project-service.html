@@ -120,7 +120,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
 
         <!-- Control Sidebar -->
@@ -174,11 +174,11 @@
                 for (var i = 0; i < dbService.length; i++) {
                     var tempService = dbService[i];
                     serviceHtml += `<div class="col-md-3">
-                                        <div class="card card-${getColor()}">
-                                            <div class="card-header">
+                                        <div class="card">
+                                            <div class="card-header" style="background-color: ${getColor()};">
                                                 <h3 class="card-title">${tempService.service_name}</h3>
                                             </div>
-                                            <div class="card-body">
+                                            <div class="card-body" style="min-height: 180px;">
                                                <div id='list_criteria_${i}'>
                                                ${getCriteria(i, tempService.criteria)}
                                                </div> 
@@ -210,7 +210,7 @@
     }
 
     function getColor() {
-        var color = ["lightblue", "olive", "maroon"]
+        var color = ["#008dd2", "#ef7f1b", "#a8c944"]
         return color[Math.floor(Math.random() * (color.length - 0) + 0)];
     }
 </script>

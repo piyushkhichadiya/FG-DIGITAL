@@ -101,7 +101,7 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- <li class="nav-item">
-                            <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
+                            <a href="/client" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
                         </li> -->
                         <li class="nav-item">
                             <a href="/client/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Projects</p></a>
@@ -155,7 +155,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
 
         <!-- Control Sidebar -->
@@ -212,27 +212,11 @@
         window.location.href = '/client/'
     }
 
-    // $.getJSON(`/client/v1/project/${urlParams.get('plan_id')}?scope=team`, (result) => {
-    //     var data = result.data;
-    //     dbTeam = data.data.team;
-    // }).fail(error => {
-    //     error = error.responseJSON
-    //     $(document).Toasts('create', {
-    //         title: 'Error!',
-    //         autohide: true,
-    //         delay: 5000,
-    //         body: 'Team Data Not Found',
-    //         class: 'bg-danger',
-    //     });
-    // });
-
     function getActivity() {
         $.get(`/client/v1/project/${urlParams.get('plan_id')}?scope=activity`, (data) => {
             var projectData = data.data;
             activityData = projectData.data.activity;
             if (activityData) {
-                // paginate(activityData, 5, 1)
-                // console.log(paginate(activityData, 5, 1))
                 for (var i = activityData.length - 1; i >= 0; i--) {
                     var tempActivity = activityData[i];
                     var getDate = new Date(tempActivity.date || tempActivity.createdOn),
@@ -251,19 +235,19 @@
                     var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
                     if (tempActivity.type == 'SERVICE') {
                         var serviceHtml = `<div class="card card-widget collapsed-card">
-                                                <div class="card-header bg-lightblue" data-card-widget="collapse">
+                                                <div class="card-header" style='background-color:#a8c944'>
                                                     <div class="user-block">
                                                         <img class="img-circle" src="images/settings.png" alt="User Image">
                                                         <span class="username">${tempActivity.title|| tempActivity.type}</span>
-                                                        <span class="description" style='color:#FFF' id='lbl_headerDate_${i}'>Created By : ADMIN &nbsp; Date : 2020/09/16 03:24 PM</span>
+                                                        <a class="description" style='color:#FFF' id='lbl_headerDate_${i}'>Created By : ADMIN &nbsp; Date : 2020/09/16 03:24 PM</a>
                                                     </div>
                                                     <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style='color:#000'></i>
                                                     </button>
                                                     </div>
                                                 </div>
                                                 <div class="card-body">
-                                                    <div class="row form-group" id='div_title_${i}' style='display:none;'>
+                                                    <div class="row" id='div_title_${i}' style='display:none;'>
                                                         <div class="col-md-12">
                                                             <p id='lbl_title_${i}'></p>
                                                         </div>
@@ -299,19 +283,19 @@
                     }
                     if (tempActivity.type == 'ACTIVITY') {
                         var activityHtml = `<div class="card card-widget collapsed-card">
-                                                <div class="card-header bg-purple" data-card-widget="collapse">
+                                                <div class="card-header bg-" style='background-color:#008dd2'>
                                                     <div class="user-block">
-                                                        <img class="img-circle" src="images/line-graph.png" alt="User Image">
+                                                        <img class="img-circle" src="images/social.png" alt="User Image">
                                                         <span class="username">${tempActivity.title|| tempActivity.type}</span>
-                                                        <span class="description" style='color:#FFF' id='lbl_headerDate_${i}'>Created By : ADMIN &nbsp; Date : 2020/09/16 03:24 PM</span>
+                                                        <a class="description" style='color:#FFF' id='lbl_headerDate_${i}'>Created By : ADMIN &nbsp; Date : 2020/09/16 03:24 PM</a>
                                                     </div>
                                                     <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style='color:#fff'></i>
                                                     </button>
                                                     </div>
                                                 </div>
                                                 <div class="card-body">
-                                                    <div class="row form-group">
+                                                    <div class="row">
                                                         <div class="col-md-12">
                                                             <p id='lbl_title_${i}'></p>
                                                         </div>
@@ -338,6 +322,10 @@
                     }
                     if (tempActivity.createdBy == 'EMPLOYEE') {
                         $(`#lbl_headerDate_${i}`).html('Created By : ' + tempActivity.createdBy + `(${tempActivity.createdById})` + '&nbsp; ' + `Date : ` + oldDate)
+                        $(`#lbl_headerDate_${i}`).attr({
+                            'href': `/client/project-team?plan_id=${urlParams.get('plan_id')}`,
+                            'target': '_blank'
+                        })
                     } else {
                         $(`#lbl_headerDate_${i}`).html('Created By : ' + tempActivity.createdBy + '&nbsp; ' + `Date : ` + oldDate)
                     }
@@ -401,6 +389,9 @@
                                             <i class="fas fa-search"></i>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <a class="btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/client/v1/profile/file/${tempDoc.filename}" download="/client/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                    </div>
                                 </div>`;
                 } else {
                     docHtml += `<div class="col-md-2 form-group img_container">
@@ -408,7 +399,7 @@
                                         <img src="images/pdfFile.png" onError=this.src='images/notfound.jpg' id='img_post' style="height: 150px; width: 100%">
                                     </div>
                                     <div class="row">
-                                        <a class="btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/employee/v1/profile/file/${tempDoc.filename}" download="/employee/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                        <a class="btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/client/v1/profile/file/${tempDoc.filename}" download="/client/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
                                     </div>
                                 </div>`
                 }

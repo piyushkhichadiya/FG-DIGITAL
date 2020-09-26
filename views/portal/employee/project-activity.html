@@ -226,25 +226,21 @@
                         </div>
                     </div>
                 </div>
+            </section>
+            <!-- /.content -->
         </div>
-
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-    <footer class="main-footer">
-        <div class="float-right d-sm-block">
-            <p id="lbl_ui_version"> VERSION INFO </p>
-        </div>
-        <strong>Copyright &copy <script>
-                document.write(new Date().getFullYear());
-                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
-    </footer>
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
+            </div>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
+        </footer>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
@@ -359,6 +355,7 @@
                                                                 </div>
                                                                 <div class='row form-group' id="div_criteria_${i}">
                                                                 ${getCriteria(i, tempActivity.criteria, tempActivity.service_id, tempActivity.service_deleted)}
+                                                                ${unCapturedCriteria(tempActivity.service_id, 'div_criteria_'+i,i) ||''}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -495,6 +492,10 @@
                     }
                     if (tempActivity.createdBy == 'EMPLOYEE') {
                         $(`#link_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy + `(${tempActivity.createdById})`);
+                        $(`#link_createdBy_${i}`).attr({
+                            'href': `/employee/project-team?plan_id=${urlParams.get('plan_id')}`,
+                            'target': '_blank'
+                        })
                     } else {
                         $(`#lbl_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy)
                     }
@@ -506,6 +507,32 @@
                     $(`#datetimepicker_${i}`).datetimepicker({
                         format: 'Y/MM/D LT'
                     });
+                }
+
+                function unCapturedCriteria(service_id, divID, index) {
+                    if (dbProjectService && addedServiceCriteria[service_id]) {
+                        for (var s = 0; s < dbProjectService.length; s++) {
+                            if (dbProjectService[s].service_id == service_id && dbProjectService[s].criteria) {
+                                var dbServiceCriteria = dbProjectService[s].criteria
+                                var unCapturedHtml = '';
+                                for (var t = 0; t < dbServiceCriteria.length; t++) {
+                                    var tempCriteria = dbServiceCriteria[t];
+                                    if (!addedServiceCriteria[service_id].includes(tempCriteria.criteria_id)) {
+                                        unCapturedHtml += `<div class="col-md-4" id="div_getJson_${index}_${t}">
+                                                    <div class="form-group row">
+                                                            <input id="txt_getCriteria_${index}_${t}_${t+1}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                                        <label id="lbl_getCriteria_${index}_${s}_${t}" class="col-md-6 ml-3">${tempCriteria.criteria} : </label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" id="txt_getValue_${index}_${t}_${t+1}" class="form-control" placeholder="Value">
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+                                    }
+                                }
+                                return unCapturedHtml;
+                            }
+                        }
+                    }
                 }
 
                 if (urlParams.has('scrollTo') && urlParams.get('scrollTo')) {
@@ -529,11 +556,15 @@
         window.location.href = `/employee/project-activity?plan_id=${urlParams.get('plan_id')}&scrollTo=div_activity_${index}`;
     }
 
+    var addedServiceCriteria = {};
+
     function getCriteria(index, criteriaData, service_id, serviceData) {
         if (criteriaData) {
             var criteriaHtml = '';
+            addedServiceCriteria[service_id] = []
             for (var i = 0; i < criteriaData.length; i++) {
                 var tempCriteria = criteriaData[i];
+                addedServiceCriteria[service_id].push(tempCriteria.criteria_id)
                 if (serviceData == true) {
                     criteriaHtml += `<div class="col-md-4" id="div_getJson_${index}_${i}">
                                         <div class="form-group row">
