@@ -97,6 +97,11 @@
                 <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
+            <a class="brand-link"></a>
+            <a href="https://fitnesswithgomzi.com/admin" target="_blank" class="brand-link">
+                <img src="images/fwg.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FWG</span>
+            </a>
         </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -154,9 +159,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script>
-                document.write(new Date().getFullYear());
-                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -195,35 +198,38 @@
 </body>
 <script>
     const urlParams = new URLSearchParams(window.location.search);
+    var planId = urlParams.get('plan_id');
     $(document).ready(() => {
         if (urlParams.has('plan_id')) {
-            var planId = urlParams.get('plan_id');
-            $.get(`/admin/v1/project/fetch/${planId}?scope=info`, (data) => {
-                var data = data.data;
-                var projectData = data.info;
-                var name = projectData.project_name,
-                    description = projectData.description;
-                $('#txt_projectName').val(name)
-                $('#txt_description').val(description)
-            }).fail(error => {
-                error = error.responseJSON
-                $(document).Toasts('create', {
-                    title: 'Error #' + error.code,
-                    autohide: true,
-                    delay: 5000,
-                    body: error.message,
-                    class: 'bg-danger',
-                });
-            });
+            getInfo();
+
         }
     });
 
+    function getInfo() {
+        $.get(`/admin/v1/project/fetch/${planId}?scope=info`, (data) => {
+            var data = data.data;
+            var projectData = data.info;
+            var name = projectData.project_name,
+                description = projectData.description;
+            $('#txt_projectName').val(name)
+            $('#txt_description').val(description)
+        }).fail(error => {
+            error = error.responseJSON
+            $(document).Toasts('create', {
+                title: 'Error #' + error.code,
+                autohide: true,
+                delay: 5000,
+                body: error.message,
+                class: 'bg-danger',
+            });
+        });
+    }
+
     $('#btn_updateInfo').click(() => {
         var project_id = urlParams.get('plan_id'),
-            project_name = $('#txt_projectName').val(),
-            project_description = $('#txt_description').val();
-        var project_name = project_name.trim(),
-            project_description = project_description.trim()
+            project_name = ($('#txt_projectName').val()).trim(),
+            project_description = String($('#txt_description').val()).trim();
         if (!project_name) {
             return $(document).Toasts('create', {
                 title: 'Project Name Missing',
@@ -234,17 +240,6 @@
             });
         } else {
             project_name = String(project_name)
-        }
-        if (!project_description) {
-            return $(document).Toasts('create', {
-                title: 'Description Missing',
-                autohide: true,
-                delay: 5000,
-                body: 'Please Enter Project Description',
-                class: 'bg-danger',
-            });
-        } else {
-            project_description = String(project_description)
         }
         $.post({
             type: 'POST',
@@ -262,7 +257,7 @@
                     body: 'Projects Info. Updated',
                     class: 'bg-success',
                 });
-
+                getInfo();
             },
             error: error => {
                 error = error.responseJSON

@@ -95,6 +95,11 @@
                 <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
+            <a class="brand-link"></a>
+            <a href="https://fitnesswithgomzi.com/admin" target="_blank" class="brand-link">
+                <img src="images/fwg.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FWG</span>
+            </a>
         </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -175,9 +180,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script>
-                document.write(new Date().getFullYear());
-                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -249,6 +252,17 @@
 <script>
     var tblService = $("#tbl_Service").DataTable({
         "responsive": true,
+        "columns": [{
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "30%",
+        }, {
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "20%",
+        }, ]
     });
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -287,7 +301,6 @@
             if (serviceData) {
                 for (var i = 0; i < serviceData.length; i++) {
                     var tempService = serviceData[i];
-                    getServiceTitle(tempService.service_id)
                     var button = `<div class="btn-group">
                                         <button class='btn btn-success m-1' id="btn_activate_${i}" onclick=activate(${i},'${tempService.service_id}')><i class='fas fa-hourglass-start'></i> Activate</button>
                                         <button class='btn btn-secondary m-1' id="btn_deactivate_${i}" onclick=deactivate(${i},'${tempService.service_id}')><i class='fas fa-ban'></i> Deactivate</button>
@@ -295,13 +308,20 @@
                                     </div>`,
                         active = tempService.active;
                     if (active == true) {
-                        var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-hourglass-start'></i> Active</p>`
+                        var status = `<p style='color:#28a745; font-size:17px;'><i class='fas fa-circle'></i> Active</p>`
                     } else {
                         status = `<p style='color:#ff0000; font-size:17px;'><i class='fas fa-ban'></i> Deactivated</p>`
                     }
-                    tblService.row.add([
-                        `${i+1}`, getServiceTitle(tempService.service_id), status, button
-                    ]).draw();
+                    if (dbService) {
+                        for (var j = 0; j < dbService.length; j++) {
+                            tempServiceName = dbService[j];
+                            if (tempServiceName.service_id == tempService.service_id) {
+                                tblService.row.add([
+                                    `${i+1}`, tempServiceName.title, status, button
+                                ]).draw();
+                            }
+                        }
+                    }
                     if (active == false) {
                         $(`#btn_deactivate_${i}`).hide();
                         $(`#btn_activate_${i}`).show();

@@ -95,6 +95,11 @@
                 <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
+            <a class="brand-link"></a>
+            <a href="https://fitnesswithgomzi.com/admin" target="_blank" class="brand-link">
+                <img src="images/fwg.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FWG</span>
+            </a>
         </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -175,9 +180,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script>
-                    document.write(new Date().getFullYear());
-                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -208,6 +211,7 @@
                                     <option value="LinkedIn">LinkedIn</option>
                                     <option value="Instagram">Instagram</option>
                                     <option value="Facebook">Facebook</option>
+                                    <option value="Twitter">Twitter</option>
                                     <option value="Gmail">Gmail</option>
                                     <option value="WhatsApp">WhatsApp</option>
                                     <option value="Outlook">Outlook</option>
@@ -219,7 +223,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Reference</label>
-                                <input type="text" class="form-control" id="txt_reference" placeholder="Reference">
+                                <input type="text" class="form-control" id="txt_reference" placeholder="URL">
                             </div>
                         </div>
                     </div>
@@ -264,6 +268,16 @@
 <script>
     var tblSocial = $("#tbl_social").DataTable({
         "responsive": true,
+        "columns": [{
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "15%",
+        }, {
+            "width": "30%",
+        }, {
+            "width": "15%",
+        }, ]
     });
     const urlParams = new URLSearchParams(window.location.search);
     var dbAccount

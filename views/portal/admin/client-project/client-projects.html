@@ -95,6 +95,11 @@
                 <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
+            <a class="brand-link"></a>
+            <a href="https://fitnesswithgomzi.com/admin" target="_blank" class="brand-link">
+                <img src="images/fwg.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FWG</span>
+            </a>
         </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -178,9 +183,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script>
-                document.write(new Date().getFullYear());
-                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
@@ -215,9 +218,28 @@
 <script>
     var tblProject = $("#tbl_project").DataTable({
         "responsive": true,
+        "columns": [{
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "10%",
+        }, {
+            "width": "35%",
+        }, {
+            "width": "10%",
+        }, {
+            "width": "10%",
+            "className": 'text-center'
+        }, {
+            "width": "20%",
+        }, ]
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+    var dbClient;
+    $.getJSON(`/admin/v1/project/get?client_id=${urlParams.get('client_id')}`, (result) => {
+        dbClient = result.data
+    });
 
     $(document).ready(() => {
 
@@ -261,9 +283,16 @@
                     if (status == 'expired') {
                         status = `<p style='color:#dc3545; font-size:17px;'><i class='fas fa-calendar-times'></i> Expired</p>`
                     }
-                    tblProject.row.add([
-                        `${i+1}`, tempProject.project_id, tempProject.plan, y + "/" + m + "/" + d, status, button
-                    ]).draw();
+                    if (dbClient) {
+                        for (var j = 0; j < dbClient.length; j++) {
+                            tempClient = dbClient[j]
+                            if (tempProject.project_id == tempClient.project_id) {
+                                tblProject.row.add([
+                                    `${i+1}`, tempProject.project_id, tempClient.project_name || '', y + "/" + m + "/" + d, status, button
+                                ]).draw();
+                            }
+                        }
+                    }
                 }
             }
         }).fail(error => {

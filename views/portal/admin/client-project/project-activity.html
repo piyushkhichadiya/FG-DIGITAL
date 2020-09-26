@@ -24,6 +24,10 @@
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
     <link rel="stylesheet" href="dist/css/ekko-lightbox.css">
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
         .middle {
             transition: .5s ease;
             opacity: 0;
@@ -127,6 +131,11 @@
                 <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
+            <a class="brand-link"></a>
+            <a href="https://fitnesswithgomzi.com/admin" target="_blank" class="brand-link">
+                <img src="images/fwg.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FWG</span>
+            </a>
         </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -243,25 +252,21 @@
                         </div>
                     </div>
                 </div>
+            </section>
+            <!-- /.content -->
         </div>
-
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-    <footer class="main-footer">
-        <div class="float-right d-sm-block">
-            <p id="lbl_ui_version"> VERSION INFO </p>
-        </div>
-        <strong>Copyright &copy <script>
-                document.write(new Date().getFullYear());
-                </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
-    </footer>
-    <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
-        <!-- Control sidebar content goes here -->
-    </aside>
-    <!-- /.control-sidebar -->
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
+            </div>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
+        </footer>
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
@@ -306,6 +311,8 @@
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+
+
     var dbService;
     var dbProjectService;
     $.getJSON('/admin/v1/service/get', (result) => {
@@ -339,17 +346,17 @@
         if (plan_id == '') {
             window.location.href = `/admin/client/project?client_id=${urlParams.get('client_id')}`
         }
-        getactivity(plan_id)
+        getActivity(plan_id)
     }
 
-    function getactivity(plan_id) {
+    function getActivity(plan_id) {
         $.get(`/admin/v1/project/fetch/${plan_id}?scope=%20activity`, (data) => {
             var projectData = data.data;
             activityData = projectData.activity;
             if (activityData) {
                 for (var i = activityData.length - 1; i >= 0; i--) {
                     var tempActivity = activityData[i];
-                    var getDate = new Date(tempActivity.date || tempActivity.createdOn),
+                    var getDate = new Date(tempActivity.date),
                         d = ('0' + getDate.getDate()).slice(-2),
                         m = ('0' + (getDate.getMonth() + 1)).slice(-2),
                         y = getDate.getFullYear(),
@@ -364,10 +371,9 @@
                     }
 
                     var date = y + '/' + m + '/' + d;
-                    var oldDate = y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time;
-
+                    var oldDate = (y + '/' + m + '/' + d + ' ' + ('0' + hr).slice(-2) + ':' + minutes + ' ' + time);
                     if (tempActivity.type == 'SERVICE') {
-                        var serviceHtml = `<div>
+                        var serviceHtml = `<div id="div_activity_${i}">
                                                     <i class="fa fa-cogs bg-blue"></i>
                                                     <div class="timeline-item">
                                                         <span class="time" id="lbl_headerDate_${i}"></span>
@@ -389,7 +395,8 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class='row form-group' id="div_criteria_${i}">
-                                                                ${getCriteria(i, tempActivity.criteria, tempActivity.service_deleted)}
+                                                                ${getCriteria(i, tempActivity.criteria, tempActivity.service_id,tempActivity.service_deleted)}
+                                                                ${unCapturedCriteria(tempActivity.service_id, 'div_criteria_'+i,i) ||''}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -428,7 +435,7 @@
                                                         
                                                         <div id='div_border_${i}' style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                                             <div class="row form-group" id="div_image_${i}">
-                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key, tempActivity.service_deleted)}
+                                                                ${getDocument(i,tempActivity.documents, tempActivity.activity_key, tempActivity.service_deleted)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
                                                                 <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                                     <div class="plus">
@@ -454,8 +461,9 @@
                             }
                         }
                     }
+
                     if (tempActivity.type == 'ACTIVITY') {
-                        var activityHtml = `<div>
+                        var activityHtml = `<div id="div_activity_${i}">
                                             <i class="fa fa-chart-line bg-green"></i>
                                                     <div class="timeline-item">
                                                         <span class="time" id="lbl_headerDate_${i}"></span>
@@ -504,7 +512,7 @@
                                                         </div>
                                                         <div id='div_border_${i}' style="border: 1px solid #b1aeae; padding:15px; border-radius:5px;" class="m-2">
                                                             <div class="row form-group" id="div_image_${i}">
-                                                                ${getDocument(tempActivity.documents, tempActivity.activity_key)}
+                                                                ${getDocument(i,tempActivity.documents, tempActivity.activity_key)}
                                                                 <input type="file" id="file_post_${i}" onchange=uploadFile(${i},'${tempActivity.activity_key}') accept=".png, .jpg, .jpeg, .pdf" style="display: none;" multiple>
                                                                 <div class="col-md-2" id="div_post_${i}" onclick="$('#file_post_${i}').click()" style="height: 150px;border-radius:2%; cursor: pointer;" onmouseover="this.style.backgroundColor='#C0C0C0';this.style.color='#FFFFFF'" onmouseout="this.style.backgroundColor='#FFFFFF';this.style.color='#000000'">
                                                                     <div class="plus">
@@ -526,16 +534,50 @@
                     }
                     if (tempActivity.createdBy == 'EMPLOYEE') {
                         $(`#link_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy + `(${tempActivity.createdById})`);
-                        $(`#link_createdBy_${i}`).attr('href', `/admin/employee/view?emp_id=${tempActivity.createdById}`)
+                        $(`#link_createdBy_${i}`).attr({
+                            'href': `/admin/employee/view?emp_id=${tempActivity.createdById}`,
+                            'target': '_blank'
+                        })
                     } else {
                         $(`#lbl_createdBy_${i}`).html('Created By : ' + tempActivity.createdBy)
                     }
-                    $(`#lbl_headerDate_${i}`).html(`Date : ` + oldDate)
+                    if (tempActivity.date) {
+                        $(`#lbl_headerDate_${i}`).html(`Date : ` + oldDate)
+                    }
                     $(`#txt_description_${i}`).val(tempActivity.description)
 
                     $(`#datetimepicker_${i}`).datetimepicker({
                         format: 'Y/MM/D LT'
                     });
+                }
+
+                function unCapturedCriteria(service_id, divID, index) {
+                    if (dbService && addedServiceCriteria[service_id]) {
+                        for (var s = 0; s < dbService.length; s++) {
+                            if (dbService[s].service_id == service_id && dbService[s].criteria) {
+                                var dbServiceCriteria = dbService[s].criteria
+                                var unCapturedHtml = '';
+                                for (var t = 0; t < dbServiceCriteria.length; t++) {
+                                    var tempCriteria = dbServiceCriteria[t];
+                                    if (!addedServiceCriteria[service_id].includes(tempCriteria.criteria_id)) {
+                                        unCapturedHtml += `<div class="col-md-4" id="div_getJson_${index}_${t}">
+                                                    <div class="form-group row">
+                                                            <input id="txt_getCriteria_${index}_${t}" value="${tempCriteria.criteria_id}" style="display:none;">
+                                                        <label id="lbl_getCriteria_${index}_${s}_${t}" class="col-md-6 ml-3">${tempCriteria.criteria} : </label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" id="txt_getValue_${index}_${t}" class="form-control" placeholder="Value">
+                                                        </div>
+                                                    </div>
+                                                </div>`;
+                                    }
+                                }
+                                return unCapturedHtml;
+                            }
+                        }
+                    }
+                }
+                if (urlParams.has('scrollTo') && urlParams.get('scrollTo')) {
+                    window.location.href = '#' + urlParams.get('scrollTo')
                 }
             }
         }).fail(error => {
@@ -550,11 +592,16 @@
         });
     }
 
-    function getCriteria(index, criteria, serviceData) {
+    // For DB Criteria
+    var addedServiceCriteria = {};
+
+    function getCriteria(index, criteria, service_id, serviceData) {
         if (criteria) {
             var criteriaHtml = '';
+            addedServiceCriteria[service_id] = []
             for (var i = 0; i < criteria.length; i++) {
                 tempCriteria = criteria[i];
+                addedServiceCriteria[service_id].push(tempCriteria.criteria_id)
                 if (serviceData == true) {
                     criteriaHtml += `<div class="col-md-4" id="div_getJson_${index}_${i}">
                                         <div class="form-group row">
@@ -581,7 +628,7 @@
         }
     };
 
-    function getDocument(document, activity_id, service) {
+    function getDocument(index, document, activity_id, service) {
         if (document) {
             var docHtml = '';
             for (var i = 0; i < document.length; i++) {
@@ -590,7 +637,7 @@
                 var ext = file.substring(file.lastIndexOf('.') + 1);
                 if (service == true) {
                     if (ext != 'pdf') {
-                        docHtml += `<div class="col-md-2 img_container form-group">
+                        docHtml += `<div class="col-md-2 img_container">
                                     <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' onError=this.href='images/notfound.jpg' data-toggle="lightbox">
                                         <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
@@ -599,12 +646,9 @@
                                     </div>
                                 </div>`;
                     } else {
-                        docHtml += `<div class="col-md-2">
+                        docHtml += `<div class="col-md-2 img_container">
                                     <div>
-                                        <embed src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
-                                        <div class="middle">
-                                            <i class="fas fa-search"></i>
-                                        </div>
+                                        <img src="images/pdfFile.png" onError=this.src='images/notfound.jpg' id='img_post' style="height: 150px; width: 100%">
                                     </div>
                                     <div class="row">
                                         <a class="btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
@@ -613,28 +657,25 @@
                     }
                 } else {
                     if (ext != 'pdf') {
-                        docHtml += `<div class="col-md-2 img_container form-group">
-                                    <div class='' href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
+                        docHtml += `<div class="col-md-2 img_container">
+                                    <div href='/admin/v1/profile/file/${tempDoc.filename}' data-toggle="lightbox">
                                         <img src="/admin/v1/profile/file/${tempDoc.filename}" onError=this.src='images/notfound.jpg' id='img_post' class="image" style="height: 150px; width: 100%">
                                         <div class="middle">
                                             <i class="fas fa-search"></i>
                                         </div>
                                     </div>
                                     <div>
-                                        <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                        <button class="btn btn-outline-danger btn-block mt-1 mb-1 btn-sm" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile(${index},'${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
                                     </div>
                                 </div>`;
                     } else {
-                        docHtml += `<div class="col-md-2">
+                        docHtml += `<div class="col-md-2 img_container">
                                     <div>
-                                        <embed  src="/admin/v1/profile/file/${tempDoc.filename}" width="100%" height="150px"/>
-                                        <div class="middle">
-                                            <i class="fas fa-search"></i>
-                                        </div>
+                                        <img src="images/pdfFile.png" onError=this.src='images/notfound.jpg' id='img_post' style="height: 150px; width: 100%">
                                     </div>
                                     <div class="row">
-                                        <a class="col-md-6 btn btn-outline-success btn-block mt-1 btn-xs mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
-                                        <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-xs col-md-6" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile('${tempDoc.filename}')><i class="fas fa-trash-alt"></i> Remove</button>
+                                        <a class="col-md-6 btn btn-outline-success btn-block mt-1 btn-sm mb-1" href="/admin/v1/profile/file/${tempDoc.filename}" download="/admin/v1/profile/file/${tempDoc.filename}"><i class="fa fa-download" aria-hidden="true"></i> Download</a>
+                                        <button class="btn btn-outline-danger btn-block mb-1 mt-1 btn-sm col-md-6" id="btn_removeDoc_${tempDoc.filename}" onclick=removeFile(${index},'${tempDoc.filename}','${activity_id}')><i class="fas fa-trash-alt"></i> Remove</button>
                                     </div>
                                 </div>`
                     }
@@ -684,7 +725,7 @@
                     </div>`;
                 $('#div_image_' + index).prepend(pdf);
             } else {
-                image = `<div  id='div_unUploaded_${i}' class="col-md-2 img_container form-group">
+                image = `<div  id='div_unUploaded_${i}' class="col-md-2 img_container">
                         <div href='${objectURL}' data-toggle="lightbox">
                             <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
@@ -806,7 +847,7 @@
                     </div>`;
                 $('#div_pdf').prepend(pdf);
             } else {
-                image = `<div id='div_uploaded_${i}' class="col-md-2 img_container form-group">
+                image = `<div id='div_uploaded_${i}' class="col-md-2 img_container">
                         <div class='' href='${objectURL}' data-toggle="lightbox">
                             <img src="${objectURL}" id='img_post' class="image" style="height: 150px; width: 100%">
                             <div class="middle">
@@ -850,9 +891,8 @@
                 body: 'Please select Activity Type',
                 class: 'bg-danger',
             });
-        } else {
-            formData.append('type', type)
         }
+        formData.append('type', type)
         if (service_id) {
             formData.append('service_id', service_id)
         }
@@ -898,6 +938,7 @@
                 }
                 criteriaString = JSON.stringify(criteria);
                 formData.append('criteria', criteriaString)
+
             } else {
                 return $(document).Toasts('create', {
                     title: 'Service Required',
@@ -920,10 +961,9 @@
                     body: 'Please Enter Title for Activity',
                     class: 'bg-danger',
                 });
-            } else {
-                formData.append('title', title)
             }
         }
+        formData.append('title', title)
         var d = new Date();
         var strDate = d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
         if (date) {
@@ -984,7 +1024,12 @@
         });
     });
 
+    function redirect(index) {
+        window.location.href = `/admin/client/project-activity?client_id=${urlParams.get('client_id')}&plan_id=${urlParams.get('plan_id')}&scrollTo=div_activity_${index}`;
+    }
+
     function updateActivity(index, activity_id, oldDate) {
+
         var getDate = $('#txt_date_' + index).val(),
             description = String($('#txt_description_' + index).val()).trim(),
             title = String($('#txt_title_' + index).val()).trim();
@@ -995,56 +1040,56 @@
         var divJson = $(`[id^=div_getJson_${index}]`);
         if ($('#txt_type_' + index).val() == 'SERVICE') {
             for (var i = 0; i < divJson.length; i++) {
-                criteria[i] = {
-                    criteria_id: Number($(`#txt_getCriteria_${index}_${i}`).val()),
-                    value: String($(`#txt_getValue_${index}_${i}`).val())
-                }
-                if (isNaN(criteria[i].value)) {
-                    return $(document).Toasts('create', {
-                        title: 'Please Enter valid Input',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Value must be numbers',
-                        class: 'bg-danger',
-                    });
-                }
-                if ((criteria[i].value) <= 0) {
-                    return $(document).Toasts('create', {
-                        title: 'Error!',
-                        autohide: true,
-                        delay: 5000,
-                        body: 'Value must be Greater than 0',
-                        class: 'bg-danger',
-                    });
+                if ($(`#txt_getValue_${index}_${i}`).val() != '') {
+                    criteria[i] = {
+                        criteria_id: Number($(`#txt_getCriteria_${index}_${i}`).val()),
+                        value: String($(`#txt_getValue_${index}_${i}`).val())
+                    }
+                    if (isNaN(criteria[i].value)) {
+                        return $(document).Toasts('create', {
+                            title: 'Please Enter valid Input',
+                            autohide: true,
+                            delay: 5000,
+                            body: 'Value must be numbers',
+                            class: 'bg-danger',
+                        });
+                    }
                 }
             }
             formData.append('criteria', JSON.stringify(criteria))
+
         }
-        var d = new Date(oldDate),
-            month = '' + (d.getMonth() + 1),
-            day = '' + d.getDate(),
-            year = d.getFullYear();
-        if (month.length < 2) month = month;
-        if (day.length < 2) day = day;
-        var date = ([year, month, day].join('/'));
-        var getNewDate = new Date(getDate),
-            d = getNewDate.getDate(),
-            m = getNewDate.getMonth() + 1,
-            y = getNewDate.getFullYear(),
-            hr = getNewDate.getHours().toString().padStart(2, "0"),
-            minutes = getNewDate.getMinutes().toString().padStart(2, "0");
-        var newDate = y + '/' + m + '/' + d + ' ' + hr + ':' + minutes;
-        var dateOld = y + '/' + m + '/' + d;
-        if (Date.parse(dateOld) > Date.parse(date)) {
-            return $(document).Toasts('create', {
-                title: 'Error!',
-                autohide: true,
-                delay: 5000,
-                body: 'Date must be Less than created Date',
-                class: 'bg-danger',
-            });
+        for (var pair of formData.entries()) {
+            console.log(pair[1]);
         }
-        formData.append('date', newDate)
+        return
+        if (getDate) {
+            var d = new Date(oldDate),
+                month = '' + (d.getMonth() + 1),
+                day = '' + d.getDate(),
+                year = d.getFullYear();
+            if (month.length < 2) month = month;
+            if (day.length < 2) day = day;
+            var date = ([year, month, day].join('/'));
+            var getNewDate = new Date(getDate),
+                d = getNewDate.getDate(),
+                m = getNewDate.getMonth() + 1,
+                y = getNewDate.getFullYear(),
+                hr = getNewDate.getHours().toString().padStart(2, "0"),
+                minutes = getNewDate.getMinutes().toString().padStart(2, "0");
+            var newDate = y + '/' + m + '/' + d + ' ' + hr + ':' + minutes;
+            var dateOld = y + '/' + m + '/' + d;
+            if (Date.parse(dateOld) > Date.parse(date)) {
+                return $(document).Toasts('create', {
+                    title: 'Error!',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Date must be Less than created Date',
+                    class: 'bg-danger',
+                });
+            }
+            formData.append('date', newDate)
+        }
         if (description) {
             formData.append('description', description)
         }
@@ -1054,10 +1099,6 @@
         for (var i = 0; i < $('#file_post_' + index)[0].files.length; ++i) {
             formData.append('file', $('#file_post_' + index)[0].files[i]);
         }
-        // for (var pair of formData.entries()) {
-        //     console.log(pair[1]);
-        // }
-        // return
         $.post({
             type: 'POST',
             url: '/admin/v1/project/activity/update',
@@ -1072,7 +1113,7 @@
                     body: 'Activity updated Successfully',
                     class: 'bg-success',
                 });
-                window.location.reload();
+                redirect(index)
             },
             error: error => {
                 error = error.responseJSON
@@ -1141,7 +1182,7 @@
         });
     }
 
-    function removeFile(filename, activity_id) {
+    function removeFile(index, filename, activity_id) {
         Swal.fire({
             title: 'Are you sure?',
             text: "You want to remove this File",
@@ -1166,7 +1207,7 @@
                             body: 'File removed Successfully',
                             class: 'bg-success',
                         });
-                        window.location.reload();
+                        redirect(index)
                     },
                     error: error => {
                         error = error.responseJSON

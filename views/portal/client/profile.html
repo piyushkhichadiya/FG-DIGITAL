@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>My Account - FG Digital</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="dist/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <!-- Toastr -->
+    <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
+    <!-- pace-progress -->
+    <link rel="stylesheet" href="plugins/pace-progress/themes/green/pace-theme-minimal.css">
+</head>
+
+<body class="hold-transition sidebar-mini sidebar-collapse">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="javascript:void(0);" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li><i class="fa fa-sign-out-alt mt-1 mr-2" title="Logout" onclick="logout()" style="cursor: pointer"></i></li>
+
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-success elevation-4">
+            <!-- Brand Logo -->
+            <a href="/client/projects" class="brand-link">
+                <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">FG Digital</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="image">
+                        <img src="images/profile.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
+
+                    </div>
+                    <div class="info">
+                        <a href="/client/profile" id="lbl_profileName" class="d-block">Member Profile</a>
+                    </div>
+                </div>
+
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+                        <!-- <li class="nav-item">
+                            <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
+                        </li> -->
+                        <li class="nav-item">
+                            <a href="/client/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Projects</p></a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>Profile</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="/employee">Home</a></li>
+                                <li class="breadcrumb-item active">Profile</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="card-body card">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Name</label>
+                                    <input type="text" class="form-control" id="txt_username" placeholder="Enter Username">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Email</label>
+                                    <p id="lbl_email"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-outline-primary float-right" id="btn_updateProfile"><i class="fas fa-pencil-alt"></i> Update Profile</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <h4 class="header-text">Update Password</h4>
+                        <div class="row">
+                            <div class="col-md-3 mt-2">
+                                <input type="password" class="form-control" id="txt_password" placeholder="Enter New Password">
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <input type="password" class="form-control" id="txt_cPassword" placeholder="Confirm Password">
+                            </div>
+                            <div class="col-md-3 mt-2">
+                                <button class="btn btn-outline-primary" id="btn_update"><i class="fas fa-pencil-alt"></i> Update Password</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <footer class="main-footer">
+            <div class="float-right d-sm-block">
+                <p id="lbl_ui_version"> VERSION INFO </p>
+            </div>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
+        </footer>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+
+
+    <!-- jQuery -->
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="dist/js/adminlte.min.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script src="dist/js/demo.js"></script>
+    <!-- sweetalert -->
+    <script src="dist/js/sweetalert2.js"></script>
+    <!-- Toaster -->
+    <script src="plugins/toastr/toastr.min.js"></script>
+    <!-- pace-progress -->
+    <script src="plugins/pace-progress/pace.js"></script>
+    <!-- Custom JS -->
+    <script src="dist/js/client-profile.js"></script>
+
+</body>
+<script>
+    $(document).ready(() => {
+        getProfile()
+    });
+
+    function getProfile() {
+        $.get("/client/v1/profile", (data) => {
+            var dbdata = data.data
+            $('#txt_username').val(dbdata.name)
+            $('#lbl_email').html(dbdata.email)
+        }).fail(error => {
+            if (error.status == 404 || error.status == 401) {
+                logout(true)
+            }
+        });
+    }
+
+    $('#btn_updateProfile').click(() => {
+        var username = ($('#txt_username').val()).trim();
+        if (!username) {
+            return $(document).Toasts('create', {
+                title: 'Name required',
+                autohide: true,
+                delay: 5000,
+                body: 'Please enter name for update',
+                class: 'bg-danger',
+            });
+        }
+        username = String(username)
+        $.post({
+            url: '/client/v1/profile/update',
+            data: {
+                "name": username,
+
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Updated',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Your Profile Has been Successfully Updated',
+                    class: 'bg-success',
+                });
+                getProfile()
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_updateProfile').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_updateProfile').removeAttr('disabled')
+            }
+        });
+    });
+
+    $('#btn_update').click(() => {
+        var password = ($('#txt_password').val()).trim(),
+            confirm_password = ($('#txt_cPassword').val()).trim();
+        if (!password || !confirm_password) {
+            return $(document).Toasts('create', {
+                title: 'Password and Confirm password required',
+                autohide: true,
+                delay: 5000,
+                body: 'Add Password and Confirm Password',
+                class: 'bg-danger',
+            });
+        } else {
+            password = String(password)
+            confirm_password = String(confirm_password)
+        }
+        if (password != confirm_password) {
+            return $(document).Toasts('create', {
+                title: 'Error!',
+                autohide: true,
+                delay: 5000,
+                body: 'Password and Confirm Password must be same',
+                class: 'bg-danger',
+            });
+        }
+        $.post({
+            url: '/client/v1/profile/password',
+            data: {
+                "password": password,
+            },
+            success: result => {
+                $(document).Toasts('create', {
+                    title: 'Password Changed',
+                    autohide: true,
+                    delay: 5000,
+                    body: 'Your Password has been changed Successfully',
+                    class: 'bg-success',
+                });
+                $('#txt_password').val(null)
+                $('#txt_cPassword').val(null)
+            },
+            error: error => {
+                error = error.responseJSON
+                $(document).Toasts('create', {
+                    title: 'Error #' + error.code,
+                    autohide: true,
+                    delay: 5000,
+                    body: error.message,
+                    class: 'bg-danger',
+                });
+            },
+            beforeSend: () => {
+                $('#btn_update').attr('disabled', true)
+            },
+            complete: () => {
+                $('#btn_update').removeAttr('disabled')
+            }
+        });
+
+    })
+</script>
+
+</html>

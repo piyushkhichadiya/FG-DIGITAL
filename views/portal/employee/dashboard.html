@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Dashboard - Admin- FG Digital</title>
+    <title>Dashboard - Member- FG Digital</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico">
@@ -47,7 +47,7 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-success elevation-4">
             <!-- Brand Logo -->
-            <a href="/admin" class="brand-link">
+            <a href="/employee" class="brand-link">
                 <img src="images/logo-small.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">FG Digital</span>
             </a>
@@ -60,7 +60,7 @@
                         <img src="images/logo-small.png" id="img_profileImage" class="img-circle elevation-2" alt="User Image" onerror="this.src='images/logo-small.png'">
                     </div>
                     <div class="info">
-                        <a href="/admin/profile" id="lbl_profileName" class="d-block">Admin Profile</a>
+                        <a href="/employee/profile" id="lbl_profileName" class="d-block">Member Profile</a>
                     </div>
                 </div>
 
@@ -69,20 +69,11 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+                        <!--<li class="nav-item">
+                            <a href="/employee" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
+                        </li> -->
                         <li class="nav-item">
-                            <a href="/admin" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/admin/plan" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Plans</p></a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/admin/client" class="nav-link"><i class="nav-icon fas fa-user-friends"></i><p>Client</p></a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/admin/employee" class="nav-link"><i class="nav-icon fas fa-users"></i><p>Team</p></a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/admin/services" class="nav-link"><i class="nav-icon fas fa-cogs"></i><p>Services</p></a>
+                            <a href="/employee/projects" class="nav-link"><i class="nav-icon fas fa-tags"></i><p>Projects</p></a>
                         </li>
                     </ul>
                 </nav>
@@ -102,7 +93,7 @@
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="/admin">Admin</a></li>
+                                <li class="breadcrumb-item"><a href="/employee">Home</a></li>
                                 <li class="breadcrumb-item active">Dashboard</li>
                             </ol>
                         </div>
@@ -120,45 +111,13 @@
                                 <!-- small card -->
                                 <div class="small-box bg-info">
                                     <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Members</p>
+                                        <h3 id="lbl_project"></h3>
+                                        <p>Total Projects</p>
                                     </div>
                                     <div class="icon">
                                         <i class="fas fa-users"></i>
                                     </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-success">
-                                    <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Projects</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-copy"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-6">
-                                <!-- small card -->
-                                <div class="small-box bg-warning">
-                                    <div class="inner">
-                                        <h3>150</h3>
-                                        <p>Pending Reviews</p>
-                                    </div>
-                                    <div class="icon">
-                                        <i class="fas fa-tasks"></i>
-                                    </div>
-                                    <a href="#" class="small-box-footer">
-			                More info <i class="fas fa-arrow-circle-right"></i>
-			              </a>
+                                    <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -174,7 +133,7 @@
             <div class="float-right d-sm-block">
                 <p id="lbl_ui_version"> VERSION INFO </p>
             </div>
-            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/"> FG Digital.</a></strong>
+            <strong>Copyright &copy <script> document.write(new Date().getFullYear()); </script> <a href="https://fgdigitals.com/" target="_blank"> FG Digital.</a> Powered By <a href="https://fitnesswithgomzi.com/" target="_blank"> Fitness With Gomzi</a></strong>
         </footer>
 
         <!-- Control Sidebar -->
@@ -203,11 +162,14 @@
     <!-- sweetalert -->
     <script src="dist/js/sweetalert2.js"></script>
     <!-- Custom JS -->
-    <script src="dist/js/logout.js"></script>
-    <script src="dist/js/profile.js"></script>
+    <script src="dist/js/employee-logout.js"></script>
+    <script src="dist/js/employee-profile.js"></script>
 
 </body>
 <script>
+    $(document).ready(() => {
+        window.location.href = '/employee/projects'
+    });
 </script>
 
 </html>
